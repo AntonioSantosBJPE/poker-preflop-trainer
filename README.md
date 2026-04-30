@@ -75,7 +75,7 @@ Abre a aplicação em modo desenvolvimento (hot reload no renderer).
 
 ### Testes E2E (Playwright)
 
-A UI corre no **Electron** (IPC + `file://`); os testes lançam `out/main/index.js` com dados de utilizador isolados (`PT_E2E_USER_DATA`) e token em ficheiro (`PT_E2E_TOKEN_FILE`, sem `keytar`).
+A UI corre no **Electron** (IPC + `file://`); os testes lançam `out/main/index.js` com dados de utilizador isolados (`PT_E2E_USER_DATA`) e token em ficheiro (`PT_E2E_TOKEN_FILE`, sem `keytar`). Os cenários estão em `e2e/*.spec.ts` com partilha de lógica em `e2e/helpers/`. Para agentes: convenções em `.cursor/skills/preflop-e2e-playwright/SKILL.md`.
 
 ```bash
 pnpm exec playwright install   # primeira vez: browsers do Playwright
