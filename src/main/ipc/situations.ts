@@ -3,12 +3,7 @@ import { and, asc, eq, inArray, ne } from 'drizzle-orm'
 import { actions, rangeCells, situations } from '../db/schema'
 import { getDb } from '../db/client'
 import { requireUserId } from '../services/session'
-import type { Position } from '@shared/constants'
-import { POSITIONS } from '@shared/constants'
-
-function assertPosition(p: string): asserts p is Position {
-  if (!POSITIONS.includes(p as Position)) throw new Error('Posição inválida')
-}
+import { parseSituationPayload } from '@shared/forms/situationSchemas'
 
 export function registerSituationsIpc(): void {
   ipcMain.handle('situations:list', async () => {
@@ -95,9 +90,7 @@ export function registerSituationsIpc(): void {
 
   ipcMain.handle('situations:create', async (_e, payload: unknown) => {
     const userId = await requireUserId()
-    const p = payload as SituationPayload
-    validateSituationPayload(p)
-    assertPosition(p.position)
+    const p = parseSituationPayload(payload)
     const db = getDb()
     const dup = await db
       .select({ id: situations.id })
@@ -156,9 +149,7 @@ export function registerSituationsIpc(): void {
 
   ipcMain.handle('situations:update', async (_e, id: number, payload: unknown) => {
     const userId = await requireUserId()
-    const p = payload as SituationPayload
-    validateSituationPayload(p)
-    assertPosition(p.position)
+    const p = parseSituationPayload(payload)
     const db = getDb()
     const row = await db
       .select()
@@ -313,44 +304,4 @@ export function registerSituationsIpc(): void {
       return sid
     })
   })
-}
-
-type SituationPayload = {
-  name: string
-  position: string
-  description?: string | null
-  effectiveStack: number
-  actions: {
-    clientKey: string
-    name: string
-    actionType: string
-    sizeBb?: number | null
-    colorHex: string
-    sortOrder?: number
-  }[]
-  rangeCells: {
-    actionClientKey: string
-    rowIndex: number
-    colIndex: number
-    frequency: number
-  }[]
-}
-
-function validateSituationPayload(p: SituationPayload): void {
-  if (!p.name?.trim()) throw new Error('Nome obrigatório')
-  if (p.effectiveStack < 10 || p.effectiveStack > 500) throw new Error('Stack efetivo entre 10 e 500 BB')
-  if (!p.actions?.length) throw new Error('Pelo menos uma ação')
-  const keys = new Set(p.actions.map((a) => a.clientKey))
-  if (keys.size !== p.actions.length) throw new Error('clientKey duplicado')
-  let hasAny = false
-  for (const a of p.actions) {
-    const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey)
-    if (cells.length) hasAny = true
-  }
-  if (!hasAny) throw new Error('Pelo menos uma ação precisa ter células no range')
-  for (const c of p.rangeCells) {
-    if (c.frequency < 0 || c.frequency > 1) throw new Error('Frequência inválida')
-    if (c.rowIndex < 0 || c.rowIndex > 12 || c.colIndex < 0 || c.colIndex > 12) throw new Error('Índice de grid inválido')
-    if (!keys.has(c.actionClientKey)) throw new Error('actionClientKey inválido')
-  }
 }

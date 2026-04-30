@@ -5,9 +5,9 @@ import type { TestUser } from './credentials'
 /** Aba “Criar conta” + formulário de registo + submit. */
 export async function registerAccount(page: Page, user: TestUser): Promise<void> {
   await page.getByRole('button', { name: 'Criar conta' }).click()
-  await page.locator('form input:not([type="email"]):not([type="password"])').fill(user.displayName)
-  await page.locator('input[type="email"]').fill(user.email)
-  await page.locator('input[type="password"]').fill(user.password)
+  await page.getByLabel('Nome').fill(user.displayName)
+  await page.getByLabel('E-mail').fill(user.email)
+  await page.getByLabel('Senha').fill(user.password)
   await page.getByRole('button', { name: 'Cadastrar e entrar' }).click()
   await expect(page.getByRole('heading', { name: new RegExp(`Olá, ${user.displayName}`) })).toBeVisible()
 }
@@ -19,8 +19,8 @@ export async function switchToLoginTab(page: Page): Promise<void> {
 
 export async function loginWithPassword(page: Page, email: string, password: string): Promise<void> {
   await switchToLoginTab(page)
-  await page.locator('input[type="email"]').fill(email)
-  await page.locator('input[type="password"]').fill(password)
+  await page.getByLabel('E-mail').fill(email)
+  await page.getByLabel('Senha').fill(password)
   await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
 }
 

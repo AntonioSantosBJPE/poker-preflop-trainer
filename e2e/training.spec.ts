@@ -20,6 +20,18 @@ test.describe('Treino', () => {
     await expect(appPage.getByRole('button', { name: 'Iniciar' })).toBeDisabled()
   })
 
+  test('validação client: número de mãos acima do máximo', async ({ appPage }) => {
+    const user = uniqueUserCredentials()
+    const situationName = uniqueSituationName()
+    await registerAccount(appPage, user)
+    await createSituationMinimal(appPage, situationName)
+    await openTrainingConfig(appPage)
+    await selectSituationsForTraining(appPage, [situationName])
+    await setTrainingHands(appPage, 501)
+    await startTrainingSession(appPage)
+    await expect(appPage.getByText(/500/)).toBeVisible()
+  })
+
   test('várias mãos com feedback imediato', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()

@@ -21,6 +21,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.8.1",
     "drizzle-orm": "^0.38.4",
@@ -29,8 +30,10 @@
     "keytar": "^7.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.74.0",
     "react-router-dom": "^6.28.0",
     "recharts": "^2.15.0",
+    "zod": "^4.4.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

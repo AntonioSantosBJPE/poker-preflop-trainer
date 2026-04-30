@@ -29,11 +29,36 @@ test.describe('Autenticação', () => {
     await registerAccount(appPage, user)
     await logout(appPage)
     await appPage.getByRole('button', { name: 'Criar conta' }).click()
-    await appPage.locator('form input:not([type="email"]):not([type="password"])').fill('Outro nome')
-    await appPage.locator('input[type="email"]').fill(user.email)
-    await appPage.locator('input[type="password"]').fill(user.password)
+    await appPage.getByLabel('Nome').fill('Outro nome')
+    await appPage.getByLabel('E-mail').fill(user.email)
+    await appPage.getByLabel('Senha').fill(user.password)
     await appPage.getByRole('button', { name: 'Cadastrar e entrar' }).click()
     await expect(appPage.getByText('E-mail já cadastrado')).toBeVisible()
+  })
+
+  test('validação client: e-mail inválido no login', async ({ appPage }) => {
+    await switchToLoginTab(appPage)
+    await appPage.getByLabel('E-mail').fill('não-é-email')
+    await appPage.getByLabel('Senha').fill('qualquer')
+    await appPage.locator('form').getByRole('button', { name: 'Entrar' }).click()
+    await expect(appPage.getByText('E-mail inválido')).toBeVisible()
+  })
+
+  test('validação client: senha curta no registo', async ({ appPage }) => {
+    await appPage.getByRole('button', { name: 'Criar conta' }).click()
+    await appPage.getByLabel('Nome').fill('Teste')
+    await appPage.getByLabel('E-mail').fill('ok@example.com')
+    await appPage.getByLabel('Senha').fill('1234567')
+    await appPage.getByRole('button', { name: 'Cadastrar e entrar' }).click()
+    await expect(appPage.getByText(/8 caracteres/)).toBeVisible()
+  })
+
+  test('validação client: nome obrigatório no registo', async ({ appPage }) => {
+    await appPage.getByRole('button', { name: 'Criar conta' }).click()
+    await appPage.getByLabel('E-mail').fill('user@example.com')
+    await appPage.getByLabel('Senha').fill('12345678')
+    await appPage.getByRole('button', { name: 'Cadastrar e entrar' }).click()
+    await expect(appPage.getByText('Nome obrigatório')).toBeVisible()
   })
 
   test('separador Entrar mostra formulário de login', async ({ appPage }) => {

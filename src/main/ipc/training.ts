@@ -4,8 +4,9 @@ import { and, asc, eq, inArray, max, sql } from 'drizzle-orm'
 import { actions, rangeCells, sessionHands, situations, trainingSessions } from '../db/schema'
 import { getDb } from '../db/client'
 import { requireUserId } from '../services/session'
+import { parseTrainingStartSession } from '@shared/forms/trainingSchemas'
 import { evaluateTrainingAnswer, handToGridCell } from '@shared/poker/grid'
-import type { FeedbackMode, RankChar, SuitChar } from '@shared/constants'
+import type { RankChar, SuitChar } from '@shared/constants'
 import { RANK_CHARS, SUITS } from '@shared/constants'
 import type { ActionType } from '@shared/constants'
 
@@ -48,12 +49,9 @@ function randomHoleCards(): { card1: PendingHand['card1']; card2: PendingHand['c
 export function registerTrainingIpc(): void {
   ipcMain.handle(
     'training:startSession',
-    async (
-      _e,
-      config: { situationIds: number[]; totalHands: number; timerSeconds: number; feedbackMode: FeedbackMode }
-    ) => {
+    async (_e, config: unknown) => {
       const userId = await requireUserId()
-      if (!config.situationIds?.length) throw new Error('Selecione ao menos uma situação')
+      const parsed = parseTrainingStartSession(config)
       const db = getDb()
       const rows = await db
         .select({ id: situations.id })
@@ -62,10 +60,10 @@ export function registerTrainingIpc(): void {
           and(
             eq(situations.userId, userId),
             eq(situations.isActive, true),
-            inArray(situations.id, config.situationIds)
+            inArray(situations.id, parsed.situationIds)
           )
         )
-      if (rows.length !== config.situationIds.length) throw new Error('Situação inválida ou inativa')
+      if (rows.length !== parsed.situationIds.length) throw new Error('Situação inválida ou inativa')
       const now = new Date()
       const inserted = await db
         .insert(trainingSessions)
@@ -73,10 +71,10 @@ export function registerTrainingIpc(): void {
           userId,
           startedAt: now,
           finishedAt: null,
-          totalHands: config.totalHands,
-          timerSeconds: config.timerSeconds,
-          feedbackMode: config.feedbackMode,
-          situationIdsJson: JSON.stringify(config.situationIds)
+          totalHands: parsed.totalHands,
+          timerSeconds: parsed.timerSeconds,
+          feedbackMode: parsed.feedbackMode,
+          situationIdsJson: JSON.stringify(parsed.situationIds)
         })
         .returning({ id: trainingSessions.id })
         .all()
