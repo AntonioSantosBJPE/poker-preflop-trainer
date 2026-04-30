@@ -1,0 +1,1 @@
+ALTER TABLE `training_sessions` ADD `situation_ids_json` text NOT NULL;
