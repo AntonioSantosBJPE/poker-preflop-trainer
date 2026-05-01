@@ -54,14 +54,36 @@ describe('situationPayloadSchema', () => {
     ).toBe(false)
   })
 
-  it('rejeita quando nenhuma ação tem células', () => {
+  it('range vazio com FOLD normaliza para 169 células (fold implícito)', () => {
     const r = situationPayloadSchema.safeParse({
       ...minimalValid,
       rangeCells: []
     })
+    expect(r.success).toBe(true)
+    if (r.success) {
+      const pos = new Set(r.data.rangeCells.map((c) => `${c.rowIndex},${c.colIndex}`))
+      expect(pos.size).toBe(169)
+    }
+  })
+
+  it('rejeita range incompleto quando não existe acção FOLD', () => {
+    const r = situationPayloadSchema.safeParse({
+      ...minimalValid,
+      actions: [
+        {
+          clientKey: 'k2',
+          name: 'Raise',
+          actionType: 'RAISE_OPEN' as const,
+          sizeBb: 2.5,
+          colorHex: '#27AE60',
+          sortOrder: 0
+        }
+      ],
+      rangeCells: [{ actionClientKey: 'k2', rowIndex: 0, colIndex: 1, frequency: 1 }]
+    })
     expect(r.success).toBe(false)
     if (!r.success) {
-      expect(r.error.issues.some((i) => i.message.includes('células'))).toBe(true)
+      expect(r.error.issues.some((i) => i.message.includes('fold'))).toBe(true)
     }
   })
 
@@ -131,5 +153,7 @@ describe('parseSituationPayload', () => {
     const p = parseSituationPayload(minimalValid)
     expect(p.name).toBe('Sit test')
     expect(p.actions).toHaveLength(2)
+    const pos = new Set(p.rangeCells.map((c) => `${c.rowIndex},${c.colIndex}`))
+    expect(pos.size).toBe(169)
   })
 })

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { ACTION_TYPES, POSITIONS } from '@shared/constants'
+import { appendImplicitFoldRangeCells } from './implicitFoldRangeCells'
 
 const positionSchema = z.enum(POSITIONS, { message: 'Posição inválida' })
 
@@ -70,6 +71,10 @@ export const situationPayloadSchema = situationCoreSchema
   .extend({
     rangeCells: z.array(situationRangeCellSchema)
   })
+  .transform((p) => ({
+    ...p,
+    rangeCells: appendImplicitFoldRangeCells(p.actions, p.rangeCells)
+  }))
   .superRefine((p, ctx) => {
     const keys = new Set(p.actions.map((a) => a.clientKey))
     if (keys.size !== p.actions.length) {
@@ -99,6 +104,17 @@ export const situationPayloadSchema = situationCoreSchema
           path: ['rangeCells']
         })
       }
+    }
+    const cellPos = new Set(p.rangeCells.map((c) => `${c.rowIndex},${c.colIndex}`))
+    if (cellPos.size !== 169) {
+      const hasFold = p.actions.some((a) => a.actionType === 'FOLD')
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: hasFold
+          ? 'Range incompleto: verifique as células ou as acções.'
+          : 'Para cobrir o tabuleiro completo, adicione pelo menos uma acção do tipo fold (células sem pintura contam como fold).',
+        path: ['rangeCells']
+      })
     }
   })
 
