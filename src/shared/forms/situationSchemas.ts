@@ -36,6 +36,7 @@ export const situationRangeCellSchema = z.object({
 
 const situationCoreSchema = z.object({
   name: z.string().trim().min(1, 'Nome obrigatório'),
+  groupId: z.number().int().positive('Grupo obrigatório'),
   position: positionSchema,
   description: z.string().nullable().optional(),
   effectiveStack: z
@@ -52,6 +53,7 @@ export const situationEditorFormSchema = z.object({
     .string()
     .min(1, 'Nome obrigatório')
     .refine((s) => s.trim().length > 0, { message: 'Nome obrigatório' }),
+  groupId: z.number().int().positive('Grupo obrigatório'),
   position: positionSchema,
   description: z.string().optional(),
   effectiveStack: z

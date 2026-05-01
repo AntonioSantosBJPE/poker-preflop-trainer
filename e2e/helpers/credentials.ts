@@ -20,3 +20,7 @@ export function uniqueUserCredentials(): TestUser {
 export function uniqueSituationName(): string {
   return `Situação E2E ${uniqueStamp()}`
 }
+
+export function uniqueGroupName(): string {
+  return `Grupo E2E ${uniqueStamp()}`
+}

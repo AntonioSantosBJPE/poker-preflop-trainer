@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures'
 import { registerAccount } from './helpers/auth'
-import { uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { createGroup } from './helpers/group'
 import { createSituationMinimal } from './helpers/situation'
 
 test.describe('Situações', () => {
@@ -29,8 +30,10 @@ test.describe('Situações', () => {
   test('criar mínima, duplicar, editar e arquivar', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const name = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, name)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, name, groupName)
 
     const row = appPage.getByRole('row').filter({ hasText: name }).filter({ hasNotText: 'Cópia de' })
     await row.getByRole('button', { name: 'Duplicar' }).click()

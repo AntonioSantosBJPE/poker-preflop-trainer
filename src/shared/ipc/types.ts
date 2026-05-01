@@ -2,9 +2,18 @@ import type { ActionType, FeedbackMode, Position, RankChar, SuitChar } from '../
 
 export type UserDto = { id: number; name: string; email: string }
 
+export type GroupSummaryDto = {
+  id: number
+  name: string
+  sortOrder: number
+  isActive: boolean
+  situationCount: number
+}
+
 export type SituationSummaryDto = {
   id: number
   name: string
+  groupId: number
   position: Position
   effectiveStack: number
   isActive: boolean
@@ -24,6 +33,7 @@ export type SituationDetailDto = SituationSummaryDto & {
 }
 
 export type TrainingSessionConfig = {
+  groupId: number
   situationIds: number[]
   totalHands: number
   timerSeconds: number
@@ -40,6 +50,7 @@ export type DealHandResult = {
 }
 
 export type StatsFilters = {
+  groupId?: number
   situationIds?: number[]
   fromTs?: number
   toTs?: number

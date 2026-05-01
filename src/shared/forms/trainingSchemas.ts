@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { FEEDBACK_MODES } from '@shared/constants'
 
 export const trainingStartFormSchema = z.object({
+  groupId: z.number().int().positive('Grupo obrigatório'),
   situationIds: z.array(z.number().int().positive()).min(1, 'Selecione ao menos uma situação'),
   totalHands: z
     .number({ message: 'Número de mãos inválido' })

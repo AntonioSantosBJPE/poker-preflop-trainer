@@ -10,3 +10,12 @@ alwaysApply: false
 - Schema e migrações Drizzle em `src/main/db/`; após `electron-vite build`, migrações copiadas para `out/main/db/migrations` (script `pnpm build`).
 - Transações para criar/atualizar situação + ações + `range_cells`.
 - Soft-delete de situações: `is_active = 0` (preservar histórico de sessões).
+
+## Testes unitários — conflito de ABI nativo
+
+- O `postinstall` recompila `better-sqlite3` para o ABI do Electron (`NODE_MODULE_VERSION 145`).
+  O Vitest corre em Node puro (`NODE_MODULE_VERSION 127`). Importar `better-sqlite3` directamente
+  em testes unitários provoca erro de ABI.
+- **Padrão correcto:** em testes de DB (`src/main/db/*.test.ts`), usar
+  `drizzle-orm/sql-js` + `vi.mock('better-sqlite3')` para criar a DB em memória.
+  Ver `src/main/db/groups.test.ts` como referência.

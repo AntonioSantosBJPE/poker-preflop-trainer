@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm'
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, real, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -11,11 +11,34 @@ export const users = sqliteTable('users', {
     .default(sql`(unixepoch())`)
 })
 
+export const situationGroups = sqliteTable(
+  'situation_groups',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`)
+  },
+  (t) => [uniqueIndex('uq_groups_user_name').on(t.userId, t.name)]
+)
+
 export const situations = sqliteTable('situations', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   userId: integer('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
+  groupId: integer('group_id')
+    .notNull()
+    .references(() => situationGroups.id),
   name: text('name').notNull(),
   position: text('position').notNull(),
   description: text('description'),
@@ -56,6 +79,7 @@ export const trainingSessions = sqliteTable('training_sessions', {
   userId: integer('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
+  groupId: integer('group_id').references(() => situationGroups.id),
   startedAt: integer('started_at', { mode: 'timestamp' }).notNull(),
   finishedAt: integer('finished_at', { mode: 'timestamp' }),
   totalHands: integer('total_hands').notNull(),
@@ -84,11 +108,21 @@ export const sessionHands = sqliteTable('session_hands', {
 
 export const usersRelations = relations(users, ({ many }) => ({
   situations: many(situations),
+  situationGroups: many(situationGroups),
   trainingSessions: many(trainingSessions)
+}))
+
+export const situationGroupsRelations = relations(situationGroups, ({ one, many }) => ({
+  situations: many(situations),
+  user: one(users, { fields: [situationGroups.userId], references: [users.id] })
 }))
 
 export const situationsRelations = relations(situations, ({ one, many }) => ({
   user: one(users, { fields: [situations.userId], references: [users.id] }),
+  situationGroup: one(situationGroups, {
+    fields: [situations.groupId],
+    references: [situationGroups.id]
+  }),
   actions: many(actions)
 }))
 
@@ -103,6 +137,10 @@ export const rangeCellsRelations = relations(rangeCells, ({ one }) => ({
 
 export const trainingSessionsRelations = relations(trainingSessions, ({ one, many }) => ({
   user: one(users, { fields: [trainingSessions.userId], references: [users.id] }),
+  situationGroup: one(situationGroups, {
+    fields: [trainingSessions.groupId],
+    references: [situationGroups.id]
+  }),
   hands: many(sessionHands)
 }))
 

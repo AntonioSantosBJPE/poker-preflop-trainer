@@ -1,17 +1,21 @@
 import { test, expect } from './fixtures'
 import { registerAccount } from './helpers/auth'
-import { uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { createGroup } from './helpers/group'
 
 const rangeGridSelector = '[data-testid="range-grid-13"]'
 
 test.describe('Range Grid — melhorias de usabilidade', () => {
   test.beforeEach(async ({ appPage }) => {
     const user = uniqueUserCredentials()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
+    await createGroup(appPage, groupName)
     await appPage.getByRole('link', { name: 'Situações' }).click()
     await appPage.getByRole('button', { name: 'Nova situação' }).click()
     await expect(appPage.getByRole('heading', { name: 'Nova situação' })).toBeVisible()
     await appPage.getByLabel('Nome').fill(uniqueSituationName())
+    await appPage.getByTestId('situation-group-select').selectOption({ label: groupName })
   })
 
   test('células do grid exibem label da mão (AA, 87s, 87o)', async ({ appPage }) => {

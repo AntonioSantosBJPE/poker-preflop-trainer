@@ -63,6 +63,9 @@ export function AppLayout(): React.ReactElement {
           <NavLink to="/" end className={navLinkClass}>
             Início
           </NavLink>
+          <NavLink to="/groups" className={navLinkClass}>
+            Grupos
+          </NavLink>
           <NavLink to="/situations" className={navLinkClass}>
             Situações
           </NavLink>

@@ -6,13 +6,17 @@ import { requireUserId } from '../services/session'
 import { parseSituationPayload } from '@shared/forms/situationSchemas'
 
 export function registerSituationsIpc(): void {
-  ipcMain.handle('situations:list', async () => {
+  ipcMain.handle('situations:list', async (_e, filter?: { groupId?: number }) => {
     const userId = await requireUserId()
     const db = getDb()
+    const whereParts = [eq(situations.userId, userId), eq(situations.isActive, true)]
+    if (filter?.groupId !== undefined) {
+      whereParts.push(eq(situations.groupId, filter.groupId))
+    }
     const rows = await db
       .select()
       .from(situations)
-      .where(and(eq(situations.userId, userId), eq(situations.isActive, true)))
+      .where(and(...whereParts))
       .orderBy(asc(situations.name))
 
     const result = []
@@ -31,6 +35,7 @@ export function registerSituationsIpc(): void {
         .orderBy(asc(actions.sortOrder))
       result.push({
         id: s.id,
+        groupId: s.groupId,
         name: s.name,
         position: s.position,
         effectiveStack: s.effectiveStack,
@@ -71,6 +76,7 @@ export function registerSituationsIpc(): void {
     }
     return {
       id: s.id,
+      groupId: s.groupId,
       name: s.name,
       position: s.position,
       description: s.description,
@@ -105,6 +111,7 @@ export function registerSituationsIpc(): void {
         .insert(situations)
         .values({
           userId,
+          groupId: p.groupId,
           name: p.name,
           position: p.position,
           description: p.description ?? null,
@@ -170,6 +177,7 @@ export function registerSituationsIpc(): void {
       const now = new Date()
       tx.update(situations)
         .set({
+          groupId: p.groupId,
           name: p.name,
           position: p.position,
           description: p.description ?? null,
@@ -264,6 +272,7 @@ export function registerSituationsIpc(): void {
         .insert(situations)
         .values({
           userId,
+          groupId: s.groupId,
           name: newName,
           position: s.position,
           description: s.description,

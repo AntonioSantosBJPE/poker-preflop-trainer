@@ -8,8 +8,14 @@ const api = {
     logout: () => ipcRenderer.invoke('auth:logout'),
     me: () => ipcRenderer.invoke('auth:me') as Promise<{ user: { id: number; name: string; email: string } } | null>
   },
+  groups: {
+    list: () => ipcRenderer.invoke('groups:list'),
+    create: (name: string) => ipcRenderer.invoke('groups:create', { name }),
+    rename: (id: number, name: string) => ipcRenderer.invoke('groups:rename', { id, name }),
+    archive: (id: number) => ipcRenderer.invoke('groups:archive', { id })
+  },
   situations: {
-    list: () => ipcRenderer.invoke('situations:list'),
+    list: (filter?: { groupId?: number }) => ipcRenderer.invoke('situations:list', filter),
     get: (id: number) => ipcRenderer.invoke('situations:get', id),
     create: (payload: unknown) => ipcRenderer.invoke('situations:create', payload),
     update: (id: number, payload: unknown) => ipcRenderer.invoke('situations:update', id, payload),

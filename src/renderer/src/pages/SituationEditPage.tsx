@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useMemo, useState } from 'react'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ACTION_TYPES, POSITIONS } from '@shared/constants'
 import {
   situationEditorFormSchema,
@@ -10,6 +10,7 @@ import {
 } from '@shared/forms/situationSchemas'
 import { countCombosForCell } from '@shared/poker/grid'
 import { RangeGrid13, type RangeCellEdit } from '../components/grid/RangeGrid13'
+import type { GroupSummaryDto } from '@shared/ipc/types'
 
 function uid(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`
@@ -25,12 +26,18 @@ function ipcErrorMessage(err: unknown): string {
 
 export function SituationEditPage(): React.ReactElement {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const isNew = !id || id === 'new'
 
+  const groupIdQuery = searchParams.get('groupId')
   const newFormDefaults = useMemo<SituationEditorFormValues>(
     () => ({
       name: '',
+      groupId: (() => {
+        const n = groupIdQuery ? Number(groupIdQuery) : NaN
+        return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0
+      })(),
       position: 'BTN',
       description: '',
       effectiveStack: 100,
@@ -51,7 +58,7 @@ export function SituationEditPage(): React.ReactElement {
         }
       ]
     }),
-    []
+    [groupIdQuery]
   )
 
   const {
@@ -69,6 +76,13 @@ export function SituationEditPage(): React.ReactElement {
     mode: 'onSubmit'
   })
 
+  useEffect(() => {
+    if (!isNew) return
+    reset(newFormDefaults)
+    setCells([])
+    setActiveActionKey(newFormDefaults.actions[0]?.clientKey ?? '')
+  }, [isNew, newFormDefaults, reset])
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'actions'
@@ -78,6 +92,14 @@ export function SituationEditPage(): React.ReactElement {
 
   const [activeActionKey, setActiveActionKey] = useState('')
   const [cells, setCells] = useState<RangeCellEdit[]>([])
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
+
+  useEffect(() => {
+    void (async () => {
+      const list = (await window.api.groups.list()) as GroupSummaryDto[]
+      setGroups(list)
+    })()
+  }, [])
 
   useEffect(() => {
     const acts = watchedActions
@@ -93,6 +115,7 @@ export function SituationEditPage(): React.ReactElement {
     void (async () => {
       const s = (await window.api.situations.get(Number(id))) as {
         name: string
+        groupId: number
         position: string
         description: string | null
         effectiveStack: number
@@ -116,6 +139,7 @@ export function SituationEditPage(): React.ReactElement {
       }))
       reset({
         name: s.name,
+        groupId: s.groupId,
         position: s.position as SituationEditorFormValues['position'],
         description: s.description ?? '',
         effectiveStack: s.effectiveStack,
@@ -163,6 +187,7 @@ export function SituationEditPage(): React.ReactElement {
     clearErrors('root')
     const payload = {
       name: values.name.trim(),
+      groupId: values.groupId,
       position: values.position,
       description: values.description?.trim() ? values.description.trim() : null,
       effectiveStack: values.effectiveStack,
@@ -237,6 +262,34 @@ export function SituationEditPage(): React.ReactElement {
           {errors.name && (
             <p className="mt-1 text-sm text-destructive" role="alert">
               {errors.name.message}
+            </p>
+          )}
+        </label>
+        <label className="block" htmlFor="situation-group">
+          <span className="pt-label">Grupo</span>
+          <select
+            id="situation-group"
+            className="pt-input"
+            data-testid="situation-group-select"
+            aria-invalid={errors.groupId ? true : undefined}
+            {...register('groupId', {
+              setValueAs: (v) => {
+                if (v === '' || v === undefined || v === null) return 0
+                const n = Number(v)
+                return Number.isNaN(n) ? 0 : n
+              }
+            })}
+          >
+            <option value="">Selecione um grupo…</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+          {errors.groupId && (
+            <p className="mt-1 text-sm text-destructive" role="alert" data-testid="situation-group-error">
+              {errors.groupId.message}
             </p>
           )}
         </label>

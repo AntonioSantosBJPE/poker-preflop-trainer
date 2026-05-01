@@ -53,8 +53,8 @@ export function registerTrainingIpc(): void {
       const userId = await requireUserId()
       const parsed = parseTrainingStartSession(config)
       const db = getDb()
-      const rows = await db
-        .select({ id: situations.id })
+      const sitDetails = await db
+        .select({ id: situations.id, groupId: situations.groupId })
         .from(situations)
         .where(
           and(
@@ -63,12 +63,23 @@ export function registerTrainingIpc(): void {
             inArray(situations.id, parsed.situationIds)
           )
         )
-      if (rows.length !== parsed.situationIds.length) throw new Error('Situação inválida ou inativa')
+      if (sitDetails.length !== parsed.situationIds.length) {
+        throw new Error('Situação inválida ou inativa')
+      }
+      const distinctGroupIds = new Set(sitDetails.map((s) => s.groupId))
+      if (distinctGroupIds.size !== 1) {
+        throw new Error('Todas as situações devem pertencer ao mesmo grupo')
+      }
+      const detectedGroupId = [...distinctGroupIds][0]!
+      if (detectedGroupId !== parsed.groupId) {
+        throw new Error('groupId não corresponde ao grupo das situações selecionadas')
+      }
       const now = new Date()
       const inserted = await db
         .insert(trainingSessions)
         .values({
           userId,
+          groupId: parsed.groupId,
           startedAt: now,
           finishedAt: null,
           totalHands: parsed.totalHands,

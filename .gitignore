@@ -12,7 +12,6 @@ release/
 .env.*
 !.env.example
 preflop_trainer.db
-.agents/
 .cursor/*.log
 playwright-report/
 test-results/

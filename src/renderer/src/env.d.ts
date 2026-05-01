@@ -1,3 +1,5 @@
+import type { GroupSummaryDto, SituationSummaryDto } from '@shared/ipc/types'
+
 export type FeedbackMode = 'IMMEDIATE' | 'END_OF_SESSION'
 
 export type ApiUser = { id: number; name: string; email: string }
@@ -9,8 +11,14 @@ export type Api = {
     logout: () => Promise<void>
     me: () => Promise<{ user: ApiUser } | null>
   }
+  groups: {
+    list: () => Promise<GroupSummaryDto[]>
+    create: (name: string) => Promise<{ id: number }>
+    rename: (id: number, name: string) => Promise<void>
+    archive: (id: number) => Promise<void>
+  }
   situations: {
-    list: () => Promise<unknown[]>
+    list: (filter?: { groupId?: number }) => Promise<SituationSummaryDto[]>
     get: (id: number) => Promise<unknown>
     create: (payload: unknown) => Promise<number>
     update: (id: number, payload: unknown) => Promise<number>
@@ -19,6 +27,7 @@ export type Api = {
   }
   training: {
     startSession: (config: {
+      groupId: number
       situationIds: number[]
       totalHands: number
       timerSeconds: number

@@ -6,7 +6,13 @@ export async function openTrainingConfig(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { name: 'Configurar treino' })).toBeVisible()
 }
 
-/** Seleciona situações por nome exacto (checkbox com label). */
+/** Passo 1: seleciona um grupo pelo nome no ecrã de treino. Avança automaticamente para passo 2. */
+export async function selectGroupForTraining(page: Page, groupName: string): Promise<void> {
+  await page.getByRole('button', { name: groupName }).click()
+  await expect(page.getByTestId('training-step-2')).toBeVisible()
+}
+
+/** Passo 2: seleciona situações por nome (checkboxes). */
 export async function selectSituationsForTraining(page: Page, situationNames: string[]): Promise<void> {
   for (const name of situationNames) {
     await page.getByRole('checkbox', { name, exact: true }).check()

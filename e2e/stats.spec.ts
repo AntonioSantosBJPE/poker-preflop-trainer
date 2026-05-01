@@ -1,11 +1,13 @@
 import type { Page } from '@playwright/test'
 import { test, expect } from './fixtures'
 import { registerAccount } from './helpers/auth'
-import { uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { createGroup } from './helpers/group'
 import { createSituationMinimal } from './helpers/situation'
 import {
   answerFoldImmediate,
   openTrainingConfig,
+  selectGroupForTraining,
   selectSituationsForTraining,
   setTrainingHands,
   startTrainingSession
@@ -31,10 +33,13 @@ test.describe('Estatísticas', () => {
   test('resumo após uma sessão de treino', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 1)
     await startTrainingSession(appPage)

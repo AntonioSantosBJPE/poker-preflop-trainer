@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/Layout'
 import { DashboardPage } from './pages/DashboardPage'
+import { GroupDetailPage } from './pages/GroupDetailPage'
+import { GroupsPage } from './pages/GroupsPage'
 import { LoginPage } from './pages/LoginPage'
 import { SituationEditPage } from './pages/SituationEditPage'
 import { SituationsPage } from './pages/SituationsPage'
@@ -44,6 +46,8 @@ export function App(): React.ReactElement {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="groups" element={<GroupsPage />} />
+          <Route path="groups/:groupId" element={<GroupDetailPage />} />
           <Route path="situations" element={<SituationsPage />} />
           <Route path="situations/new" element={<SituationEditPage />} />
           <Route path="situations/:id" element={<SituationEditPage />} />

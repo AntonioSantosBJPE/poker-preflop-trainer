@@ -7,6 +7,7 @@ import {
 
 const minimalValid = {
   name: 'Sit test',
+  groupId: 1,
   position: 'BTN' as const,
   description: null,
   effectiveStack: 100,
@@ -105,6 +106,7 @@ describe('situationEditorFormSchema', () => {
     expect(
       situationEditorFormSchema.safeParse({
         name: '',
+        groupId: 1,
         position: 'BTN',
         description: '',
         effectiveStack: 100,
@@ -114,6 +116,7 @@ describe('situationEditorFormSchema', () => {
     expect(
       situationEditorFormSchema.safeParse({
         name: '   ',
+        groupId: 1,
         position: 'BTN',
         description: '',
         effectiveStack: 100,

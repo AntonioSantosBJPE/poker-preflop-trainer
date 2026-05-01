@@ -14,6 +14,9 @@ function sessionWhereClause(userId: number, filters?: StatsFilters) {
   if (filters?.toTs !== undefined) {
     parts.push(lte(trainingSessions.startedAt, new Date(filters.toTs * 1000)))
   }
+  if (filters?.groupId !== undefined) {
+    parts.push(eq(trainingSessions.groupId, filters.groupId))
+  }
   return and(...parts)
 }
 

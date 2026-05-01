@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { GroupSummaryDto } from '@shared/ipc/types'
 import {
   CartesianGrid,
   Line,
@@ -12,6 +13,8 @@ import { useChartPalette } from '../hooks/useChartPalette'
 
 export function StatsPage(): React.ReactElement {
   const chart = useChartPalette()
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
+  const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
   const [overview, setOverview] = useState({ sessions: 0, hands: 0, accuracy: 0, avgResponseMs: 0 })
   const [timeline, setTimeline] = useState<{ date: string; accuracy: number; avgTimeMs: number }[]>([])
   const [bySit, setBySit] = useState<
@@ -21,20 +24,67 @@ export function StatsPage(): React.ReactElement {
 
   useEffect(() => {
     void (async () => {
-      const ov = (await window.api.stats.overview()) as typeof overview
-      setOverview(ov)
-      const tl = (await window.api.stats.timeline()) as typeof timeline
-      setTimeline(tl)
-      const bs = (await window.api.stats.bySituation()) as typeof bySit
-      setBySit(bs)
-      const w = (await window.api.stats.worstHands({}, 15)) as typeof worst
-      setWorst(w)
+      const list = (await window.api.groups.list()) as GroupSummaryDto[]
+      setGroups(list)
     })()
   }, [])
+
+  useEffect(() => {
+    void (async () => {
+      const filters = activeGroupId !== null ? { groupId: activeGroupId } : {}
+      const ov = (await window.api.stats.overview(filters)) as typeof overview
+      setOverview(ov)
+      const tl = (await window.api.stats.timeline(filters)) as typeof timeline
+      setTimeline(tl)
+      const bs = (await window.api.stats.bySituation(filters)) as typeof bySit
+      setBySit(bs)
+      const w = (await window.api.stats.worstHands(filters, 15)) as typeof worst
+      setWorst(w)
+    })()
+  }, [activeGroupId])
 
   return (
     <div className="space-y-8">
       <h1 className="pt-page-title">Estatísticas</h1>
+      <div
+        className="flex gap-1 overflow-x-auto border-b border-border pb-px"
+        role="tablist"
+        data-testid="stats-group-tabs"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeGroupId === null}
+          onClick={() => setActiveGroupId(null)}
+          className={[
+            'whitespace-nowrap rounded-t-lg px-4 py-2 text-sm font-medium transition-colors',
+            activeGroupId === null
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-muted-foreground hover:text-foreground'
+          ].join(' ')}
+          data-testid="stats-tab-all"
+        >
+          Todos
+        </button>
+        {groups.map((g) => (
+          <button
+            key={g.id}
+            type="button"
+            role="tab"
+            aria-selected={activeGroupId === g.id}
+            onClick={() => setActiveGroupId(g.id)}
+            className={[
+              'whitespace-nowrap rounded-t-lg px-4 py-2 text-sm font-medium transition-colors',
+              activeGroupId === g.id
+                ? 'border-b-2 border-primary text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            ].join(' ')}
+            data-testid={`stats-tab-group-${g.id}`}
+          >
+            {g.name}
+          </button>
+        ))}
+      </div>
       <div className="grid gap-4 md:grid-cols-4 md:items-stretch">
         <div className="pt-card p-4">
           <p className="text-sm text-muted-foreground">Sessões</p>

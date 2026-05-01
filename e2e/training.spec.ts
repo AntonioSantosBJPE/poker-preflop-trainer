@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures'
 import { registerAccount } from './helpers/auth'
-import { uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
+import { createGroup } from './helpers/group'
 import { createSituationMinimal } from './helpers/situation'
 import {
   answerFoldEndOfSession,
@@ -9,6 +10,7 @@ import {
   clickAbandon,
   confirmAbandon,
   openTrainingConfig,
+  selectGroupForTraining,
   selectSituationsForTraining,
   setFeedbackMode,
   setTrainingHands,
@@ -21,15 +23,19 @@ test.describe('Treino', () => {
     const user = uniqueUserCredentials()
     await registerAccount(appPage, user)
     await openTrainingConfig(appPage)
-    await expect(appPage.getByRole('button', { name: 'Iniciar' })).toBeDisabled()
+    await expect(appPage.getByTestId('training-step-1')).toBeVisible()
+    await expect(appPage.getByRole('button', { name: 'Iniciar' })).toHaveCount(0)
   })
 
   test('validação client: número de mãos acima do máximo', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 501)
     await startTrainingSession(appPage)
@@ -39,10 +45,13 @@ test.describe('Treino', () => {
   test('várias mãos com feedback imediato', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 2)
     await startTrainingSession(appPage)
@@ -57,10 +66,13 @@ test.describe('Treino', () => {
   test('feedback ao final da sessão sem painel entre mãos', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 2)
     await setFeedbackMode(appPage, 'END_OF_SESSION')
@@ -77,10 +89,13 @@ test.describe('Treino', () => {
   test('abandonar sessão — cancelar mantém sessão ativa', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 5)
     await startTrainingSession(appPage)
@@ -97,10 +112,13 @@ test.describe('Treino', () => {
   test('abandonar sessão — confirmar navega para resultado', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 5)
     await startTrainingSession(appPage)
@@ -115,10 +133,13 @@ test.describe('Treino', () => {
   test('timer conta regressiva e dispara timeout', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 1)
     await setTrainingTimer(appPage, 2)
@@ -137,10 +158,13 @@ test.describe('Treino', () => {
   test('cartas exibem ícone de naipe e não letra isolada', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 1)
     await startTrainingSession(appPage)
@@ -160,10 +184,13 @@ test.describe('Treino', () => {
   test('resultado da sessão liga para nova sessão', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const situationName = uniqueSituationName()
+    const groupName = uniqueGroupName()
     await registerAccount(appPage, user)
-    await createSituationMinimal(appPage, situationName)
+    await createGroup(appPage, groupName)
+    await createSituationMinimal(appPage, situationName, groupName)
 
     await openTrainingConfig(appPage)
+    await selectGroupForTraining(appPage, groupName)
     await selectSituationsForTraining(appPage, [situationName])
     await setTrainingHands(appPage, 1)
     await startTrainingSession(appPage)

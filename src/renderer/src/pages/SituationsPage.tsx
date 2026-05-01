@@ -1,25 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import type { GroupSummaryDto, SituationSummaryDto } from '@shared/ipc/types'
 
-type Row = {
-  id: number
-  name: string
-  position: string
-  effectiveStack: number
-}
+type Row = Pick<SituationSummaryDto, 'id' | 'name' | 'position' | 'effectiveStack' | 'groupId'>
 
 export function SituationsPage(): React.ReactElement {
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
   const [rows, setRows] = useState<Row[]>([])
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
   const navigate = useNavigate()
 
-  async function load(): Promise<void> {
-    const list = (await window.api.situations.list()) as Row[]
+  async function load(groupId?: number): Promise<void> {
+    const list = (await window.api.situations.list(groupId != null ? { groupId } : undefined)) as Row[]
     setRows(list)
   }
 
+  const reload = useCallback(() => load(selectedGroupId ?? undefined), [selectedGroupId])
+
   useEffect(() => {
-    void load()
+    void (async () => {
+      const g = (await window.api.groups.list()) as GroupSummaryDto[]
+      setGroups(g)
+    })()
   }, [])
+
+  useEffect(() => {
+    void reload()
+  }, [reload])
 
   return (
     <div className="space-y-6">
@@ -29,11 +36,39 @@ export function SituationsPage(): React.ReactElement {
           Nova situação
         </button>
       </div>
+      <div className="space-y-2">
+        <label className="block max-w-xs" htmlFor="situations-group-filter-input">
+          <span className="pt-label">Filtrar por grupo</span>
+          <select
+            id="situations-group-filter-input"
+            data-testid="situations-group-filter"
+            className="pt-input"
+            value={selectedGroupId ?? ''}
+            onChange={(e) => {
+              const v = e.target.value
+              setSelectedGroupId(v === '' ? null : Number(v))
+            }}
+          >
+            <option value="">Todos os grupos</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        {selectedGroupId != null && (
+          <p className="text-sm text-muted-foreground">
+            Grupo: {groups.find((g) => g.id === selectedGroupId)?.name ?? '—'}
+          </p>
+        )}
+      </div>
       <div className="pt-card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted text-muted-foreground">
             <tr>
               <th className="p-3 text-left font-medium">Nome</th>
+              <th className="p-3 text-left font-medium">Grupo</th>
               <th className="p-3 text-left font-medium">Posição</th>
               <th className="p-3 text-left font-medium">Stack (BB)</th>
               <th className="p-3" />
@@ -43,6 +78,7 @@ export function SituationsPage(): React.ReactElement {
             {rows.map((r) => (
               <tr key={r.id} className="border-t border-border hover:bg-muted/40">
                 <td className="p-3">{r.name}</td>
+                <td className="p-3">{groups.find((g) => g.id === r.groupId)?.name ?? '—'}</td>
                 <td className="p-3">{r.position}</td>
                 <td className="p-3 tabular-nums">{r.effectiveStack}</td>
                 <td className="space-x-2 p-3 text-right">
@@ -58,7 +94,7 @@ export function SituationsPage(): React.ReactElement {
                     className="text-muted-foreground hover:text-foreground"
                     onClick={async () => {
                       await window.api.situations.duplicate(r.id)
-                      void load()
+                      void reload()
                     }}
                   >
                     Duplicar
@@ -68,7 +104,7 @@ export function SituationsPage(): React.ReactElement {
                     className="text-destructive hover:underline"
                     onClick={async () => {
                       await window.api.situations.delete(r.id)
-                      void load()
+                      void reload()
                     }}
                   >
                     Arquivar
@@ -78,7 +114,7 @@ export function SituationsPage(): React.ReactElement {
             ))}
             {!rows.length && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-muted-foreground">
+                <td colSpan={5} className="p-8 text-center text-muted-foreground">
                   Nenhuma situação.{' '}
                   <Link to="/situations/new" className="text-primary hover:underline">
                     Criar a primeira
