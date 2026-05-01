@@ -1,0 +1,30 @@
+# STATE — Preflop Trainer
+
+**Última actualização:** 2026-05-01
+
+## Decisões
+
+| ID  | Decisão | Racional | Data |
+|-----|---------|----------|------|
+| D-01 | Usar pnpm como package manager | Melhor gestão de dependências nativas Electron (better-sqlite3, keytar) via `onlyBuiltDependencies` | 2026-05-01 |
+| D-02 | Adiar actualização React 18→19 e react-router 6→7 para fase própria | Breaking changes significativos; requerem validação E2E completa | 2026-05-01 |
+| D-03 | Adiar electron 33→41, electron-vite 2→5 e vite 5→8 para fase própria | Saltos de versão major com potencial impacto no build e IPC | 2026-05-01 |
+
+## Blockers Activos
+
+Nenhum.
+
+## Lições Aprendidas
+
+- `@types/bcryptjs` 3.0.0 está deprecated — a biblioteca bcryptjs 3.x passa a incluir tipos próprios; remover `@types/bcryptjs` após upgrade de bcryptjs para ^3.
+- `better-sqlite3` 12.x é major — verificar API nativa e compatibilidade com Electron.
+
+## TODOs / Deferred
+
+- [ ] Avaliar migração para Tailwind 4 após confirmar suporte electron-vite 5.
+- [ ] Avaliar upgrade TypeScript 5→6 após estabilização do ecossistema (vite 8, vitest 4).
+- [ ] Avaliar React 19 após Recharts 3 confirmar suporte estável.
+
+## Preferências
+
+- (nenhuma ainda)
