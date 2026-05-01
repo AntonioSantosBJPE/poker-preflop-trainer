@@ -8,6 +8,7 @@
   "author": "Preflop Trainer <preflop-trainer@example.com>",
   "main": "out/main/index.js",
   "scripts": {
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
     "dev": "electron-vite dev",
     "dev:gpu-safe": "electron-vite dev -- --disable-gpu",
     "build": "electron-vite build && mkdir -p out/main/db && cp -r src/main/db/migrations out/main/db/migrations && electron-builder",
@@ -41,6 +42,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
     "@playwright/test": "^1.59.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.12",
