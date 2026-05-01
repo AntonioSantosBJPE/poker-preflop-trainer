@@ -20,7 +20,7 @@ Aplicação desktop (Electron + SQLite) para treino de decisões pré-flop no Ho
 - **Frontend:** React 18 + Vite 5 + Tailwind 3 + react-router-dom 6
 - **Data:** Drizzle ORM 0.38 + better-sqlite3 11 (main process)
 - **Auth:** bcryptjs 2 + jsonwebtoken 9 + keytar 7
-- **Testes:** Vitest 2 (unit) + Playwright 1.49 (E2E)
+- **Testes:** Vitest 2 (`pnpm test:unit`) + Playwright E2E (`pnpm test` local = unit + build + E2E; CI só unitários)
 - **Build:** electron-vite 2 + electron-builder 25
 - **Package manager:** pnpm 10 (lockfileVersion 9.0)
 

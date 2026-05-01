@@ -48,9 +48,9 @@ pnpm add @fontsource/fraunces@latest postcss@^8 @playwright/test@^1 drizzle-kit@
 
 - `pnpm outdated` não mostra estes pacotes
 - `pnpm typecheck` passa
-- `pnpm test:all` passa
+- `pnpm test:unit` passa
 
-**Gate:** Quick (`pnpm test && pnpm typecheck`)
+**Gate:** Quick (`pnpm test:unit && pnpm typecheck`)
 
 ---
 
@@ -76,7 +76,7 @@ pnpm add drizzle-orm@latest
 **Done when:**
 
 - `pnpm typecheck` passa sem erros em `src/main/db/`
-- `pnpm test` passa (testes de DB)
+- `pnpm test:unit` passa (testes de DB)
 
 **Gate:** Quick
 
@@ -99,7 +99,7 @@ pnpm remove @types/bcryptjs
 **Done when:**
 
 - `pnpm typecheck` passa no módulo de auth
-- `pnpm test` passa nos testes de autenticação
+- `pnpm test:unit` passa nos testes de autenticação
 
 **Gate:** Quick
 
@@ -192,7 +192,7 @@ pnpm add -D vite@^8 @vitejs/plugin-react@^6
 - `pnpm build:app` conclui sem erros
 - `pnpm dev` inicia correctamente
 
-**Gate:** Full (`pnpm build:app && pnpm test`)
+**Gate:** Full (`pnpm build:app && pnpm test:unit`)
 
 ---
 
@@ -209,7 +209,7 @@ pnpm add -D vitest@^4
 
 **Done when:**
 
-- `pnpm test` passa com mesma cobertura
+- `pnpm test:unit` passa com mesma cobertura
 
 **Gate:** Quick
 
@@ -284,9 +284,9 @@ pnpm rebuild
 **Done when:**
 
 - `pnpm dev` abre sem erros de contexto ou IPC
-- `pnpm test:e2e` passa (todos os cenários de auth e treino)
+- `pnpm test` passa (unitários + build + E2E; cobre auth e treino)
 
-**Gate:** Build completo (`pnpm build:app && pnpm test && pnpm test:e2e`)
+**Gate:** Build completo (`pnpm test`)
 
 ---
 
@@ -324,7 +324,7 @@ pnpm rebuild
 **Done when:**
 
 - `pnpm typecheck` passa em `src/main/db/`
-- `pnpm test` passa nos testes de DB
+- `pnpm test:unit` passa nos testes de DB
 - App inicia e persiste dados correctamente
 
 **Gate:** Full
@@ -402,10 +402,9 @@ pnpm add -D @types/react@^19 @types/react-dom@^19
 **Done when:**
 
 - `pnpm typecheck` passa sem erros React
-- `pnpm test` passa
-- `pnpm test:e2e` passa (fluxo completo auth + treino + stats)
+- `pnpm test` passa (fluxo completo: unitários + build + E2E; auth + treino + stats)
 
-**Gate:** Build completo (`pnpm build:app && pnpm test && pnpm test:e2e`)
+**Gate:** Build completo (`pnpm test`)
 
 ---
 
@@ -427,13 +426,15 @@ T-1.1 → T-2.1 → T-2.2 → T-2.3 → T-2.4
 
 ## Gates de Validação Resumidos
 
-| Fase | Gate             | Comando                                        |
-| ---- | ---------------- | ---------------------------------------------- |
-| 1    | Quick            | `pnpm test && pnpm typecheck`                  |
-| 2    | Quick (por task) | `pnpm test && pnpm typecheck`                  |
-| 3    | Full             | `pnpm build:app && pnpm test`                  |
-| 4    | Build completo   | `pnpm build:app && pnpm test && pnpm test:e2e` |
-| 5    | Build completo   | `pnpm build:app && pnpm test && pnpm test:e2e` |
+Paridade com CI (GitHub Actions): **`pnpm test:unit`**, `pnpm typecheck`, `pnpm exec electron-vite build` — sem E2E.
+
+| Fase | Gate             | Comando                                          |
+| ---- | ---------------- | ------------------------------------------------ |
+| 1    | Quick            | `pnpm test:unit && pnpm typecheck`             |
+| 2    | Quick (por task) | `pnpm test:unit && pnpm typecheck`             |
+| 3    | Full             | `pnpm build:app && pnpm test:unit`             |
+| 4    | Build completo   | `pnpm test` (unit + build + E2E local)          |
+| 5    | Build completo   | `pnpm test` (unit + build + E2E local)          |
 
 ---
 

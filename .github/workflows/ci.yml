@@ -18,6 +18,6 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm test
+      - run: pnpm test:unit
       - run: pnpm typecheck
       - run: pnpm exec electron-vite build

@@ -5,3 +5,4 @@
    - Grid 13×13, enums e avaliação: skill `preflop-domain`.
 2. Seguir regras em [.cursor/rules/](.cursor/rules/); skills do projeto em [.cursor/skills/](.cursor/skills/).
 3. Não expor segredos no renderer; DB e JWT apenas no `main`.
+4. Testes: **`pnpm test:unit`** (rápido / CI); **`pnpm test`** (unitários + build + E2E local).

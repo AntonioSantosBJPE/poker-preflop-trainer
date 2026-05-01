@@ -56,18 +56,20 @@ Abre a aplicação em modo desenvolvimento (hot reload no renderer).
 
 ### Scripts úteis
 
-| Comando             | Descrição                                                     |
-| ------------------- | ------------------------------------------------------------- |
-| `pnpm dev`          | Desenvolvimento                                               |
-| `pnpm dev:gpu-safe` | Desenvolvimento com `--disable-gpu` (Linux com falhas de GPU) |
-| `pnpm build`        | Build de produção + empacotamento (`electron-builder`)        |
-| `pnpm preview`      | Pré-visualização do build                                     |
-| `pnpm test`         | Testes unitários (Vitest)                                     |
-| `pnpm test:e2e`     | Testes E2E (Playwright + Electron); exige `pnpm build:app`    |
-| `pnpm test:e2e:ci`  | Build da app + E2E (adequado a CI)                            |
-| `pnpm build:app`    | Só compila main/preload/renderer e copia migrações (sem .exe) |
-| `pnpm typecheck`    | Verificação TypeScript (main + renderer)                      |
-| `pnpm db:generate`  | Gera migrações Drizzle a partir do schema                     |
+| Comando                  | Descrição                                                              |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `pnpm dev`               | Desenvolvimento                                                        |
+| `pnpm dev:gpu-safe`      | Desenvolvimento com `--disable-gpu` (Linux com falhas de GPU)        |
+| `pnpm build`             | Build de produção + empacotamento (`electron-builder`)                 |
+| `pnpm preview`           | Pré-visualização do build                                              |
+| `pnpm test`              | Suíte completa local: unitários (Vitest) + build + E2E (Playwright)    |
+| `pnpm test:unit`         | Apenas testes unitários (Vitest); também usado no CI                   |
+| `pnpm test:unit:watch`   | Vitest em modo watch                                                   |
+| `pnpm test:e2e`          | Só E2E (Playwright + Electron); exige `out/main/index.js` (`build:app`) |
+| `pnpm test:e2e:ci`       | `build:app` + E2E (sem Vitest; útil quando só queres validar E2E)      |
+| `pnpm build:app`         | Só compila main/preload/renderer e copia migrações (sem .exe)          |
+| `pnpm typecheck`         | Verificação TypeScript (main + renderer)                               |
+| `pnpm db:generate`       | Gera migrações Drizzle a partir do schema                              |
 
 ### Testes E2E (Playwright)
 
@@ -79,7 +81,7 @@ pnpm build:app
 pnpm test:e2e
 ```
 
-Em CI sem display gráfico (Linux): `xvfb-run -a pnpm test:e2e:ci`.
+Para correr só E2E em CI ou máquina sem display (Linux): `xvfb-run -a pnpm test:e2e:ci`. O workflow em GitHub Actions **não** executa E2E por defeito (usa `pnpm test:unit`).
 
 ---
 
@@ -116,7 +118,7 @@ Documentação para **agentes de IA**: `[AGENTS.md](AGENTS.md)` e skills em `.cu
 
 ## CI
 
-O workflow em `[.github/workflows/ci.yml](.github/workflows/ci.yml)` executa testes, `typecheck` e `electron-vite build` em pull requests e pushes para `main` / `master`.
+O workflow em `[.github/workflows/ci.yml](.github/workflows/ci.yml)` corre **`pnpm test:unit`** (Vitest), **`pnpm typecheck`** e **`pnpm exec electron-vite build`** em pull requests e pushes para `main` / `master`. Não inclui E2E (Playwright); para validação completa localmente usa **`pnpm test`**.
 
 ---
 
@@ -131,7 +133,7 @@ Atualize no `[package.json](package.json)` os campos `**homepage`**, `**author`*
 ## Contribuir
 
 1. Fork e branch a partir de `main`.
-2. `pnpm install` → `pnpm test` → `pnpm typecheck`.
+2. `pnpm install` → `pnpm test:unit` → `pnpm typecheck` (ou `pnpm test` para suíte completa com E2E antes do PR).
 3. Pull request com descrição clara do problema ou da funcionalidade.
 
 Para convenções e trabalho com assistentes no editor, consulte `[.cursor/rules/](.cursor/rules/)` e o índice de tasks em `[docs/agents/TASKS_INDEX.md](docs/agents/TASKS_INDEX.md)`.

@@ -9,7 +9,8 @@ description: >-
 
 ## Pré-requisitos
 
-- Correr **`pnpm build:app`** antes de `pnpm test:e2e` (o fixture falha se `out/main/index.js` não existir). Em CI usar **`pnpm test:e2e:ci`**.
+- Correr **`pnpm build:app`** antes de `pnpm test:e2e` (o fixture falha se `out/main/index.js` não existir). **`pnpm test:e2e:ci`** faz build + E2E; **`pnpm test`** (local) corre Vitest e depois `test:e2e:ci` — suíte completa.
+- O workflow em **GitHub Actions** usa apenas **`pnpm test:unit`** (sem Playwright); validação E2E é local ou pipeline dedicado.
 - Primeira vez: `pnpm exec playwright install` (ver [README](../../../README.md)).
 
 ## Arranque e isolamento
@@ -33,9 +34,10 @@ description: >-
 ```bash
 pnpm build:app && pnpm test:e2e
 pnpm test:e2e:ci
+pnpm test
 ```
 
-Linux sem display: `xvfb-run -a pnpm test:e2e:ci`.
+Linux sem display: `xvfb-run -a pnpm test:e2e:ci` ou `xvfb-run -a pnpm test` (suíte completa).
 
 ## Paralelismo
 

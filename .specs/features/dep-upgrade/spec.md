@@ -97,15 +97,16 @@ Por risco:
 
 | ID | Requisito |
 |----|-----------|
-| R-01 | Todas as actualizações BAIXO e MÉDIO devem ser aplicadas com `pnpm install` e `pnpm test` a passar |
-| R-02 | Actualizações ALTO devem ser aplicadas individualmente com gate de testes unitários + typecheck |
+| R-01 | Actualizações BAIXO e MÉDIO: após `pnpm install`, **`pnpm test:unit`** deve passar (coerente com o CI). Antes de encerrar uma fase, recomenda-se **`pnpm test`** (unitários + build + E2E local) |
+| R-02 | Actualizações ALTO devem ser aplicadas individualmente com gate de testes unitários + typecheck (`pnpm test:unit` + `pnpm typecheck`) |
 | R-03 | Actualizações CRÍTICO devem ser aplicadas em fases isoladas com gate E2E completo |
 | R-04 | Após actualização de `bcryptjs` para v3, remover `@types/bcryptjs` |
 | R-05 | `better-sqlite3` major deve ser acompanhado de rebuild nativo (`pnpm rebuild`) |
-| R-06 | A app deve compilar, iniciar e passar todos os testes E2E após cada fase |
+| R-06 | A app deve compilar, iniciar e passar todos os testes E2E após cada fase (validar localmente com **`pnpm test`** ou **`pnpm test:e2e`** após `pnpm build:app`) |
 | R-07 | O `package.json` não deve conter versões pinned (usar `^`) excepto onde explicitamente justificado |
 | R-08 | Adiar React 19 + react-router 7 para uma fase dedicada dado o impacto na UI toda |
 | R-09 | Adiar Tailwind 4 para após confirmação de suporte pelo electron-vite actualizado |
+| R-10 | O CI em `.github/workflows/ci.yml` executa **`pnpm test:unit`**, `typecheck` e `electron-vite build`; não corre E2E Playwright |
 
 ---
 

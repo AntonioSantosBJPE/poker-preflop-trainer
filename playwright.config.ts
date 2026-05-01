@@ -2,7 +2,8 @@ import { defineConfig } from '@playwright/test'
 
 /**
  * Testes E2E lançam o binário Electron com `out/main/index.js`.
- * Execute antes: `pnpm build:app` (ou `pnpm test:e2e:ci`).
+ * Antes do Playwright: `pnpm build:app`, ou `pnpm test:e2e:ci` / `pnpm test` (suíte local completa).
+ * O CI do repo só corre `pnpm test:unit`; E2E é local ou pipeline dedicado.
  */
 export default defineConfig({
   testDir: 'e2e',
