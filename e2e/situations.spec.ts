@@ -12,7 +12,7 @@ test.describe('Situações', () => {
     await appPage.getByRole('button', { name: 'Nova situação' }).click()
     await expect(appPage.getByRole('heading', { name: 'Nova situação' })).toBeVisible()
     await appPage.getByLabel('Nome').fill('')
-    const rangeGrid = appPage.locator('div.select-none.inline-block.rounded-lg.border.border-slate-700')
+    const rangeGrid = appPage.locator('[data-testid="range-grid-13"]')
     await rangeGrid.locator('button[title]').first().click()
     await appPage.getByRole('button', { name: 'Salvar' }).click()
     await expect(appPage.getByText('Nome obrigatório')).toBeVisible()

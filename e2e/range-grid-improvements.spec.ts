@@ -2,7 +2,7 @@ import { test, expect } from './fixtures'
 import { registerAccount } from './helpers/auth'
 import { uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
 
-const rangeGridSelector = 'div.select-none.inline-block.rounded-lg.border.border-slate-700'
+const rangeGridSelector = '[data-testid="range-grid-13"]'
 
 test.describe('Range Grid — melhorias de usabilidade', () => {
   test.beforeEach(async ({ appPage }) => {
@@ -80,18 +80,18 @@ test.describe('Range Grid — melhorias de usabilidade', () => {
   })
 
   test('ação ativa para pintura tem highlight visual na linha', async ({ appPage }) => {
-    const actionsSection = appPage.locator('div.rounded-lg.border.border-slate-800')
-    const actionRows = actionsSection.locator('div[class*="flex flex-wrap gap-2 items-center"]')
+    const actionsSection = appPage.getByTestId('situation-actions-panel')
+    const actionRows = actionsSection.getByTestId('situation-action-row')
 
     // Por padrão a primeira ação está ativa (highlight)
     const firstRow = actionRows.first()
-    await expect(firstRow).toHaveClass(/border-white/)
+    await expect(firstRow).toHaveClass(/border-primary/)
 
     // Clicar em "Pintar" na segunda ação muda o highlight
     const secondRow = actionRows.nth(1)
     await secondRow.getByRole('button', { name: 'Pintar' }).click()
-    await expect(secondRow).toHaveClass(/border-white/)
-    await expect(firstRow).not.toHaveClass(/border-white/)
+    await expect(secondRow).toHaveClass(/border-primary/)
+    await expect(firstRow).not.toHaveClass(/border-primary/)
   })
 
   test('limpar todo o range apaga todas as células', async ({ appPage }) => {
@@ -116,8 +116,8 @@ test.describe('Range Grid — melhorias de usabilidade', () => {
   test('limpar range de uma ação apaga só as células dessa ação', async ({ appPage }) => {
     const rangeGrid = appPage.locator(rangeGridSelector)
     const cells = rangeGrid.locator('button[title]')
-    const actionsSection = appPage.locator('div.rounded-lg.border.border-slate-800')
-    const actionRows = actionsSection.locator('div[class*="flex flex-wrap gap-2 items-center"]')
+    const actionsSection = appPage.getByTestId('situation-actions-panel')
+    const actionRows = actionsSection.getByTestId('situation-action-row')
 
     // Pintar AA com a primeira ação (ativa por padrão)
     const aaCell = cells.filter({ hasText: 'AA' }).first()

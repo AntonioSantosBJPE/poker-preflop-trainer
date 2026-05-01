@@ -14,7 +14,7 @@ export async function registerAccount(page: Page, user: TestUser): Promise<void>
 
 /** Aba “Entrar” (não o botão submit do formulário). */
 export async function switchToLoginTab(page: Page): Promise<void> {
-  await page.locator('div.flex.gap-2.mb-6').getByRole('button', { name: 'Entrar' }).click()
+  await page.getByTestId('auth-tab-login').click()
 }
 
 export async function loginWithPassword(page: Page, email: string, password: string): Promise<void> {

@@ -61,98 +61,117 @@ export function LoginPage(): React.ReactElement {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-8 rounded-xl border border-slate-800 bg-slate-900 shadow-xl">
-      <h1 className="text-2xl font-bold mb-2">Preflop Trainer</h1>
-      <p className="text-slate-400 text-sm mb-6">Treino offline de ranges pré-flop NLHE 6-max.</p>
-      <div className="flex gap-2 mb-6">
-        <button
-          type="button"
-          className={`flex-1 py-2 rounded ${tab === 'login' ? 'bg-emerald-600' : 'bg-slate-800'}`}
-          onClick={() => setTab('login')}
-        >
-          Entrar
-        </button>
-        <button
-          type="button"
-          className={`flex-1 py-2 rounded ${tab === 'register' ? 'bg-emerald-600' : 'bg-slate-800'}`}
-          onClick={() => setTab('register')}
-        >
-          Criar conta
-        </button>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
+      <div className="mb-8 flex flex-col items-center gap-3">
+        <img
+          src="/assets/logo/logo-master.png"
+          alt="Preflop Trainer"
+          className="h-14 w-auto max-w-[280px] object-contain dark:brightness-[1.06]"
+        />
       </div>
-      <form className="space-y-4" onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
-        {tab === 'register' && (
+      <div className="pt-card w-full max-w-md space-y-6 p-8 shadow-lg">
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Preflop Trainer</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Treino offline de ranges pré-flop NLHE 6-max.
+          </p>
+        </div>
+        <div className="mb-6 flex gap-2">
+          <button
+            type="button"
+            data-testid="auth-tab-login"
+            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+              tab === 'login' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+            onClick={() => setTab('login')}
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            data-testid="auth-tab-register"
+            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+              tab === 'register' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+            onClick={() => setTab('register')}
+          >
+            Criar conta
+          </button>
+        </div>
+        <form className="space-y-4" onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
+          {tab === 'register' && (
+            <div>
+              <label htmlFor="auth-name" className="pt-label">
+                Nome
+              </label>
+              <input
+                id="auth-name"
+                autoComplete="name"
+                className="pt-input"
+                aria-invalid={errors.name ? true : undefined}
+                aria-describedby={errors.name ? 'auth-name-error' : undefined}
+                {...register('name')}
+              />
+              {errors.name && (
+                <p id="auth-name-error" className="mt-1 text-sm text-destructive" role="alert">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+          )}
           <div>
-            <label htmlFor="auth-name" className="block text-sm text-slate-400 mb-1">
-              Nome
+            <label htmlFor="auth-email" className="pt-label">
+              E-mail
             </label>
             <input
-              id="auth-name"
-              autoComplete="name"
-              className="w-full rounded bg-slate-950 border border-slate-700 px-3 py-2 aria-invalid:border-red-500"
-              aria-invalid={errors.name ? true : undefined}
-              aria-describedby={errors.name ? 'auth-name-error' : undefined}
-              {...register('name')}
+              id="auth-email"
+              type="email"
+              autoComplete="email"
+              className="pt-input"
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? 'auth-email-error' : undefined}
+              {...register('email')}
             />
-            {errors.name && (
-              <p id="auth-name-error" className="text-red-400 text-sm mt-1" role="alert">
-                {errors.name.message}
+            {errors.email && (
+              <p id="auth-email-error" className="mt-1 text-sm text-destructive" role="alert">
+                {errors.email.message}
               </p>
             )}
           </div>
-        )}
-        <div>
-          <label htmlFor="auth-email" className="block text-sm text-slate-400 mb-1">
-            E-mail
-          </label>
-          <input
-            id="auth-email"
-            type="email"
-            autoComplete="email"
-            className="w-full rounded bg-slate-950 border border-slate-700 px-3 py-2 aria-invalid:border-red-500"
-            aria-invalid={errors.email ? true : undefined}
-            aria-describedby={errors.email ? 'auth-email-error' : undefined}
-            {...register('email')}
-          />
-          {errors.email && (
-            <p id="auth-email-error" className="text-red-400 text-sm mt-1" role="alert">
-              {errors.email.message}
+          <div>
+            <label htmlFor="auth-password" className="pt-label">
+              Senha
+            </label>
+            <input
+              id="auth-password"
+              type="password"
+              autoComplete={tab === 'register' ? 'new-password' : 'current-password'}
+              className="pt-input"
+              aria-invalid={errors.password ? true : undefined}
+              aria-describedby={errors.password ? 'auth-password-error' : undefined}
+              {...register('password')}
+            />
+            {errors.password && (
+              <p id="auth-password-error" className="mt-1 text-sm text-destructive" role="alert">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+          {errors.root?.message && (
+            <p className="text-sm text-destructive" role="alert">
+              {errors.root.message}
             </p>
           )}
-        </div>
-        <div>
-          <label htmlFor="auth-password" className="block text-sm text-slate-400 mb-1">
-            Senha
-          </label>
-          <input
-            id="auth-password"
-            type="password"
-            autoComplete={tab === 'register' ? 'new-password' : 'current-password'}
-            className="w-full rounded bg-slate-950 border border-slate-700 px-3 py-2 aria-invalid:border-red-500"
-            aria-invalid={errors.password ? true : undefined}
-            aria-describedby={errors.password ? 'auth-password-error' : undefined}
-            {...register('password')}
-          />
-          {errors.password && (
-            <p id="auth-password-error" className="text-red-400 text-sm mt-1" role="alert">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-        {errors.root?.message && (
-          <p className="text-red-400 text-sm" role="alert">
-            {errors.root.message}
-          </p>
-        )}
-        <button type="submit" className="w-full py-2 rounded bg-emerald-600 font-medium">
-          {tab === 'login' ? 'Entrar' : 'Cadastrar e entrar'}
-        </button>
-      </form>
-      <p className="mt-6 text-center text-xs text-slate-500">
-        <Link to="/" className="text-emerald-400">
-          Voltar
-        </Link>
-      </p>
+          <button type="submit" className="pt-btn-primary w-full py-2.5">
+            {tab === 'login' ? 'Entrar' : 'Cadastrar e entrar'}
+          </button>
+        </form>
+        <p className="text-center text-xs text-muted-foreground">
+          <Link to="/" className="text-primary hover:underline">
+            Voltar
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }

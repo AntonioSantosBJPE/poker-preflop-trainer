@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { app, BrowserWindow, session } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -15,6 +16,15 @@ log.transports.file.level = 'info'
 Object.assign(console, log.functions)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/** Ícone da janela (Linux/Windows); tenta build `out/renderer` ou fonte `public` em dev. */
+function resolveWindowIcon(): string | undefined {
+  const built = path.join(__dirname, '../renderer/assets/logo/icon.png')
+  if (existsSync(built)) return built
+  const fromSrc = path.join(app.getAppPath(), 'src/renderer/public/assets/logo/icon.png')
+  if (existsSync(fromSrc)) return fromSrc
+  return undefined
+}
 
 function setupCsp(): void {
   // Em dev o renderer vem do servidor Vite (HMR, WebSocket, etc.). CSP estrita quebra a página em branco.
@@ -34,6 +44,7 @@ function setupCsp(): void {
 }
 
 function createWindow(): void {
+  const icon = resolveWindowIcon()
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -41,6 +52,7 @@ function createWindow(): void {
     minHeight: 640,
     show: false,
     autoHideMenuBar: true,
+    ...(icon ? { icon } : {}),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.mjs'),
       contextIsolation: true,

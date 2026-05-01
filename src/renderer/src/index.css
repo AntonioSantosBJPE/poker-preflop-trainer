@@ -1,7 +1,100 @@
+@import '@fontsource/fraunces/400.css';
+@import '@fontsource/fraunces/600.css';
+@import '@fontsource/outfit/400.css';
+@import '@fontsource/outfit/500.css';
+@import '@fontsource/outfit/600.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
+@layer base {
+  :root {
+    --background: 244 241 234;
+    --foreground: 26 46 38;
+    --card: 250 248 244;
+    --card-foreground: 26 46 38;
+    --muted: 235 230 220;
+    --muted-foreground: 74 92 84;
+    --border: 212 207 195;
+    --input: 212 207 195;
+    --primary: 139 105 20;
+    --primary-foreground: 250 248 244;
+    --destructive: 220 38 38;
+    --destructive-foreground: 250 248 244;
+    --ring: 201 162 39;
+    --chart-1: 139 105 20;
+    --chart-2: 74 92 84;
+    --felt-empty: 221 216 206;
+  }
+
+  .dark {
+    --background: 13 31 23;
+    --foreground: 232 240 236;
+    --card: 20 41 32;
+    --card-foreground: 232 240 236;
+    --muted: 30 53 48;
+    --muted-foreground: 156 184 174;
+    --border: 42 74 62;
+    --input: 42 74 62;
+    --primary: 201 162 39;
+    --primary-foreground: 13 31 23;
+    --destructive: 239 68 68;
+    --destructive-foreground: 250 248 244;
+    --ring: 221 184 61;
+    --chart-1: 201 162 39;
+    --chart-2: 127 182 170;
+    --felt-empty: 30 53 48;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-family: Outfit, system-ui, sans-serif;
+    font-feature-settings: 'kern' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: Fraunces, Georgia, serif;
+  }
+}
+
+@layer components {
+  .pt-input {
+    @apply mt-1 w-full rounded-md border border-border bg-muted px-3 py-2 text-foreground shadow-sm transition-colors;
+    @apply placeholder:text-muted-foreground;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  .pt-input[aria-invalid='true'] {
+    @apply border-destructive;
+  }
+
+  .pt-btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors;
+    @apply hover:brightness-110 active:brightness-95;
+    @apply disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  .pt-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors;
+    @apply hover:bg-muted;
+  }
+
+  .pt-card {
+    @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
+  }
+
+  .pt-page-title {
+    @apply font-display text-2xl font-semibold tracking-tight text-foreground;
+  }
+
+  .pt-label {
+    @apply block text-sm text-muted-foreground;
+  }
 }

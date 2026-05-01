@@ -12,6 +12,7 @@ linux:
     - deb
   category: Game
   maintainer: preflop-trainer@example.com
+  icon: src/renderer/public/assets/logo/logo-512x512.png
 win:
   target:
     - nsis

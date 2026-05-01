@@ -213,40 +213,36 @@ export function SituationEditPage(): React.ReactElement {
   }, [actionCombos])
 
   return (
-    <form className="space-y-6 max-w-6xl" onSubmit={(e) => void handleSubmit(onValid)(e)} noValidate>
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">{isNew ? 'Nova situação' : 'Editar situação'}</h1>
-        <button type="submit" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium">
+    <form className="max-w-6xl space-y-6" onSubmit={(e) => void handleSubmit(onValid)(e)} noValidate>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="pt-page-title">{isNew ? 'Nova situação' : 'Editar situação'}</h1>
+        <button type="submit" className="pt-btn-primary">
           Salvar
         </button>
       </div>
       {errors.root?.message && (
-        <p className="text-red-400 text-sm" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {errors.root.message}
         </p>
       )}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <label className="block md:col-span-2" htmlFor="situation-name">
-          <span className="text-sm text-slate-400">Nome</span>
+          <span className="pt-label">Nome</span>
           <input
             id="situation-name"
-            className="mt-1 w-full rounded bg-slate-950 border border-slate-700 px-3 py-2 aria-invalid:border-red-500"
+            className="pt-input"
             aria-invalid={errors.name ? true : undefined}
             {...register('name')}
           />
           {errors.name && (
-            <p className="text-red-400 text-sm mt-1" role="alert">
+            <p className="mt-1 text-sm text-destructive" role="alert">
               {errors.name.message}
             </p>
           )}
         </label>
         <label className="block" htmlFor="situation-position">
-          <span className="text-sm text-slate-400">Posição</span>
-          <select
-            id="situation-position"
-            className="mt-1 w-full rounded bg-slate-950 border border-slate-700 px-3 py-2"
-            {...register('position')}
-          >
+          <span className="pt-label">Posição</span>
+          <select id="situation-position" className="pt-input" {...register('position')}>
             {POSITIONS.map((p) => (
               <option key={p} value={p}>
                 {p}
@@ -255,51 +251,51 @@ export function SituationEditPage(): React.ReactElement {
           </select>
         </label>
         <label className="block" htmlFor="situation-stack">
-          <span className="text-sm text-slate-400">Stack efetivo (BB)</span>
+          <span className="pt-label">Stack efetivo (BB)</span>
           <input
             id="situation-stack"
             type="number"
             min={10}
             max={500}
-            className="mt-1 w-full rounded bg-slate-950 border border-slate-700 px-3 py-2 aria-invalid:border-red-500"
+            className="pt-input"
             aria-invalid={errors.effectiveStack ? true : undefined}
             {...register('effectiveStack', { valueAsNumber: true })}
           />
           {errors.effectiveStack && (
-            <p className="text-red-400 text-sm mt-1" role="alert">
+            <p className="mt-1 text-sm text-destructive" role="alert">
               {errors.effectiveStack.message}
             </p>
           )}
         </label>
         <label className="block md:col-span-2" htmlFor="situation-description">
-          <span className="text-sm text-slate-400">Descrição</span>
-          <textarea
-            id="situation-description"
-            className="mt-1 w-full rounded bg-slate-950 border border-slate-700 px-3 py-2 min-h-[72px]"
-            {...register('description')}
-          />
+          <span className="pt-label">Descrição</span>
+          <textarea id="situation-description" className="pt-input min-h-[72px]" {...register('description')} />
         </label>
       </div>
 
-      <div className="rounded-lg border border-slate-800 p-4 space-y-3">
-        <div className="flex justify-between items-center">
+      <div className="space-y-3 rounded-xl border border-border bg-card p-4" data-testid="situation-actions-panel">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-baseline gap-3">
-            <h2 className="font-medium">Ações</h2>
-            <span className="text-xs text-slate-400 tabular-nums">
+            <h2 className="font-display text-lg font-semibold text-foreground">Ações</h2>
+            <span className="text-xs tabular-nums text-muted-foreground">
               Range total: {((totalCombos / 1326) * 100).toFixed(1)}%
             </span>
           </div>
           <div className="flex gap-3">
-            <button type="button" className="text-sm text-slate-400 hover:text-slate-200" onClick={() => setCells([])}>
+            <button
+              type="button"
+              className="text-sm text-muted-foreground hover:text-foreground"
+              onClick={() => setCells([])}
+            >
               Limpar tudo
             </button>
-            <button type="button" className="text-sm text-emerald-400" onClick={addAction}>
+            <button type="button" className="text-sm font-medium text-primary hover:underline" onClick={addAction}>
               + Adicionar
             </button>
           </div>
         </div>
         {errors.actions && typeof errors.actions === 'object' && 'message' in errors.actions && (
-          <p className="text-red-400 text-sm" role="alert">
+          <p className="text-sm text-destructive" role="alert">
             {(errors.actions as { message?: string }).message}
           </p>
         )}
@@ -312,23 +308,19 @@ export function SituationEditPage(): React.ReactElement {
             return (
               <div
                 key={field.id}
+                data-testid="situation-action-row"
                 className={[
-                  'flex flex-wrap gap-2 items-center p-2 rounded transition-colors',
-                  isActive
-                    ? 'border-2 border-white/30 bg-slate-800/70'
-                    : 'border border-slate-800 bg-slate-900/60'
+                  'flex flex-wrap items-center gap-2 rounded-lg p-2 transition-colors',
+                  isActive ? 'border-2 border-primary/40 bg-muted' : 'border border-border bg-muted/40'
                 ].join(' ')}
               >
                 <input
-                  className="flex-1 min-w-[120px] rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
+                  className="pt-input mt-0 min-w-[120px] flex-1 py-1 text-sm"
                   aria-invalid={errors.actions?.[index]?.name ? true : undefined}
                   {...register(`actions.${index}.name`)}
                 />
                 <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-                <select
-                  className="rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
-                  {...register(`actions.${index}.actionType`)}
-                >
+                <select className="pt-input mt-0 w-auto py-1 text-sm" {...register(`actions.${index}.actionType`)}>
                   {ACTION_TYPES.map((t) => (
                     <option key={t} value={t}>
                       {t}
@@ -339,7 +331,7 @@ export function SituationEditPage(): React.ReactElement {
                   type="number"
                   step="0.1"
                   placeholder="BB"
-                  className="w-24 rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
+                  className="pt-input mt-0 w-24 py-1 text-sm"
                   aria-invalid={errors.actions?.[index]?.sizeBb ? true : undefined}
                   {...register(`actions.${index}.sizeBb`, {
                     setValueAs: (v) => {
@@ -349,29 +341,29 @@ export function SituationEditPage(): React.ReactElement {
                     }
                   })}
                 />
-                <input type="color" className="h-8 w-10 bg-transparent border-0" {...register(`actions.${index}.colorHex`)} />
-                <span className="text-xs text-slate-400 tabular-nums w-14 text-right">{pct}%</span>
+                <input type="color" className="h-8 w-10 border-0 bg-transparent" {...register(`actions.${index}.colorHex`)} />
+                <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">{pct}%</span>
                 <button
                   type="button"
-                  className="text-xs text-emerald-400 hover:text-emerald-300"
+                  className="text-xs font-medium text-primary hover:underline"
                   onClick={() => setActiveActionKey(clientKey)}
                 >
                   Pintar
                 </button>
                 <button
                   type="button"
-                  className="text-xs text-slate-400 hover:text-slate-200"
+                  className="text-xs text-muted-foreground hover:text-foreground"
                   onClick={() => setCells((prev) => prev.filter((c) => c.actionClientKey !== clientKey))}
                 >
                   Limpar
                 </button>
-                <button type="button" className="text-xs text-red-400" onClick={() => removeAt(index)}>
+                <button type="button" className="text-xs text-destructive hover:underline" onClick={() => removeAt(index)}>
                   Remover
                 </button>
                 {(errors.actions?.[index]?.name ||
                   errors.actions?.[index]?.actionType ||
                   errors.actions?.[index]?.sizeBb) && (
-                  <p className="w-full text-red-400 text-xs" role="alert">
+                  <p className="w-full text-xs text-destructive" role="alert">
                     {errors.actions?.[index]?.name?.message ??
                       errors.actions?.[index]?.actionType?.message ??
                       errors.actions?.[index]?.sizeBb?.message}

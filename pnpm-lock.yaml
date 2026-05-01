@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/fraunces':
+        specifier: 5.2.8
+        version: 5.2.8
+      '@fontsource/outfit':
+        specifier: 5.2.8
+        version: 5.2.8
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.74.0(react@18.3.1))
@@ -707,6 +713,12 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource/fraunces@5.2.8':
+    resolution: {integrity: sha512-8xVNY2QaseVks952yq+BseHD+D7eUkaUjdjt5ErbTFZ2LBvjiFEsi55qD7nt0E/h+DDCZMwmETvhijq1FIMigA==}
+
+  '@fontsource/outfit@5.2.8':
+    resolution: {integrity: sha512-rXC6g0MqD7cOBjht0bMqc43qM6lRqDLML9KXsmg9uykz0wLQhy8Z/ajrMG6iyoT3NJR+MYgU+OEHp7uHoTb+Yw==}
 
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
@@ -3894,6 +3906,10 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
+
+  '@fontsource/fraunces@5.2.8': {}
+
+  '@fontsource/outfit@5.2.8': {}
 
   '@gar/promisify@1.1.3': {}
 

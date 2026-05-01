@@ -9,9 +9,11 @@ import {
   XAxis,
   YAxis
 } from 'recharts'
+import { useChartPalette } from '../hooks/useChartPalette'
 
 export function TrainingResultPage(): React.ReactElement {
   const { sessionId } = useParams()
+  const chart = useChartPalette()
   const [summary, setSummary] = useState<{ totalHands: number; correct: number; accuracy: number } | null>(null)
   const [bySit, setBySit] = useState<{ name: string; accuracy: number }[]>([])
 
@@ -40,41 +42,47 @@ export function TrainingResultPage(): React.ReactElement {
     })()
   }, [sessionId])
 
-  if (!summary) return <p className="text-slate-400">Carregando…</p>
+  if (!summary) return <p className="text-muted-foreground">Carregando…</p>
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold">Resultado da sessão</h1>
-      <div className="rounded-lg border border-slate-800 bg-slate-900 p-4 grid md:grid-cols-3 gap-4 text-center">
-        <div>
-          <p className="text-slate-400 text-sm">Mãos</p>
-          <p className="text-3xl font-bold text-emerald-400">{summary.totalHands}</p>
+      <h1 className="pt-page-title">Resultado da sessão</h1>
+      <div className="grid gap-4 text-center md:grid-cols-3 md:items-stretch">
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Mãos</p>
+          <p className="font-display text-3xl font-bold tabular-nums text-primary">{summary.totalHands}</p>
         </div>
-        <div>
-          <p className="text-slate-400 text-sm">Acertos</p>
-          <p className="text-3xl font-bold text-emerald-400">{summary.correct}</p>
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Acertos</p>
+          <p className="font-display text-3xl font-bold tabular-nums text-primary">{summary.correct}</p>
         </div>
-        <div>
-          <p className="text-slate-400 text-sm">Acerto</p>
-          <p className="text-3xl font-bold text-emerald-400">{(summary.accuracy * 100).toFixed(1)}%</p>
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Acerto</p>
+          <p className="font-display text-3xl font-bold tabular-nums text-primary">
+            {(summary.accuracy * 100).toFixed(1)}%
+          </p>
         </div>
       </div>
-      <div className="h-64 rounded-lg border border-slate-800 p-2 bg-slate-900">
+      <div className="h-64 rounded-xl border border-border bg-card p-2">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={bySit}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} tick={{ fill: '#94a3b8', fontSize: 11 }} domain={[0, 1]} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+            <XAxis dataKey="name" tick={{ fill: chart.tick, fontSize: 11 }} />
+            <YAxis
+              tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+              tick={{ fill: chart.tick, fontSize: 11 }}
+              domain={[0, 1]}
+            />
             <Tooltip formatter={(v: number) => `${(v * 100).toFixed(1)}%`} />
-            <Bar dataKey="accuracy" fill="#34d399" />
+            <Bar dataKey="accuracy" fill={chart.primary} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex gap-3">
-        <Link to="/training" className="rounded-lg bg-slate-800 px-4 py-2 text-sm">
+      <div className="flex flex-wrap gap-3">
+        <Link to="/training" className="pt-btn-secondary">
           Nova sessão
         </Link>
-        <Link to="/stats" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm">
+        <Link to="/stats" className="pt-btn-primary">
           Ver estatísticas
         </Link>
       </div>

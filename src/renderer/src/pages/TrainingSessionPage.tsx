@@ -97,14 +97,12 @@ export function TrainingSessionPage(): React.ReactElement {
     }
   }, [sessionId, navigate, dealNextHand])
 
-  // Tick interval: pauses when abandon dialog is open or there is no hand
   useEffect(() => {
     if (!hand || showAbandonDialog) return
     const t = setInterval(() => setTick((x) => x + 1), 200)
     return () => clearInterval(t)
   }, [hand, showAbandonDialog])
 
-  // Compute remaining seconds from deadline ref on every tick
   const remainingSec =
     timerSecondsRef.current && deadlineRef.current
       ? Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000))
@@ -140,7 +138,6 @@ export function TrainingSessionPage(): React.ReactElement {
     }
   }
 
-  // Fire timeout submit using refs to avoid unnecessary effect recreations
   useEffect(() => {
     if (
       !timerSecondsRef.current ||
@@ -156,7 +153,6 @@ export function TrainingSessionPage(): React.ReactElement {
   }, [tick]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function openAbandonDialog(): void {
-    // Freeze the deadline: store remaining ms and clear the deadline so the display stops
     if (deadlineRef.current !== null) {
       pausedRemainingMsRef.current = Math.max(0, deadlineRef.current - Date.now())
       deadlineRef.current = null
@@ -165,7 +161,6 @@ export function TrainingSessionPage(): React.ReactElement {
   }
 
   function closeAbandonDialog(): void {
-    // Restore the deadline from the paused remaining time
     if (pausedRemainingMsRef.current !== null) {
       deadlineRef.current = Date.now() + pausedRemainingMsRef.current
       pausedRemainingMsRef.current = null
@@ -179,22 +174,22 @@ export function TrainingSessionPage(): React.ReactElement {
   }
 
   if (!hand) {
-    return <p className="text-slate-400">Carregando mão…</p>
+    return <p className="text-muted-foreground">Carregando mão…</p>
   }
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex justify-between items-center text-sm text-slate-400">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
         <span>
           Mão {index + 1} / {totalHands}
         </span>
         <div className="flex items-center gap-4">
           {remainingSec !== null && (
-            <span className="text-emerald-400 font-mono">{remainingSec}s</span>
+            <span className="font-mono tabular-nums text-primary">{remainingSec}s</span>
           )}
           <button
             type="button"
-            className="rounded border border-slate-600 bg-slate-800 px-3 py-1 text-sm text-slate-300 hover:border-red-500 hover:text-red-400 transition-colors"
+            className="rounded-lg border border-border bg-muted px-3 py-1 text-sm text-foreground transition-colors hover:border-destructive hover:text-destructive"
             onClick={() => openAbandonDialog()}
           >
             Abandonar
@@ -207,28 +202,18 @@ export function TrainingSessionPage(): React.ReactElement {
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="abandon-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
         >
-          <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 space-y-4 max-w-sm w-full mx-4">
-            <p id="abandon-title" className="text-lg font-semibold text-white">
+          <div className="mx-4 w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-6 shadow-xl">
+            <p id="abandon-title" className="font-display text-lg font-semibold text-foreground">
               Abandonar sessão?
             </p>
-            <p className="text-slate-400 text-sm">
-              O progresso desta sessão será perdido.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                type="button"
-                className="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
-                onClick={() => closeAbandonDialog()}
-              >
+            <p className="text-sm text-muted-foreground">O progresso desta sessão será perdido.</p>
+            <div className="flex justify-end gap-3">
+              <button type="button" className="pt-btn-secondary" onClick={() => closeAbandonDialog()}>
                 Continuar treinando
               </button>
-              <button
-                type="button"
-                className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-                onClick={() => void finishSession()}
-              >
+              <button type="button" className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:brightness-110" onClick={() => void finishSession()}>
                 Confirmar abandono
               </button>
             </div>
@@ -236,8 +221,8 @@ export function TrainingSessionPage(): React.ReactElement {
         </div>
       )}
 
-      <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-2">
-        <p className="text-slate-400 text-sm">{situationName}</p>
+      <div className="space-y-2 rounded-xl border border-border bg-card p-6">
+        <p className="text-sm text-muted-foreground">{situationName}</p>
         <div className="flex gap-4">
           <PlayingCard rank={hand.card1.rank} suit={hand.card1.suit} />
           <PlayingCard rank={hand.card2.rank} suit={hand.card2.suit} />
@@ -250,7 +235,7 @@ export function TrainingSessionPage(): React.ReactElement {
             key={a.id}
             type="button"
             style={{ borderColor: a.colorHex }}
-            className="rounded-lg border-2 bg-slate-950 px-4 py-3 font-medium min-w-[120px]"
+            className="min-w-[120px] rounded-lg border-2 bg-muted px-4 py-3 font-medium text-foreground"
             disabled={Boolean(feedback)}
             onClick={() => void submit(a.id, false)}
           >
@@ -260,11 +245,11 @@ export function TrainingSessionPage(): React.ReactElement {
       </div>
 
       {feedback && feedbackMode === 'IMMEDIATE' && (
-        <div className="rounded-lg border border-slate-700 bg-slate-900/80 p-4 space-y-3">
-          <p className={feedback.ok ? 'text-emerald-400' : 'text-red-400'}>
+        <div className="space-y-3 rounded-lg border border-border bg-card/90 p-4">
+          <p className={feedback.ok ? 'text-primary' : 'text-destructive'}>
             {feedback.ok ? 'Correto' : 'Incorreto'} — {feedback.ms} ms
           </p>
-          <button type="button" className="rounded bg-emerald-600 px-4 py-2 text-sm" onClick={() => void onNextHand()}>
+          <button type="button" className="pt-btn-primary text-sm" onClick={() => void onNextHand()}>
             Próxima mão
           </button>
         </div>

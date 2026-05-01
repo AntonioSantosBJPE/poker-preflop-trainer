@@ -22,40 +22,40 @@ export function SituationsPage(): React.ReactElement {
   }, [])
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Situações</h1>
-        <button
-          type="button"
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium"
-          onClick={() => navigate('/situations/new')}
-        >
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="pt-page-title">Situações</h1>
+        <button type="button" className="pt-btn-primary text-sm" onClick={() => navigate('/situations/new')}>
           Nova situação
         </button>
       </div>
-      <div className="rounded-lg border border-slate-800 overflow-hidden">
+      <div className="pt-card overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-slate-400">
+          <thead className="bg-muted text-muted-foreground">
             <tr>
-              <th className="text-left p-3">Nome</th>
-              <th className="text-left p-3">Posição</th>
-              <th className="text-left p-3">Stack (BB)</th>
+              <th className="p-3 text-left font-medium">Nome</th>
+              <th className="p-3 text-left font-medium">Posição</th>
+              <th className="p-3 text-left font-medium">Stack (BB)</th>
               <th className="p-3" />
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t border-slate-800 hover:bg-slate-900/60">
+              <tr key={r.id} className="border-t border-border hover:bg-muted/40">
                 <td className="p-3">{r.name}</td>
                 <td className="p-3">{r.position}</td>
-                <td className="p-3">{r.effectiveStack}</td>
-                <td className="p-3 text-right space-x-2">
-                  <button type="button" className="text-emerald-400" onClick={() => navigate(`/situations/${r.id}`)}>
+                <td className="p-3 tabular-nums">{r.effectiveStack}</td>
+                <td className="space-x-2 p-3 text-right">
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                    onClick={() => navigate(`/situations/${r.id}`)}
+                  >
                     Editar
                   </button>
                   <button
                     type="button"
-                    className="text-slate-400"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={async () => {
                       await window.api.situations.duplicate(r.id)
                       void load()
@@ -65,7 +65,7 @@ export function SituationsPage(): React.ReactElement {
                   </button>
                   <button
                     type="button"
-                    className="text-amber-400"
+                    className="text-destructive hover:underline"
                     onClick={async () => {
                       await window.api.situations.delete(r.id)
                       void load()
@@ -78,9 +78,9 @@ export function SituationsPage(): React.ReactElement {
             ))}
             {!rows.length && (
               <tr>
-                <td colSpan={4} className="p-6 text-center text-slate-500">
+                <td colSpan={4} className="p-8 text-center text-muted-foreground">
                   Nenhuma situação.{' '}
-                  <Link to="/situations/new" className="text-emerald-400">
+                  <Link to="/situations/new" className="text-primary hover:underline">
                     Criar a primeira
                   </Link>
                 </td>

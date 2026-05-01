@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
 import { expect } from '../fixtures'
 
-const rangeGridSelector = 'div.select-none.inline-block.rounded-lg.border.border-slate-700'
+const rangeGridSelector = '[data-testid="range-grid-13"]'
 
 /** Uma célula pintada satisfaz `validateSituationPayload` (pelo menos uma ação com células). */
 export async function createSituationMinimal(page: Page, name: string): Promise<void> {

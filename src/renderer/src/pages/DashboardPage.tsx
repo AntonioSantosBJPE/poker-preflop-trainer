@@ -22,26 +22,25 @@ export function DashboardPage(): React.ReactElement {
   }, [])
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Olá, {user?.name}</h1>
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Situações ativas</p>
-          <p className="text-3xl font-bold text-emerald-400">{counts.situations}</p>
+    <div className="space-y-8">
+      <h1 className="pt-page-title">Olá, {user?.name}</h1>
+      <div className="grid gap-4 md:grid-cols-3 md:items-stretch">
+        <div className="pt-card flex flex-col justify-between p-5">
+          <p className="text-sm text-muted-foreground">Situações ativas</p>
+          <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">{counts.situations}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Sessões de treino</p>
-          <p className="text-3xl font-bold text-emerald-400">{counts.sessions}</p>
+        <div className="pt-card flex flex-col justify-between p-5">
+          <p className="text-sm text-muted-foreground">Sessões de treino</p>
+          <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">{counts.sessions}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Acerto geral</p>
-          <p className="text-3xl font-bold text-emerald-400">{(counts.accuracy * 100).toFixed(1)}%</p>
+        <div className="pt-card flex flex-col justify-between p-5">
+          <p className="text-sm text-muted-foreground">Acerto geral</p>
+          <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">
+            {(counts.accuracy * 100).toFixed(1)}%
+          </p>
         </div>
       </div>
-      <Link
-        to="/training"
-        className="inline-flex items-center rounded-lg bg-emerald-600 px-5 py-3 font-medium hover:bg-emerald-500"
-      >
+      <Link to="/training" className="pt-btn-primary inline-flex px-6 py-3 text-base">
         Treinar agora
       </Link>
     </div>

@@ -21,6 +21,8 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@fontsource/fraunces": "5.2.8",
+    "@fontsource/outfit": "5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.8.1",

@@ -13,9 +13,9 @@ import {
 
 function sessionsOverviewValue(appPage: Page) {
   return appPage
-    .locator('div.rounded-lg.border.border-slate-800.bg-slate-900.p-4')
-    .filter({ has: appPage.locator('p.text-slate-400.text-sm', { hasText: 'Sessões' }) })
-    .locator('p.text-2xl.font-bold.text-emerald-400')
+    .locator('div.pt-card')
+    .filter({ has: appPage.getByText('Sessões', { exact: true }) })
+    .locator('p.font-display.text-2xl.font-bold')
 }
 
 test.describe('Estatísticas', () => {

@@ -8,8 +8,10 @@ import {
   XAxis,
   YAxis
 } from 'recharts'
+import { useChartPalette } from '../hooks/useChartPalette'
 
 export function StatsPage(): React.ReactElement {
+  const chart = useChartPalette()
   const [overview, setOverview] = useState({ sessions: 0, hands: 0, accuracy: 0, avgResponseMs: 0 })
   const [timeline, setTimeline] = useState<{ date: string; accuracy: number; avgTimeMs: number }[]>([])
   const [bySit, setBySit] = useState<
@@ -32,62 +34,71 @@ export function StatsPage(): React.ReactElement {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Estatísticas</h1>
-      <div className="grid md:grid-cols-4 gap-4">
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Sessões</p>
-          <p className="text-2xl font-bold text-emerald-400">{overview.sessions}</p>
+      <h1 className="pt-page-title">Estatísticas</h1>
+      <div className="grid gap-4 md:grid-cols-4 md:items-stretch">
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Sessões</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-primary">{overview.sessions}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Mãos</p>
-          <p className="text-2xl font-bold text-emerald-400">{overview.hands}</p>
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Mãos</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-primary">{overview.hands}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Acerto geral</p>
-          <p className="text-2xl font-bold text-emerald-400">{(overview.accuracy * 100).toFixed(1)}%</p>
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Acerto geral</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-primary">
+            {(overview.accuracy * 100).toFixed(1)}%
+          </p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-          <p className="text-slate-400 text-sm">Tempo médio</p>
-          <p className="text-2xl font-bold text-emerald-400">{overview.avgResponseMs.toFixed(0)} ms</p>
+        <div className="pt-card p-4">
+          <p className="text-sm text-muted-foreground">Tempo médio</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-primary">
+            {overview.avgResponseMs.toFixed(0)} ms
+          </p>
         </div>
       </div>
 
-      <div className="h-72 rounded-lg border border-slate-800 bg-slate-900 p-2">
+      <div className="h-72 rounded-xl border border-border bg-card p-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={timeline}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis dataKey="date" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="a" domain={[0, 1]} tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="b" orientation="right" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+            <XAxis dataKey="date" tick={{ fill: chart.tick, fontSize: 11 }} />
+            <YAxis
+              yAxisId="a"
+              domain={[0, 1]}
+              tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+              tick={{ fill: chart.tick, fontSize: 11 }}
+            />
+            <YAxis yAxisId="b" orientation="right" tick={{ fill: chart.tick, fontSize: 11 }} />
             <Tooltip />
-            <Line yAxisId="a" type="monotone" dataKey="accuracy" stroke="#34d399" dot={false} name="Acerto" />
-            <Line yAxisId="b" type="monotone" dataKey="avgTimeMs" stroke="#38bdf8" dot={false} name="Tempo ms" />
+            <Line yAxisId="a" type="monotone" dataKey="accuracy" stroke={chart.primary} dot={false} name="Acerto" />
+            <Line yAxisId="b" type="monotone" dataKey="avgTimeMs" stroke={chart.secondary} dot={false} name="Tempo ms" />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-lg border border-slate-800 overflow-hidden">
+      <div className="pt-card overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-slate-400">
+          <thead className="bg-muted text-muted-foreground">
             <tr>
-              <th className="text-left p-3">Situação</th>
-              <th className="text-left p-3">Pos.</th>
-              <th className="text-left p-3">Acerto</th>
-              <th className="text-left p-3">Tempo médio</th>
+              <th className="p-3 text-left font-medium">Situação</th>
+              <th className="p-3 text-left font-medium">Pos.</th>
+              <th className="p-3 text-left font-medium">Acerto</th>
+              <th className="p-3 text-left font-medium">Tempo médio</th>
             </tr>
           </thead>
           <tbody>
             {bySit.map((r) => (
-              <tr key={r.situationId} className="border-t border-slate-800">
+              <tr key={r.situationId} className="border-t border-border">
                 <td className="p-3">{r.name}</td>
                 <td className="p-3">{r.position}</td>
-                <td className="p-3">{(r.accuracy * 100).toFixed(1)}%</td>
-                <td className="p-3">{r.avgResponseMs.toFixed(0)} ms</td>
+                <td className="p-3 tabular-nums">{(r.accuracy * 100).toFixed(1)}%</td>
+                <td className="p-3 tabular-nums">{r.avgResponseMs.toFixed(0)} ms</td>
               </tr>
             ))}
             {!bySit.length && (
               <tr>
-                <td colSpan={4} className="p-6 text-center text-slate-500">
+                <td colSpan={4} className="p-8 text-center text-muted-foreground">
                   Sem dados ainda.
                 </td>
               </tr>
@@ -97,15 +108,15 @@ export function StatsPage(): React.ReactElement {
       </div>
 
       <div>
-        <h2 className="font-medium mb-2">Piores mãos</h2>
-        <ul className="rounded-lg border border-slate-800 divide-y divide-slate-800">
+        <h2 className="mb-2 font-display text-lg font-semibold text-foreground">Piores mãos</h2>
+        <ul className="divide-y divide-border rounded-xl border border-border">
           {worst.map((w) => (
-            <li key={w.label} className="flex justify-between px-3 py-2 text-sm">
-              <span className="font-mono text-slate-300">{w.label}</span>
-              <span className="text-amber-400">{w.count} erros</span>
+            <li key={w.label} className="flex justify-between gap-4 px-3 py-2 text-sm">
+              <span className="font-mono text-foreground">{w.label}</span>
+              <span className="tabular-nums text-primary">{w.count} erros</span>
             </li>
           ))}
-          {!worst.length && <li className="p-4 text-slate-500 text-sm">Sem erros registrados.</li>}
+          {!worst.length && <li className="p-4 text-sm text-muted-foreground">Sem erros registrados.</li>}
         </ul>
       </div>
     </div>

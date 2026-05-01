@@ -70,11 +70,11 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
     const key = `${row},${col}`
     const list = map.get(key) ?? []
     if (!list.length) {
-      return { background: '#1e293b' }
+      return { background: 'rgb(var(--felt-empty))' }
     }
     if (list.length === 1) {
       const a = actions.find((x) => x.clientKey === list[0]!.actionClientKey)
-      return { background: a?.colorHex ?? '#334155' }
+      return { background: a?.colorHex ?? '#64748b' }
     }
     const parts: string[] = []
     let acc = 0
@@ -90,7 +90,8 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
 
   return (
     <div
-      className="select-none inline-block rounded-lg border border-slate-700 p-2 bg-slate-900"
+      data-testid="range-grid-13"
+      className="inline-block select-none rounded-xl border border-border bg-card p-2"
       onMouseLeave={() => setPainting(false)}
       onMouseUp={() => setPainting(false)}
       onContextMenu={(e) => e.preventDefault()}
@@ -98,18 +99,18 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
       <div className="grid gap-0.5" style={{ gridTemplateColumns: `24px repeat(13, minmax(0,1fr))` }}>
         <div />
         {RANK_CHARS.map((r) => (
-          <div key={r} className="text-[10px] text-center text-slate-500">
+          <div key={r} className="text-center text-[10px] text-muted-foreground">
             {r}
           </div>
         ))}
         {RANK_CHARS.map((rRow, row) => (
           <Fragment key={rRow}>
-            <div className="text-[10px] pr-1 flex items-center justify-end text-slate-500">{rRow}</div>
+            <div className="flex items-center justify-end pr-1 text-[10px] text-muted-foreground">{rRow}</div>
             {RANK_CHARS.map((rCol, col) => (
               <button
                 type="button"
                 key={`${row}-${col}`}
-                className="h-7 w-full rounded-sm border border-slate-800 text-[7px] font-semibold text-white/60 hover:outline hover:outline-emerald-500/40 leading-none"
+                className="h-7 w-full rounded-sm border border-border text-[7px] font-semibold leading-none text-foreground/70 hover:outline hover:outline-2 hover:outline-primary/40"
                 style={cellStyle(row, col)}
                 title={label(row, col)}
                 onMouseDown={(e) => onDown(row, col, e)}
@@ -121,7 +122,9 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
           </Fragment>
         ))}
       </div>
-      <p className="mt-2 text-xs text-slate-500">Clique esquerdo: selecionar a ação ativa. Alt+clique ou botão direito: apagar célula.</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Clique esquerdo: selecionar a ação ativa. Alt+clique ou botão direito: apagar célula.
+      </p>
     </div>
   )
 }

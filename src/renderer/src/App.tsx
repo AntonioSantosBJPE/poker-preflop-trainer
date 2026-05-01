@@ -15,7 +15,11 @@ function Protected({ children }: { children: React.ReactNode }): React.ReactElem
   const user = useAuthStore((s) => s.user)
   const ready = useAuthStore((s) => s.ready)
   if (!ready) {
-    return <p className="text-slate-400 p-6">Carregando…</p>
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Carregando…</p>
+      </div>
+    )
   }
   if (!user) {
     return <Navigate to="/login" replace />
