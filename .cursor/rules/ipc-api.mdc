@@ -6,7 +6,7 @@ alwaysApply: false
 
 # IPC
 
-- Canais e semântica alinhados a `docs/agents/CONTRACTS.md` e §6 da spec.
+- Canais e semântica alinhados ao skill `electron-preflop-architecture` (secção IPC) e §6 da spec.
 - Handlers `ipcMain.handle`: assíncronos, erros propagados como exceções (mensagens claras em PT para utilizador quando aplicável).
 - Tipos de payload partilhados em `src/shared/ipc/types.ts` quando fizer sentido.
-- Preload: API `window.api` estável; não alterar nomes de métodos sem atualizar `CONTRACTS.md` e renderer.
+- Preload: API `window.api` estável; não alterar nomes de canais sem atualizar preload, renderer e testes.

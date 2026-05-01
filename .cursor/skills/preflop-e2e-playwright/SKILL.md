@@ -22,7 +22,7 @@ description: >-
 - Ficheiros de teste: **`e2e/**/*.spec.ts`**.
 - Helpers partilhados: **`e2e/helpers/`** (auth, situação, treino).
 - Locators: preferir **`getByRole`**, **`getByLabel`** (alinhado à UI em português).
-- Enums e semântica de grid / ações: [`docs/agents/CONTRACTS.md`](../../../docs/agents/CONTRACTS.md).
+- Enums e semântica de grid / ações: skill `preflop-domain` (secções Grid 13×13 e Ações pré-flop).
 
 ## Boas práticas Playwright genéricas
 

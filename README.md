@@ -15,7 +15,6 @@ Aplicação **desktop** multiplataforma (**Linux** e **Windows**) para treino si
 
 ## Stack
 
-
 | Camada       | Tecnologia                                                          |
 | ------------ | ------------------------------------------------------------------- |
 | UI           | React 18, TypeScript, Tailwind CSS, React Router, Zustand, Recharts |
@@ -24,12 +23,11 @@ Aplicação **desktop** multiplataforma (**Linux** e **Windows**) para treino si
 | Persistência | SQLite (`better-sqlite3`), [Drizzle ORM](https://orm.drizzle.team/) |
 | Auth         | `bcryptjs`, `jsonwebtoken`, `keytar`                                |
 
-
 ---
 
 ## Requisitos
 
-- **Node.js** ≥ 20  
+- **Node.js** ≥ 20
 - **pnpm** (recomendado; o projeto usa `pnpm.onlyBuiltDependencies` para módulos nativos)
 
 Instalação de dependências com scripts de build nativos:
@@ -58,7 +56,6 @@ Abre a aplicação em modo desenvolvimento (hot reload no renderer).
 
 ### Scripts úteis
 
-
 | Comando             | Descrição                                                     |
 | ------------------- | ------------------------------------------------------------- |
 | `pnpm dev`          | Desenvolvimento                                               |
@@ -72,7 +69,6 @@ Abre a aplicação em modo desenvolvimento (hot reload no renderer).
 | `pnpm typecheck`    | Verificação TypeScript (main + renderer)                      |
 | `pnpm db:generate`  | Gera migrações Drizzle a partir do schema                     |
 
-
 ### Testes E2E (Playwright)
 
 A UI corre no **Electron** (IPC + `file://`); os testes lançam `out/main/index.js` com dados de utilizador isolados (`PT_E2E_USER_DATA`) e token em ficheiro (`PT_E2E_TOKEN_FILE`, sem `keytar`). Os cenários estão em `e2e/*.spec.ts` com partilha de lógica em `e2e/helpers/`. Para agentes: convenções em `.cursor/skills/preflop-e2e-playwright/SKILL.md`.
@@ -85,19 +81,13 @@ pnpm test:e2e
 
 Em CI sem display gráfico (Linux): `xvfb-run -a pnpm test:e2e:ci`.
 
-### Cursor — MCP Playwright (navegador web)
-
-O servidor oficial **não** abre esta app Electron; serve para automatizar **sites** em Chromium. Para ativar: **Cursor Settings → MCP → Add new MCP Server** — tipo *command*, comando `npx`, argumentos `@playwright/mcp@latest` (opcional: `--headless`). Documentação: [Playwright MCP](https://playwright.dev/docs/next/getting-started-mcp).
-
 ---
 
 ## Variáveis de ambiente
 
-
 | Variável             | Descrição                                                                                                                                 |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `PREFLOP_JWT_SECRET` | Segredo para assinar JWT de sessão. **Obrigatório em produção**; em desenvolvimento existe um valor por defeito apenas para conveniência. |
-
 
 ---
 
@@ -120,7 +110,7 @@ src/
 └── shared/         # Tipos e lógica partilhada (ex.: poker / grid)
 ```
 
-Documentação para **agentes de IA** e contratos de API: `[AGENTS.md](AGENTS.md)`, `[docs/agents/CONTRACTS.md](docs/agents/CONTRACTS.md)`, `[docs/agents/TASKS_INDEX.md](docs/agents/TASKS_INDEX.md)`.
+Documentação para **agentes de IA**: `[AGENTS.md](AGENTS.md)` e skills em `.cursor/skills/` (domínio, IPC, design, data layer, E2E).
 
 ---
 
@@ -134,7 +124,7 @@ O workflow em `[.github/workflows/ci.yml](.github/workflows/ci.yml)` executa tes
 
 O ficheiro `[electron-builder.yml](electron-builder.yml)` define alvos **Linux** (AppImage e `.deb`) e **Windows** (NSIS). Os artefactos são gerados em `release/` após `pnpm build`.
 
-Atualize no `[package.json](package.json)` os campos `**homepage`**, `**author`** e o `**maintainer**` em `electron-builder.yml` com os dados reais do projeto antes de publicar releases.
+Atualize no `[package.json](package.json)` os campos `**homepage`**, `**author`** e o `**maintainer**`em`electron-builder.yml` com os dados reais do projeto antes de publicar releases.
 
 ---
 
