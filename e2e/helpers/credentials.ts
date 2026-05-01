@@ -4,8 +4,12 @@ export type TestUser = {
   password: string
 }
 
+function uniqueStamp(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
 export function uniqueUserCredentials(): TestUser {
-  const stamp = Date.now()
+  const stamp = uniqueStamp()
   return {
     displayName: `Tester ${stamp}`,
     email: `e2e-${stamp}@test.local`,
@@ -14,5 +18,5 @@ export function uniqueUserCredentials(): TestUser {
 }
 
 export function uniqueSituationName(): string {
-  return `Situação E2E ${Date.now()}`
+  return `Situação E2E ${uniqueStamp()}`
 }

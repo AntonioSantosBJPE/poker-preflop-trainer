@@ -41,4 +41,12 @@ Linux sem display: `xvfb-run -a pnpm test:e2e:ci` ou `xvfb-run -a pnpm test` (su
 
 ## Paralelismo
 
-Manter **`workers: 1`** em [`playwright.config.ts`](../../../playwright.config.ts) salvo isolamento comprovado entre várias instâncias Electron.
+A suite corre com **`fullyParallel: true`** e **`workers: 2`** em local (1 em CI).
+
+**Isolamento já garantido pelo fixture:** cada `test()` lança um processo Electron próprio com `userData` e `tokenFile` em directórios temporários distintos (`mkdtempSync`). Não há estado global partilhado entre testes.
+
+**Regra de unicidade de credenciais:** `uniqueUserCredentials()` e `uniqueSituationName()` em `e2e/helpers/credentials.ts` usam `${Date.now()}-${Math.random().toString(36).slice(2, 8)}` como semente, garantindo colisões impossíveis mesmo com múltiplos workers a gerar credenciais no mesmo milissegundo.
+
+**Para aumentar workers** (ex: pipeline E2E dedicado): ajustar `playwright.config.ts`. Não há limitação no código da app que force um máximo — o limite prático é a carga de CPU/RAM de ter N processos Electron simultâneos e disponibilidade de display (Xvfb ou nativo).
+
+**Não usar `test.describe.serial()`** salvo dependência de estado entre testes no mesmo `describe` comprovada — o padrão é cada teste criar o seu próprio contexto via helpers (`registerAccount`, `createSituationMinimal`, etc.).

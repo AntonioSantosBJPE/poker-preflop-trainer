@@ -7,7 +7,7 @@ alwaysApply: true
 
 - Manter `contextIsolation: true` e `nodeIntegration: false` em `BrowserWindow`.
 - Expor apenas APIs mínimas via `contextBridge` no preload; não expor `ipcRenderer` genérico sem whitelist de canais.
-- JWT de sessão apenas no keychain (`keytar`); nunca em `localStorage` ou ficheiros em texto plano.
+- JWT de sessão apenas no keychain (`keytar`); nunca em `localStorage` ou ficheiros em texto plano em produção. Excepção controlada: `PT_E2E_TOKEN_FILE` em `src/main/services/session.ts` activa armazenamento em ficheiro temporário **exclusivamente** em testes E2E (isolamento sem keyring); não expor em código de produção.
 - Senhas: apenas hash bcrypt (12 rounds) na tabela `users`.
 - Validar inputs no **main** antes de persistir, mesmo que o renderer já valide.
 - Configurar CSP restritiva no `session` (ver `src/main/index.ts`).
