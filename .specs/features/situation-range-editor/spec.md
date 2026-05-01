@@ -9,7 +9,7 @@ Em paralelo, o componente de seleção de range (`RangeGrid13`) usa células e t
 ## Goals
 
 - [x] Ao guardar uma situação (criar ou editar), **toda a grelha 13×13** de combinações válidas SHALL ter pelo menos uma entrada em `range_cells` após normalização, sendo as células sem pintura atribuídas à ação de **fold** (`action_type = FOLD`).
-- [ ] O editor de range SHALL apresentar células e legendas com **tamanho mínimo maior**, mantendo legibilidade e usabilidade (selecção e pintura) sem regressões de layout grave no formulário.
+- [x] O editor de range SHALL apresentar células e legendas com **tamanho mínimo maior**, mantendo legibilidade e usabilidade (selecção e pintura) sem regressões de layout grave no formulário.
 
 ## Out of Scope
 
@@ -73,8 +73,8 @@ Em paralelo, o componente de seleção de range (`RangeGrid13`) usa células e t
 | -------------- | ----- | ----- | ------ |
 | SRANGE-01 | P1: Fold implícito | Implementação | Done |
 | SRANGE-02 | P1: Fold implícito (validação FOLD única / determinística) | Implementação | Done |
-| SRANGE-03 | P1: Grid maior (células e rótulos) | Implementação | Pending |
-| SRANGE-04 | P1: Grid responsivo / usabilidade | Implementação | Pending |
+| SRANGE-03 | P1: Grid maior (células e rótulos) | Implementação | Done |
+| SRANGE-04 | P1: Grid responsivo / usabilidade | Implementação | Done |
 
 **Coverage:** 4 requisitos; mapear para `tasks.md` quando a fase Tasks for aberta.
 
@@ -84,7 +84,7 @@ Em paralelo, o componente de seleção de range (`RangeGrid13`) usa células e t
 
 - [ ] Guardar uma situação com range parcialmente pintado produz `range_cells` que cobrem todas as 169 células do grid 13×13, com não pintadas → `action_id` da acção fold.
 - [ ] Testes automatizados cobrem normalização (unitário em `shared` ou `main`, conforme onde for aplicada a regra) e regressão do schema de payload.
-- [ ] Revisão visual: grid claramente maior que o estado actual; feedback do utilizador-alvo (opcional) ou checklist interno de acessibilidade básica (contraste já definido em design system).
+- [x] Revisão visual: grid claramente maior que o estado actual; feedback do utilizador-alvo (opcional) ou checklist interno de acessibilidade básica (contraste já definido em design system).
 
 ---
 

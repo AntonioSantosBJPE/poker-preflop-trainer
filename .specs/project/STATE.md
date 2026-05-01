@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-01 (situation-groups concluída)
+**Última actualização:** 2026-05-01 (situation-range-editor concluída; situation-groups concluída)
 
 ## Decisões
 
@@ -19,6 +19,7 @@
 | Feature | Data | Notas |
 |---------|------|-------|
 | situation-groups (GRP-01..16) | 2026-05-01 | 25 tasks, 65 unit tests, 8 E2E novos (38 total) |
+| situation-range-editor (SRANGE-01..04) | 2026-05-01 | T1 fold implícito shared; T2 N/A (parse no main); T3 `RangeGrid13` min 36px + scroll |
 
 ## Blockers Activos
 

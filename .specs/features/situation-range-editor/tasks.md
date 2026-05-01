@@ -1,17 +1,17 @@
 # Editor de situação (range + grid) — Tasks
 
 **Spec**: `.specs/features/situation-range-editor/spec.md`  
-**Status**: In Progress (T1 concluída)
+**Status**: Done (T1, T3; T2 N/A)
 
 ---
 
 ## Execution Plan
 
-### Fase 1 — Fold implícito (sequencial)
+### Fase 1 — Fold implícito
 
-T1 → T2
+T1 (T2 N/A — validação já no main via `parseSituationPayload`)
 
-### Fase 2 — Grid maior [P] após T2
+### Fase 2 — Grid maior
 
 T3
 
@@ -41,12 +41,14 @@ T3
 
 ---
 
-### T2: (Reservado) Endurecer mensagens / IPC se necessário
+### T2: (Reservado) Endurecer mensagens / IPC se necessário — **N/A**
 
 **What**: Só se após T1 faltar validação duplicada no `main`; caso contrário marcar como cancelado/N/A.  
 **Depends on**: T1  
 **Tests**: unit  
 **Gate**: `pnpm test:unit`
+
+**Resolução:** `situations:create` e `situations:update` já chamam `parseSituationPayload` no main (`src/main/ipc/situations.ts`), que aplica a mesma normalização de fold implícito que o renderer — não é necessária segunda camada.
 
 ---
 
@@ -60,6 +62,12 @@ T3
 **Tests**: none (smoke visual; `data-testid="range-grid-13"` mantido)  
 **Gate**: `pnpm test:unit` + `pnpm typecheck`
 
+**Done when** (implementado):
+
+- [x] `min-h-9` (36px) nas células e `minmax(2.25rem, 1fr)` nas colunas do grid
+- [x] Rótulos de rank `text-xs`; combo dentro da célula `text-xs`
+- [x] Contenedor `overflow-x-auto` + `max-w-full` no wrapper para viewport estreito
+
 ---
 
 ## Diagrama vs Depends on
@@ -67,7 +75,7 @@ T3
 | Task | Depends on (corpo) | Diagrama | Status |
 | ---- | ------------------ | -------- | ------ |
 | T1   | —                  | T1       | OK     |
-| T2   | T1                 | T1→T2    | OK     |
+| T2   | T1                 | T1→T2    | N/A    |
 | T3   | T1                 | T1→T3    | OK     |
 
 ## Co-localização de testes (matrix implícita)
@@ -75,5 +83,5 @@ T3
 | Task | Camada        | Task Says | Status |
 | ---- | ------------- | --------- | ------ |
 | T1   | shared/forms  | unit      | OK     |
-| T2   | main opcional | unit      | OK     |
+| T2   | main opcional | unit      | N/A    |
 | T3   | renderer UI   | none      | OK     |

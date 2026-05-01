@@ -91,36 +91,43 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
   return (
     <div
       data-testid="range-grid-13"
-      className="inline-block select-none rounded-xl border border-border bg-card p-2"
+      className="inline-block max-w-full select-none rounded-xl border border-border bg-card p-2"
       onMouseLeave={() => setPainting(false)}
       onMouseUp={() => setPainting(false)}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <div className="grid gap-0.5" style={{ gridTemplateColumns: `24px repeat(13, minmax(0,1fr))` }}>
-        <div />
-        {RANK_CHARS.map((r) => (
-          <div key={r} className="text-center text-[10px] text-muted-foreground">
-            {r}
-          </div>
-        ))}
-        {RANK_CHARS.map((rRow, row) => (
-          <Fragment key={rRow}>
-            <div className="flex items-center justify-end pr-1 text-[10px] text-muted-foreground">{rRow}</div>
-            {RANK_CHARS.map((rCol, col) => (
-              <button
-                type="button"
-                key={`${row}-${col}`}
-                className="h-7 w-full rounded-sm border border-border text-[7px] font-semibold leading-none text-foreground/70 hover:outline hover:outline-2 hover:outline-primary/40"
-                style={cellStyle(row, col)}
-                title={label(row, col)}
-                onMouseDown={(e) => onDown(row, col, e)}
-                onMouseEnter={() => onEnter(row, col)}
-              >
-                {label(row, col)}
-              </button>
-            ))}
-          </Fragment>
-        ))}
+      <div className="overflow-x-auto">
+        <div
+          className="grid gap-0.5"
+          style={{ gridTemplateColumns: `2rem repeat(13, minmax(2.25rem, 1fr))` }}
+        >
+          <div />
+          {RANK_CHARS.map((r) => (
+            <div key={r} className="flex min-h-9 items-end justify-center pb-0.5 text-xs font-medium text-muted-foreground">
+              {r}
+            </div>
+          ))}
+          {RANK_CHARS.map((rRow, row) => (
+            <Fragment key={rRow}>
+              <div className="flex min-h-9 items-center justify-end pr-1 text-xs font-medium text-muted-foreground">
+                {rRow}
+              </div>
+              {RANK_CHARS.map((rCol, col) => (
+                <button
+                  type="button"
+                  key={`${row}-${col}`}
+                  className="min-h-9 w-full min-w-[2.25rem] rounded-sm border border-border px-0.5 text-xs font-semibold leading-tight text-foreground/80 hover:outline hover:outline-2 hover:outline-primary/40"
+                  style={cellStyle(row, col)}
+                  title={label(row, col)}
+                  onMouseDown={(e) => onDown(row, col, e)}
+                  onMouseEnter={() => onEnter(row, col)}
+                >
+                  {label(row, col)}
+                </button>
+              ))}
+            </Fragment>
+          ))}
+        </div>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Clique esquerdo: selecionar a ação ativa. Alt+clique ou botão direito: apagar célula.
