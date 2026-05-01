@@ -440,21 +440,21 @@ Paridade com CI (GitHub Actions): **`pnpm test:unit`**, `pnpm typecheck`, `pnpm 
 
 ## Status das Tasks
 
-| Task  | Status  | Observações                                  |
-| ----- | ------- | -------------------------------------------- |
-| T-1.1 | done    | Gate Quick passou — 31 testes + typecheck OK |
-| T-2.1 | pending |                                              |
-| T-2.2 | pending |                                              |
-| T-2.3 | pending |                                              |
-| T-2.4 | pending |                                              |
-| T-3.1 | pending |                                              |
-| T-3.2 | pending |                                              |
-| T-3.3 | pending |                                              |
-| T-3.4 | pending | Pode aguardar T-4.1                          |
-| T-4.1 | pending |                                              |
-| T-4.2 | pending |                                              |
-| T-4.3 | pending |                                              |
-| T-4.4 | pending |                                              |
-| T-5.1 | pending |                                              |
-| T-5.2 | pending |                                              |
-| T-5.3 | pending |                                              |
+| Task  | Status | Observações                                                                                               |
+| ----- | ------ | --------------------------------------------------------------------------------------------------------- |
+| T-1.1 | done   | Gate Quick passou — 31 testes + typecheck OK                                                              |
+| T-2.1 | done   | drizzle-orm 0.45.2 — typecheck + 31 testes OK                                                            |
+| T-2.2 | done   | bcryptjs 3.0.3 + @types/bcryptjs removido — API mantida                                                  |
+| T-2.3 | done   | @types/node 25.6.0 — typecheck OK                                                                        |
+| T-2.4 | done   | eslint 10.2.1 + eslint-plugin-react-hooks 7.1.1                                                          |
+| T-3.1 | done   | typescript 6.0.3; ajustado tsconfig (ignoreDeprecations, noUncheckedSideEffectImports:false)              |
+| T-3.2 | done   | vite 7.3.2 + @vitejs/plugin-react 5.2.0 (v8/v6 aguardam suporte electron-vite — SPEC_DEVIATION aceite)  |
+| T-3.3 | done   | vitest 4.1.5 — 31 testes OK                                                                              |
+| T-3.4 | done   | tailwindcss 4.2.4; migração para @tailwindcss/vite + @theme; tailwind.config.js removido                 |
+| T-4.1 | done   | electron-vite 5.0.0 — feito junto com T-3.2                                                              |
+| T-4.2 | done   | electron 41.4.0 — rebuild OK                                                                             |
+| T-4.3 | done   | electron-builder 26.8.1 + electron-builder-squirrel-windows 26.8.1                                       |
+| T-4.4 | done   | better-sqlite3 12.9.0 — feito junto com T-4.2; rebuild Electron 41 OK                                   |
+| T-5.1 | done   | recharts 3.8.1; corrigido tipo Formatter do Tooltip (v→undefined)                                        |
+| T-5.2 | done   | react-router-dom 7.14.2 — sem alterações de código                                                       |
+| T-5.3 | done   | react + react-dom 19.2.5 + @types/* 19.x — typecheck + 31 testes + build OK                             |

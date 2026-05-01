@@ -73,7 +73,7 @@ export function TrainingResultPage(): React.ReactElement {
               tick={{ fill: chart.tick, fontSize: 11 }}
               domain={[0, 1]}
             />
-            <Tooltip formatter={(v: number) => `${(v * 100).toFixed(1)}%`} />
+            <Tooltip formatter={(v) => typeof v === 'number' ? `${(v * 100).toFixed(1)}%` : v} />
             <Bar dataKey="accuracy" fill={chart.primary} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
