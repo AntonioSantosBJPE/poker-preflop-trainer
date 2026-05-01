@@ -109,7 +109,7 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
               <button
                 type="button"
                 key={`${row}-${col}`}
-                className="h-7 w-full rounded-sm border border-slate-800 text-[8px] text-slate-900/0 hover:outline hover:outline-emerald-500/40"
+                className="h-7 w-full rounded-sm border border-slate-800 text-[7px] font-semibold text-white/60 hover:outline hover:outline-emerald-500/40 leading-none"
                 style={cellStyle(row, col)}
                 title={label(row, col)}
                 onMouseDown={(e) => onDown(row, col, e)}
@@ -121,7 +121,7 @@ export function RangeGrid13({ actions, activeActionKey, cells, onChange }: Props
           </Fragment>
         ))}
       </div>
-      <p className="mt-2 text-xs text-slate-500">Clique esquerdo: pintar ação ativa. Alt+clique ou botão direito: apagar célula.</p>
+      <p className="mt-2 text-xs text-slate-500">Clique esquerdo: selecionar a ação ativa. Alt+clique ou botão direito: apagar célula.</p>
     </div>
   )
 }

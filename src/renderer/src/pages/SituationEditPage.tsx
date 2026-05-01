@@ -8,6 +8,7 @@ import {
   situationPayloadSchema,
   type SituationEditorFormValues
 } from '@shared/forms/situationSchemas'
+import { countCombosForCell } from '@shared/poker/grid'
 import { RangeGrid13, type RangeCellEdit } from '../components/grid/RangeGrid13'
 
 function uid(prefix: string): string {
@@ -196,6 +197,21 @@ export function SituationEditPage(): React.ReactElement {
   const gridActions =
     watchedActions?.map((a) => ({ clientKey: a.clientKey, colorHex: a.colorHex, name: a.name })) ?? []
 
+  const actionCombos = useMemo(() => {
+    const totals = new Map<string, number>()
+    for (const c of cells) {
+      const combos = countCombosForCell(c.rowIndex, c.colIndex) * c.frequency
+      totals.set(c.actionClientKey, (totals.get(c.actionClientKey) ?? 0) + combos)
+    }
+    return totals
+  }, [cells])
+
+  const totalCombos = useMemo(() => {
+    let sum = 0
+    for (const v of actionCombos.values()) sum += v
+    return sum
+  }, [actionCombos])
+
   return (
     <form className="space-y-6 max-w-6xl" onSubmit={(e) => void handleSubmit(onValid)(e)} noValidate>
       <div className="flex justify-between items-center">
@@ -267,10 +283,20 @@ export function SituationEditPage(): React.ReactElement {
 
       <div className="rounded-lg border border-slate-800 p-4 space-y-3">
         <div className="flex justify-between items-center">
-          <h2 className="font-medium">Ações</h2>
-          <button type="button" className="text-sm text-emerald-400" onClick={addAction}>
-            + Adicionar
-          </button>
+          <div className="flex items-baseline gap-3">
+            <h2 className="font-medium">Ações</h2>
+            <span className="text-xs text-slate-400 tabular-nums">
+              Range total: {((totalCombos / 1326) * 100).toFixed(1)}%
+            </span>
+          </div>
+          <div className="flex gap-3">
+            <button type="button" className="text-sm text-slate-400 hover:text-slate-200" onClick={() => setCells([])}>
+              Limpar tudo
+            </button>
+            <button type="button" className="text-sm text-emerald-400" onClick={addAction}>
+              + Adicionar
+            </button>
+          </div>
         </div>
         {errors.actions && typeof errors.actions === 'object' && 'message' in errors.actions && (
           <p className="text-red-400 text-sm" role="alert">
@@ -278,63 +304,82 @@ export function SituationEditPage(): React.ReactElement {
           </p>
         )}
         <div className="space-y-2">
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="flex flex-wrap gap-2 items-center bg-slate-900/60 p-2 rounded border border-slate-800"
-            >
-              <input
-                className="flex-1 min-w-[120px] rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
-                aria-invalid={errors.actions?.[index]?.name ? true : undefined}
-                {...register(`actions.${index}.name`)}
-              />
-              <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-              <select
-                className="rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
-                {...register(`actions.${index}.actionType`)}
+          {fields.map((field, index) => {
+            const clientKey = getValues(`actions.${index}.clientKey`)
+            const isActive = clientKey === activeActionKey
+            const combos = actionCombos.get(clientKey) ?? 0
+            const pct = ((combos / 1326) * 100).toFixed(1)
+            return (
+              <div
+                key={field.id}
+                className={[
+                  'flex flex-wrap gap-2 items-center p-2 rounded transition-colors',
+                  isActive
+                    ? 'border-2 border-white/30 bg-slate-800/70'
+                    : 'border border-slate-800 bg-slate-900/60'
+                ].join(' ')}
               >
-                {ACTION_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                step="0.1"
-                placeholder="BB"
-                className="w-24 rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
-                aria-invalid={errors.actions?.[index]?.sizeBb ? true : undefined}
-                {...register(`actions.${index}.sizeBb`, {
-                  setValueAs: (v) => {
-                    if (v === '' || v === undefined || v === null) return null
-                    const n = Number(v)
-                    return Number.isNaN(n) ? null : n
-                  }
-                })}
-              />
-              <input type="color" className="h-8 w-10 bg-transparent border-0" {...register(`actions.${index}.colorHex`)} />
-              <button
-                type="button"
-                className="text-xs text-emerald-400"
-                onClick={() => setActiveActionKey(getValues(`actions.${index}.clientKey`))}
-              >
-                Pintar
-              </button>
-              <button type="button" className="text-xs text-red-400" onClick={() => removeAt(index)}>
-                Remover
-              </button>
-              {(errors.actions?.[index]?.name ||
-                errors.actions?.[index]?.actionType ||
-                errors.actions?.[index]?.sizeBb) && (
-                <p className="w-full text-red-400 text-xs" role="alert">
-                  {errors.actions?.[index]?.name?.message ??
-                    errors.actions?.[index]?.actionType?.message ??
-                    errors.actions?.[index]?.sizeBb?.message}
-                </p>
-              )}
-            </div>
-          ))}
+                <input
+                  className="flex-1 min-w-[120px] rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
+                  aria-invalid={errors.actions?.[index]?.name ? true : undefined}
+                  {...register(`actions.${index}.name`)}
+                />
+                <input type="hidden" {...register(`actions.${index}.clientKey`)} />
+                <select
+                  className="rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
+                  {...register(`actions.${index}.actionType`)}
+                >
+                  {ACTION_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="BB"
+                  className="w-24 rounded bg-slate-950 border border-slate-700 px-2 py-1 text-sm"
+                  aria-invalid={errors.actions?.[index]?.sizeBb ? true : undefined}
+                  {...register(`actions.${index}.sizeBb`, {
+                    setValueAs: (v) => {
+                      if (v === '' || v === undefined || v === null) return null
+                      const n = Number(v)
+                      return Number.isNaN(n) ? null : n
+                    }
+                  })}
+                />
+                <input type="color" className="h-8 w-10 bg-transparent border-0" {...register(`actions.${index}.colorHex`)} />
+                <span className="text-xs text-slate-400 tabular-nums w-14 text-right">{pct}%</span>
+                <button
+                  type="button"
+                  className="text-xs text-emerald-400 hover:text-emerald-300"
+                  onClick={() => setActiveActionKey(clientKey)}
+                >
+                  Pintar
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-slate-400 hover:text-slate-200"
+                  onClick={() => setCells((prev) => prev.filter((c) => c.actionClientKey !== clientKey))}
+                >
+                  Limpar
+                </button>
+                <button type="button" className="text-xs text-red-400" onClick={() => removeAt(index)}>
+                  Remover
+                </button>
+                {(errors.actions?.[index]?.name ||
+                  errors.actions?.[index]?.actionType ||
+                  errors.actions?.[index]?.sizeBb) && (
+                  <p className="w-full text-red-400 text-xs" role="alert">
+                    {errors.actions?.[index]?.name?.message ??
+                      errors.actions?.[index]?.actionType?.message ??
+                      errors.actions?.[index]?.sizeBb?.message}
+                  </p>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
 

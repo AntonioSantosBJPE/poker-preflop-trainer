@@ -36,3 +36,19 @@ export async function answerFoldImmediate(page: Page): Promise<void> {
 export async function answerFoldEndOfSession(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Fold' }).click()
 }
+
+export async function setTrainingTimer(page: Page, seconds: number): Promise<void> {
+  await page.getByLabel('Timer (s, 0 = desligado)').fill(String(seconds))
+}
+
+export async function clickAbandon(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Abandonar' }).click()
+}
+
+export async function confirmAbandon(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Confirmar abandono' }).click()
+}
+
+export async function cancelAbandon(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Continuar treinando' }).click()
+}

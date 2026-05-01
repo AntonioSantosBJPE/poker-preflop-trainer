@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FeedbackMode } from '../env'
+import { PlayingCard } from '../components/PlayingCard'
 
 type Card = { rank: string; suit: string }
 type Act = { id: number; name: string; colorHex: string }
@@ -25,14 +26,32 @@ export function TrainingSessionPage(): React.ReactElement {
   } | null>(null)
   const [situationName, setSituationName] = useState('')
   const [feedback, setFeedback] = useState<{ ok: boolean; ms: number } | null>(null)
+  const [showAbandonDialog, setShowAbandonDialog] = useState(false)
+
   const deadlineRef = useRef<number | null>(null)
+  const pausedRemainingMsRef = useRef<number | null>(null)
   const [tick, setTick] = useState(0)
   const answeredRef = useRef(false)
   const timerSecondsRef = useRef(timerSeconds)
+  const feedbackRef = useRef(feedback)
+  const handRef = useRef(hand)
+  const showAbandonDialogRef = useRef(showAbandonDialog)
 
   useEffect(() => {
     timerSecondsRef.current = timerSeconds
   }, [timerSeconds])
+
+  useEffect(() => {
+    feedbackRef.current = feedback
+  }, [feedback])
+
+  useEffect(() => {
+    handRef.current = hand
+  }, [hand])
+
+  useEffect(() => {
+    showAbandonDialogRef.current = showAbandonDialog
+  }, [showAbandonDialog])
 
   const dealNextHand = useCallback(async () => {
     answeredRef.current = false
@@ -47,8 +66,8 @@ export function TrainingSessionPage(): React.ReactElement {
     const detail = (await window.api.situations.get(h.situationId)) as { name: string }
     setSituationName(detail.name)
     setFeedback(null)
-    const ts = timerSecondsRef.current
-    deadlineRef.current = ts > 0 ? Date.now() + ts * 1000 : null
+    feedbackRef.current = null
+    deadlineRef.current = timerSecondsRef.current > 0 ? Date.now() + timerSecondsRef.current * 1000 : null
   }, [sessionId])
 
   useEffect(() => {
@@ -78,14 +97,18 @@ export function TrainingSessionPage(): React.ReactElement {
     }
   }, [sessionId, navigate, dealNextHand])
 
+  // Tick interval: pauses when abandon dialog is open or there is no hand
   useEffect(() => {
-    if (!timerSeconds || !deadlineRef.current || feedback) return
+    if (!hand || showAbandonDialog) return
     const t = setInterval(() => setTick((x) => x + 1), 200)
     return () => clearInterval(t)
-  }, [timerSeconds, hand, feedback])
+  }, [hand, showAbandonDialog])
 
+  // Compute remaining seconds from deadline ref on every tick
   const remainingSec =
-    timerSeconds && deadlineRef.current ? Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000)) : null
+    timerSecondsRef.current && deadlineRef.current
+      ? Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000))
+      : null
 
   async function finishSession(): Promise<void> {
     await window.api.training.finishSession(Number(sessionId))
@@ -117,12 +140,38 @@ export function TrainingSessionPage(): React.ReactElement {
     }
   }
 
+  // Fire timeout submit using refs to avoid unnecessary effect recreations
   useEffect(() => {
-    if (!timerSeconds || !hand || feedback || answeredRef.current) return
+    if (
+      !timerSecondsRef.current ||
+      !handRef.current ||
+      feedbackRef.current ||
+      answeredRef.current ||
+      showAbandonDialogRef.current
+    )
+      return
     if (remainingSec === 0) {
       void submit(null, true)
     }
-  }, [tick, timerSeconds, hand, feedback, remainingSec])
+  }, [tick]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function openAbandonDialog(): void {
+    // Freeze the deadline: store remaining ms and clear the deadline so the display stops
+    if (deadlineRef.current !== null) {
+      pausedRemainingMsRef.current = Math.max(0, deadlineRef.current - Date.now())
+      deadlineRef.current = null
+    }
+    setShowAbandonDialog(true)
+  }
+
+  function closeAbandonDialog(): void {
+    // Restore the deadline from the paused remaining time
+    if (pausedRemainingMsRef.current !== null) {
+      deadlineRef.current = Date.now() + pausedRemainingMsRef.current
+      pausedRemainingMsRef.current = null
+    }
+    setShowAbandonDialog(false)
+  }
 
   async function onNextHand(): Promise<void> {
     setFeedback(null)
@@ -135,25 +184,66 @@ export function TrainingSessionPage(): React.ReactElement {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex justify-between text-sm text-slate-400">
+      <div className="flex justify-between items-center text-sm text-slate-400">
         <span>
           Mão {index + 1} / {totalHands}
         </span>
-        {remainingSec !== null && <span className="text-emerald-400 font-mono">{remainingSec}s</span>}
-      </div>
-      <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-2">
-        <p className="text-slate-400 text-sm">{situationName}</p>
-        <div className="flex gap-4 text-4xl font-bold tracking-widest">
-          <span className="rounded-lg bg-white text-slate-900 px-4 py-3">
-            {hand.card1.rank}
-            {hand.card1.suit.toUpperCase()}
-          </span>
-          <span className="rounded-lg bg-white text-slate-900 px-4 py-3">
-            {hand.card2.rank}
-            {hand.card2.suit.toUpperCase()}
-          </span>
+        <div className="flex items-center gap-4">
+          {remainingSec !== null && (
+            <span className="text-emerald-400 font-mono">{remainingSec}s</span>
+          )}
+          <button
+            type="button"
+            className="rounded border border-slate-600 bg-slate-800 px-3 py-1 text-sm text-slate-300 hover:border-red-500 hover:text-red-400 transition-colors"
+            onClick={() => openAbandonDialog()}
+          >
+            Abandonar
+          </button>
         </div>
       </div>
+
+      {showAbandonDialog && (
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="abandon-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+        >
+          <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 space-y-4 max-w-sm w-full mx-4">
+            <p id="abandon-title" className="text-lg font-semibold text-white">
+              Abandonar sessão?
+            </p>
+            <p className="text-slate-400 text-sm">
+              O progresso desta sessão será perdido.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                className="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
+                onClick={() => closeAbandonDialog()}
+              >
+                Continuar treinando
+              </button>
+              <button
+                type="button"
+                className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                onClick={() => void finishSession()}
+              >
+                Confirmar abandono
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-2">
+        <p className="text-slate-400 text-sm">{situationName}</p>
+        <div className="flex gap-4">
+          <PlayingCard rank={hand.card1.rank} suit={hand.card1.suit} />
+          <PlayingCard rank={hand.card2.rank} suit={hand.card2.suit} />
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-3">
         {hand.actions.map((a) => (
           <button
@@ -168,6 +258,7 @@ export function TrainingSessionPage(): React.ReactElement {
           </button>
         ))}
       </div>
+
       {feedback && feedbackMode === 'IMMEDIATE' && (
         <div className="rounded-lg border border-slate-700 bg-slate-900/80 p-4 space-y-3">
           <p className={feedback.ok ? 'text-emerald-400' : 'text-red-400'}>
