@@ -27,7 +27,7 @@ test.describe('Situações', () => {
     await expect(appPage.getByText('Nenhuma situação.')).toBeVisible()
   })
 
-  test('criar mínima, duplicar, editar e arquivar', async ({ appPage }) => {
+  test('criar mínima, duplicar, editar e arquivar com confirmação', async ({ appPage }) => {
     const user = uniqueUserCredentials()
     const name = uniqueSituationName()
     const groupName = uniqueGroupName()
@@ -46,6 +46,10 @@ test.describe('Situações', () => {
     await expect(appPage.getByRole('heading', { name: 'Situações' })).toBeVisible()
 
     const copyRow = appPage.getByRole('row').filter({ hasText: `Cópia de ${name}` })
+    await expect(copyRow).toBeVisible()
+    appPage.once('dialog', async (dialog) => {
+      await dialog.accept()
+    })
     await copyRow.getByRole('button', { name: 'Arquivar' }).click()
     await expect(appPage.getByText(`Cópia de ${name}`)).not.toBeVisible()
     await expect(appPage.getByText(name)).toBeVisible()

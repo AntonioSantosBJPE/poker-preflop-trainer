@@ -12,6 +12,7 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
   const [editing, setEditing] = useState(false)
   const [editName, setEditName] = useState(group.name)
   const [renameError, setRenameError] = useState('')
+  const [archiving, setArchiving] = useState(false)
 
   async function handleSaveRename(): Promise<void> {
     setRenameError('')
@@ -31,15 +32,19 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
   }
 
   async function handleArchive(): Promise<void> {
+    if (archiving) return
     const ok = confirm(
       `Arquivar grupo "${group.name}"? Isto arquivará também as situações do grupo.`
     )
     if (!ok) return
+    setArchiving(true)
     try {
       await window.api.groups.archive(group.id)
       onArchived()
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erro ao arquivar grupo')
+    } finally {
+      setArchiving(false)
     }
   }
 
@@ -106,6 +111,7 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
             type="button"
             className="text-sm text-destructive underline-offset-4 hover:underline"
             data-testid="group-archive-btn"
+            disabled={archiving}
             onClick={() => void handleArchive()}
           >
             Arquivar

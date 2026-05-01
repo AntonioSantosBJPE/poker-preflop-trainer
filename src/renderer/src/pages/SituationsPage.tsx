@@ -8,6 +8,7 @@ export function SituationsPage(): React.ReactElement {
   const [groups, setGroups] = useState<GroupSummaryDto[]>([])
   const [rows, setRows] = useState<Row[]>([])
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
+  const [archivingId, setArchivingId] = useState<number | null>(null)
   const navigate = useNavigate()
 
   async function load(groupId?: number): Promise<void> {
@@ -16,6 +17,19 @@ export function SituationsPage(): React.ReactElement {
   }
 
   const reload = useCallback(() => load(selectedGroupId ?? undefined), [selectedGroupId])
+
+  async function handleArchive(row: Row): Promise<void> {
+    if (archivingId === row.id) return
+    const ok = confirm(`Arquivar situação "${row.name}"?`)
+    if (!ok) return
+    setArchivingId(row.id)
+    try {
+      await window.api.situations.delete(row.id)
+      await reload()
+    } finally {
+      setArchivingId(null)
+    }
+  }
 
   useEffect(() => {
     void (async () => {
@@ -102,10 +116,8 @@ export function SituationsPage(): React.ReactElement {
                   <button
                     type="button"
                     className="text-destructive hover:underline"
-                    onClick={async () => {
-                      await window.api.situations.delete(r.id)
-                      void reload()
-                    }}
+                    disabled={archivingId === r.id}
+                    onClick={() => void handleArchive(r)}
                   >
                     Arquivar
                   </button>

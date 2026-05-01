@@ -16,6 +16,7 @@ export function GroupDetailPage(): React.ReactElement {
 
   const [group, setGroup] = useState<GroupSummaryDto | null | undefined>(undefined)
   const [situations, setSituations] = useState<SituationRow[]>([])
+  const [archivingId, setArchivingId] = useState<number | null>(null)
 
   async function loadGroupsAndSituations(): Promise<void> {
     if (!Number.isFinite(groupId)) {
@@ -42,6 +43,19 @@ export function GroupDetailPage(): React.ReactElement {
   useEffect(() => {
     void loadGroupsAndSituations()
   }, [groupId])
+
+  async function handleArchive(row: SituationRow): Promise<void> {
+    if (archivingId === row.id) return
+    const ok = confirm(`Arquivar situação "${row.name}"?`)
+    if (!ok) return
+    setArchivingId(row.id)
+    try {
+      await window.api.situations.delete(row.id)
+      await loadGroupsAndSituations()
+    } finally {
+      setArchivingId(null)
+    }
+  }
 
   if (group === undefined) {
     return (
@@ -118,10 +132,8 @@ export function GroupDetailPage(): React.ReactElement {
                   <button
                     type="button"
                     className="text-destructive hover:underline"
-                    onClick={async () => {
-                      await window.api.situations.delete(r.id)
-                      void loadGroupsAndSituations()
-                    }}
+                    disabled={archivingId === r.id}
+                    onClick={() => void handleArchive(r)}
                   >
                     Arquivar
                   </button>
