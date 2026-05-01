@@ -18,7 +18,7 @@ test.describe('Treino — seleção por grupo', () => {
     await createSituationMinimal(appPage, sit1, group1)
     await createSituationMinimal(appPage, sit2, group2)
 
-    await appPage.getByRole('link', { name: 'Treino' }).click()
+    await appPage.getByRole('link', { name: 'Treino', exact: true }).click()
     await expect(appPage.getByTestId('training-step-1')).toBeVisible()
     await expect(appPage.getByText(group1)).toBeVisible()
 

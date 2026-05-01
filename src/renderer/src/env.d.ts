@@ -50,6 +50,16 @@ export type Api = {
     finishSession: (sessionId: number) => Promise<unknown>
     getSessionResult: (sessionId: number) => Promise<unknown>
   }
+  simultaneousTraining: {
+    startSession: (config: {
+      tableCount: number
+      groupId: number
+      situationIds: number[]
+      totalHands: number
+      timerSeconds: number
+      feedbackMode: FeedbackMode
+    }) => Promise<{ sessionIds: number[] }>
+  }
   stats: {
     overview: (filters?: unknown) => Promise<unknown>
     bySituation: (filters?: unknown) => Promise<unknown>

@@ -40,6 +40,14 @@ export type TrainingSessionConfig = {
   feedbackMode: FeedbackMode
 }
 
+export type SimultaneousTrainingConfig = TrainingSessionConfig & {
+  tableCount: number
+}
+
+export type SimultaneousTrainingStartResult = {
+  sessionIds: number[]
+}
+
 export type CardDto = { rank: RankChar; suit: SuitChar }
 
 export type DealHandResult = {

@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test'
 import { expect } from '../fixtures'
 
 export async function openTrainingConfig(page: Page): Promise<void> {
-  await page.getByRole('link', { name: 'Treino' }).click()
+  await page.getByRole('link', { name: 'Treino', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Configurar treino' })).toBeVisible()
 }
 

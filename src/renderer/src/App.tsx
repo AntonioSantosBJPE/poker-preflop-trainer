@@ -8,6 +8,9 @@ import { LoginPage } from './pages/LoginPage'
 import { SituationEditPage } from './pages/SituationEditPage'
 import { SituationsPage } from './pages/SituationsPage'
 import { StatsPage } from './pages/StatsPage'
+import { SimultaneousTrainingConfigPage } from './pages/SimultaneousTrainingConfigPage'
+import { SimultaneousTrainingSessionPage } from './pages/SimultaneousTrainingSessionPage'
+import { SimultaneousTrainingSummaryPage } from './pages/SimultaneousTrainingSummaryPage'
 import { TrainingConfigPage } from './pages/TrainingConfigPage'
 import { TrainingResultPage } from './pages/TrainingResultPage'
 import { TrainingSessionPage } from './pages/TrainingSessionPage'
@@ -52,6 +55,9 @@ export function App(): React.ReactElement {
           <Route path="situations/new" element={<SituationEditPage />} />
           <Route path="situations/:id" element={<SituationEditPage />} />
           <Route path="training" element={<TrainingConfigPage />} />
+          <Route path="training/simultaneous" element={<SimultaneousTrainingConfigPage />} />
+          <Route path="training/simultaneous/session" element={<SimultaneousTrainingSessionPage />} />
+          <Route path="training/simultaneous/summary" element={<SimultaneousTrainingSummaryPage />} />
           <Route path="training/:sessionId" element={<TrainingSessionPage />} />
           <Route path="training/:sessionId/result" element={<TrainingResultPage />} />
           <Route path="stats" element={<StatsPage />} />

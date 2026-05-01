@@ -72,6 +72,9 @@ export function AppLayout(): React.ReactElement {
           <NavLink to="/training" className={navLinkClass}>
             Treino
           </NavLink>
+          <NavLink to="/training/simultaneous" className={navLinkClass}>
+            Treino Simultâneo
+          </NavLink>
           <NavLink to="/stats" className={navLinkClass}>
             Estatísticas
           </NavLink>

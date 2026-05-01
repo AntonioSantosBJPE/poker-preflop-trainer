@@ -29,3 +29,22 @@ export function parseTrainingStartSession(raw: unknown): TrainingStartSessionInp
   }
   return r.data
 }
+
+export const simultaneousTrainingStartSchema = trainingStartFormSchema.extend({
+  tableCount: z
+    .coerce.number({ message: 'Número de mesas inválido' })
+    .int('Número de mesas deve ser inteiro')
+    .min(2, 'Mínimo 2 mesas')
+    .max(4, 'Máximo 4 mesas')
+})
+
+export type SimultaneousTrainingStartInput = z.infer<typeof simultaneousTrainingStartSchema>
+export type SimultaneousTrainingStartFormInput = z.input<typeof simultaneousTrainingStartSchema>
+
+export function parseSimultaneousTrainingStart(raw: unknown): SimultaneousTrainingStartInput {
+  const r = simultaneousTrainingStartSchema.safeParse(raw)
+  if (!r.success) {
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos')
+  }
+  return r.data
+}

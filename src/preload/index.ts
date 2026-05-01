@@ -30,6 +30,9 @@ const api = {
     finishSession: (sessionId: number) => ipcRenderer.invoke('training:finishSession', sessionId),
     getSessionResult: (sessionId: number) => ipcRenderer.invoke('training:getSessionResult', sessionId)
   },
+  simultaneousTraining: {
+    startSession: (config: unknown) => ipcRenderer.invoke('simultaneous-training:startSession', config)
+  },
   stats: {
     overview: (filters?: unknown) => ipcRenderer.invoke('stats:overview', filters),
     bySituation: (filters?: unknown) => ipcRenderer.invoke('stats:bySituation', filters),
