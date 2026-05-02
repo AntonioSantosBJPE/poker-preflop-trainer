@@ -14,6 +14,8 @@
   - quick: `pnpm test:unit`
   - e2e feature: `pnpm playwright test <specs>`
   - full: `pnpm test`
+- Ao final de cada bloco do plano de execucao, executar obrigatoriamente `pnpm test`.
+- Bloco so pode ser considerado concluido com `pnpm test` verde.
 - Todo componente/hook/provider extraido do renderer deve receber teste unitario na mesma task
 - Se houver divergencia relevante entre spec/design e implementacao: marcar `SPEC_DEVIATION`
 - Skills recomendadas por task:

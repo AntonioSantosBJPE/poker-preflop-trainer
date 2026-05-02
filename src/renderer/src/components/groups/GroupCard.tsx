@@ -1,6 +1,10 @@
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ConfirmActionDialog, SectionCard } from '@/components/app';
 
 export interface GroupCardProps {
   group: GroupSummaryDto;
@@ -13,6 +17,8 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
   const [editName, setEditName] = useState(group.name);
   const [renameError, setRenameError] = useState('');
   const [archiving, setArchiving] = useState(false);
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const [archiveError, setArchiveError] = useState('');
 
   async function handleSaveRename(): Promise<void> {
     setRenameError('');
@@ -33,33 +39,30 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
 
   async function handleArchive(): Promise<void> {
     if (archiving) return;
-    const ok = confirm(
-      `Arquivar grupo "${group.name}"? Isto arquivará também as situações do grupo.`,
-    );
-    if (!ok) return;
     setArchiving(true);
+    setArchiveError('');
     try {
       await window.api.groups.archive(group.id);
       onArchived();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao arquivar grupo');
+      setArchiveError(err instanceof Error ? err.message : 'Erro ao arquivar grupo');
     } finally {
       setArchiving(false);
     }
   }
 
   return (
-    <div className="pt-card flex flex-col gap-4 p-4" data-testid="group-card">
-      <div className="space-y-1">
+    <SectionCard className="h-full" contentClassName="gap-4 p-4" testId="group-card">
+      <div className="flex flex-col gap-1">
         {editing ? (
           <>
-            <label className="pt-label sr-only" htmlFor={`rename-${group.id}`}>
+            <Label className="sr-only" htmlFor={`rename-${group.id}`}>
               Novo nome do grupo
-            </label>
-            <input
+            </Label>
+            <Input
               id={`rename-${group.id}`}
               type="text"
-              className="pt-input w-full text-base font-medium"
+              className="text-base font-medium"
               value={editName}
               data-testid="group-rename-input"
               onChange={(e) => setEditName(e.target.value)}
@@ -70,20 +73,21 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
               </p>
             ) : null}
             <div className="flex flex-wrap gap-2 pt-2">
-              <button
+              <Button
                 type="button"
-                className="pt-btn-primary text-sm"
+                size="sm"
                 onClick={() => void handleSaveRename()}
               >
                 Salvar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                variant="ghost"
+                size="sm"
                 onClick={handleCancelRename}
               >
                 Cancelar
-              </button>
+              </Button>
             </div>
           </>
         ) : (
@@ -102,9 +106,10 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
       </div>
       {!editing && (
         <div className="mt-auto flex flex-wrap gap-2 border-t border-border pt-4">
-          <button
+          <Button
             type="button"
-            className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            variant="ghost"
+            size="sm"
             data-testid="group-rename-btn"
             onClick={() => {
               setEditName(group.name);
@@ -113,18 +118,28 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
             }}
           >
             Renomear
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="text-sm text-destructive underline-offset-4 hover:underline"
+            variant="destructive"
+            size="sm"
             data-testid="group-archive-btn"
             disabled={archiving}
-            onClick={() => void handleArchive()}
+            onClick={() => setArchiveDialogOpen(true)}
           >
             Arquivar
-          </button>
+          </Button>
         </div>
       )}
-    </div>
+      {archiveError ? <p className="text-sm text-destructive">{archiveError}</p> : null}
+      <ConfirmActionDialog
+        open={archiveDialogOpen}
+        onOpenChange={setArchiveDialogOpen}
+        title={`Arquivar grupo \"${group.name}\"?`}
+        description="Isto arquivará também as situações do grupo."
+        confirmLabel="Arquivar"
+        onConfirm={handleArchive}
+      />
+    </SectionCard>
   );
 }

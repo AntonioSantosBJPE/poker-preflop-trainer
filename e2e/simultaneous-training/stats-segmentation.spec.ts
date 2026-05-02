@@ -10,10 +10,7 @@ import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
 
 function sessionsOverviewValue(appPage: Page) {
-  return appPage
-    .locator('div.pt-card')
-    .filter({ has: appPage.getByText('Sessões', { exact: true }) })
-    .locator('p.font-display.text-2xl.font-bold');
+  return appPage.getByTestId('stats-overview-sessions');
 }
 
 async function startSimultaneousViaApi(

@@ -1,5 +1,9 @@
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { EmptyState, PageHeader, SectionCard } from '@/components/app';
 import { GroupCard } from '../components/groups/GroupCard';
 
 export function GroupsPage(): React.ReactElement {
@@ -41,61 +45,69 @@ export function GroupsPage(): React.ReactElement {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="pt-page-title">Grupos</h1>
-        <button type="button" className="pt-btn-primary text-sm" onClick={openNewForm}>
-          Novo grupo
-        </button>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Grupos"
+        actions={
+          <Button type="button" onClick={openNewForm}>
+            Novo grupo
+          </Button>
+        }
+      />
 
       {showNewForm && (
-        <div className="pt-card space-y-3 p-4" data-testid="new-group-form">
-          <label className="pt-label" htmlFor="new-group-name">
-            Nome do grupo
-          </label>
-          <input
-            id="new-group-name"
-            type="text"
-            className="pt-input max-w-md"
-            value={newName}
-            data-testid="new-group-input"
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') void handleCreate();
-            }}
-          />
-          {newError ? (
-            <p className="text-sm text-destructive" data-testid="new-group-error">
-              {newError}
-            </p>
-          ) : null}
+        <SectionCard
+          title="Novo grupo"
+          contentClassName="gap-3"
+          className="max-w-2xl"
+          testId="new-group-form"
+        >
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="new-group-name">Nome do grupo</Label>
+            <Input
+              id="new-group-name"
+              type="text"
+              value={newName}
+              data-testid="new-group-input"
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void handleCreate();
+              }}
+            />
+            {newError ? (
+              <p className="text-sm text-destructive" data-testid="new-group-error">
+                {newError}
+              </p>
+            ) : null}
+          </div>
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
               type="button"
-              className="pt-btn-primary text-sm"
               onClick={() => void handleCreate()}
             >
               Criar
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              variant="ghost"
               onClick={cancelNewForm}
             >
               Cancelar
-            </button>
+            </Button>
           </div>
-        </div>
+        </SectionCard>
       )}
 
       {!groups.length && (
-        <div className="space-y-4">
-          <p className="text-muted-foreground">Sem grupos ainda. Crie o primeiro grupo.</p>
-          <button type="button" className="pt-btn-primary text-sm" onClick={openNewForm}>
-            Criar primeiro grupo
-          </button>
-        </div>
+        <EmptyState
+          title="Nenhum grupo cadastrado"
+          description="Crie seu primeiro grupo para organizar as situações de treino."
+          action={
+            <Button type="button" onClick={openNewForm}>
+              Criar primeiro grupo
+            </Button>
+          }
+        />
       )}
 
       <div

@@ -1,5 +1,4 @@
 import { test, expect } from './fixtures';
-import type { Dialog } from '@playwright/test';
 import { registerAccount } from './helpers/auth';
 import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials';
 import { createGroup } from './helpers/group';
@@ -25,7 +24,7 @@ test.describe('Situações', () => {
     await registerAccount(appPage, user);
     await appPage.getByRole('link', { name: 'Situações' }).click();
     await expect(appPage.getByRole('heading', { name: 'Situações' })).toBeVisible();
-    await expect(appPage.getByText('Nenhuma situação.')).toBeVisible();
+    await expect(appPage.getByText('Nenhuma situação')).toBeVisible();
   });
 
   test('criar mínima, duplicar, editar e arquivar com confirmação', async ({ appPage }) => {
@@ -51,11 +50,9 @@ test.describe('Situações', () => {
 
     const copyRow = appPage.getByRole('row').filter({ hasText: `Cópia de ${name}` });
     await expect(copyRow).toBeVisible();
-    appPage.once('dialog', async (dialog: Dialog) => {
-      await dialog.accept();
-    });
     await copyRow.getByRole('button', { name: 'Arquivar' }).click();
-    await expect(appPage.getByText(`Cópia de ${name}`)).not.toBeVisible();
+    await appPage.getByRole('button', { name: 'Arquivar' }).click();
+    await expect(appPage.getByRole('row').filter({ hasText: `Cópia de ${name}` })).toHaveCount(0);
     await expect(appPage.getByText(name)).toBeVisible();
   });
 });

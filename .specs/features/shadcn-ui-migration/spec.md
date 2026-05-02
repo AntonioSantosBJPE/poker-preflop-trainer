@@ -191,6 +191,8 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 - Todo componente reaproveitavel extraido do renderer deve ter cobertura unitaria co-localizada.
 - Mocks de `window.api` devem substituir IPC real nos testes unitarios do renderer.
 - O grid 13x13, dialogs e filtros precisam de testes unitarios focados em comportamento visual/interativo, nao apenas snapshot.
+- Ao concluir cada bloco de execucao (Blocos 0, 1, 2, 3 e 4), a equipa SHALL executar a suite completa com `pnpm test`.
+- Um bloco so pode ser marcado como concluido quando `pnpm test` terminar verde (unit + build + E2E).
 
 ---
 
@@ -239,10 +241,10 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 | T-01 | Done | 2026-05-02 |
 | T-02 | Done | 2026-05-02 |
 | T-03 | Done | 2026-05-02 |
-| T-04 | Pending | - |
-| T-05 | Pending | - |
-| T-06 | Pending | - |
-| T-07 | Pending | - |
+| T-04 | Done | 2026-05-02 |
+| T-05 | Done | 2026-05-02 |
+| T-06 | Done | 2026-05-02 |
+| T-07 | Done | 2026-05-02 |
 | T-08 | Pending | - |
 | T-09 | Pending | - |
 | T-10 | Pending | - |

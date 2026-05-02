@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures';
-import type { Dialog } from '@playwright/test';
 import { registerAccount } from '../helpers/auth';
 import { uniqueGroupName, uniqueUserCredentials } from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
@@ -25,9 +24,9 @@ test.describe('Grupos — CRUD', () => {
     await expect(appPage.getByText(groupName)).not.toBeVisible();
 
     const renamedCard = appPage.getByTestId('group-card').filter({ hasText: renamedName });
-    appPage.once('dialog', (dialog: Dialog) => dialog.accept());
     await renamedCard.getByTestId('group-archive-btn').click();
-    await expect(appPage.getByText(renamedName)).not.toBeVisible();
+    await appPage.getByRole('button', { name: 'Arquivar' }).click();
+    await expect(appPage.getByTestId('group-card').filter({ hasText: renamedName })).toHaveCount(0);
   });
 
   test('E2E-GRP-02: nome duplicado mostra erro', async ({ appPage }) => {

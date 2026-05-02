@@ -14,10 +14,7 @@ import {
 } from './helpers/training';
 
 function sessionsOverviewValue(appPage: Page) {
-  return appPage
-    .locator('div.pt-card')
-    .filter({ has: appPage.getByText('Sessões', { exact: true }) })
-    .locator('p.font-display.text-2xl.font-bold');
+  return appPage.getByTestId('stats-overview-sessions');
 }
 
 async function startSimultaneousViaApi(
@@ -49,7 +46,7 @@ test.describe('Estatísticas', () => {
     await registerAccount(appPage, user);
     await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
     await expect(appPage.getByRole('heading', { name: 'Estatísticas' })).toBeVisible();
-    await expect(appPage.getByRole('cell', { name: /Sem dados ainda/ })).toBeVisible();
+    await expect(appPage.getByText('Sem dados por situação')).toBeVisible();
     await expect(sessionsOverviewValue(appPage)).toHaveText('0');
   });
 
