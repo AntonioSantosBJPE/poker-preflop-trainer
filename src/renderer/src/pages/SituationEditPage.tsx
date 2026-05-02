@@ -1,42 +1,42 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { ACTION_TYPES, POSITIONS } from '@shared/constants'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useMemo, useState } from 'react';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ACTION_TYPES, POSITIONS } from '@shared/constants';
 import {
   situationEditorFormSchema,
   situationPayloadSchema,
-  type SituationEditorFormValues
-} from '@shared/forms/situationSchemas'
-import { countCombosForCell } from '@shared/poker/grid'
-import { RangeGrid13, type RangeCellEdit } from '../components/grid/RangeGrid13'
-import type { GroupSummaryDto } from '@shared/ipc/types'
+  type SituationEditorFormValues,
+} from '@shared/forms/situationSchemas';
+import { countCombosForCell } from '@shared/poker/grid';
+import { RangeGrid13, type RangeCellEdit } from '../components/grid/RangeGrid13';
+import type { GroupSummaryDto } from '@shared/ipc/types';
 
 function uid(prefix: string): string {
-  return `${prefix}-${Math.random().toString(36).slice(2, 9)}`
+  return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 function ipcErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message
+  if (err instanceof Error) return err.message;
   if (typeof err === 'object' && err !== null && 'message' in err) {
-    return String((err as { message: unknown }).message)
+    return String((err as { message: unknown }).message);
   }
-  return 'Erro'
+  return 'Erro';
 }
 
 export function SituationEditPage(): React.ReactElement {
-  const { id } = useParams()
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const isNew = !id || id === 'new'
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const isNew = !id || id === 'new';
 
-  const groupIdQuery = searchParams.get('groupId')
+  const groupIdQuery = searchParams.get('groupId');
   const newFormDefaults = useMemo<SituationEditorFormValues>(
     () => ({
       name: '',
       groupId: (() => {
-        const n = groupIdQuery ? Number(groupIdQuery) : NaN
-        return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0
+        const n = groupIdQuery ? Number(groupIdQuery) : NaN;
+        return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
       })(),
       position: 'BTN',
       description: '',
@@ -47,19 +47,19 @@ export function SituationEditPage(): React.ReactElement {
           name: 'Fold',
           actionType: 'FOLD',
           sizeBb: null,
-          colorHex: '#95A5A6'
+          colorHex: '#95A5A6',
         },
         {
           clientKey: uid('a'),
           name: 'Raise 2.5BB',
           actionType: 'RAISE_OPEN',
           sizeBb: 2.5,
-          colorHex: '#27AE60'
-        }
-      ]
+          colorHex: '#27AE60',
+        },
+      ],
     }),
-    [groupIdQuery]
-  )
+    [groupIdQuery],
+  );
 
   const {
     register,
@@ -69,98 +69,103 @@ export function SituationEditPage(): React.ReactElement {
     getValues,
     setError,
     clearErrors,
-    formState: { errors }
+    formState: { errors },
   } = useForm<SituationEditorFormValues>({
     resolver: zodResolver(situationEditorFormSchema),
     defaultValues: newFormDefaults,
-    mode: 'onSubmit'
-  })
+    mode: 'onSubmit',
+  });
 
   useEffect(() => {
-    if (!isNew) return
-    reset(newFormDefaults)
-    setCells([])
-    setActiveActionKey(newFormDefaults.actions[0]?.clientKey ?? '')
-  }, [isNew, newFormDefaults, reset])
+    if (!isNew) return;
+    reset(newFormDefaults);
+    setCells([]);
+    setActiveActionKey(newFormDefaults.actions[0]?.clientKey ?? '');
+  }, [isNew, newFormDefaults, reset]);
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'actions'
-  })
+    name: 'actions',
+  });
 
-  const watchedActions = useWatch({ control, name: 'actions' })
+  const watchedActions = useWatch({ control, name: 'actions' });
 
-  const [activeActionKey, setActiveActionKey] = useState('')
-  const [cells, setCells] = useState<RangeCellEdit[]>([])
-  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
+  const [activeActionKey, setActiveActionKey] = useState('');
+  const [cells, setCells] = useState<RangeCellEdit[]>([]);
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
 
   useEffect(() => {
     void (async () => {
-      const list = (await window.api.groups.list()) as GroupSummaryDto[]
-      setGroups(list)
-    })()
-  }, [])
+      const list = (await window.api.groups.list()) as GroupSummaryDto[];
+      setGroups(list);
+    })();
+  }, []);
 
   useEffect(() => {
-    const acts = watchedActions
-    if (!acts?.length) return
+    const acts = watchedActions;
+    if (!acts?.length) return;
     if (!activeActionKey || !acts.some((a) => a.clientKey === activeActionKey)) {
-      setActiveActionKey(acts[0]!.clientKey)
+      setActiveActionKey(acts[0]!.clientKey);
     }
-  }, [watchedActions, activeActionKey])
+  }, [watchedActions, activeActionKey]);
 
   useEffect(() => {
-    if (isNew) return
-    let cancelled = false
+    if (isNew) return;
+    let cancelled = false;
     void (async () => {
       const s = (await window.api.situations.get(Number(id))) as {
-        name: string
-        groupId: number
-        position: string
-        description: string | null
-        effectiveStack: number
+        name: string;
+        groupId: number;
+        position: string;
+        description: string | null;
+        effectiveStack: number;
         actions: {
-          id: number
-          name: string
-          actionType: string
-          sizeBb: number | null
-          colorHex: string
-          sortOrder: number
-        }[]
-        rangeCells: { actionId: number; rowIndex: number; colIndex: number; frequency: number }[]
-      }
-      if (cancelled) return
+          id: number;
+          name: string;
+          actionType: string;
+          sizeBb: number | null;
+          colorHex: string;
+          sortOrder: number;
+        }[];
+        rangeCells: {
+          actionId: number;
+          rowIndex: number;
+          colIndex: number;
+          frequency: number;
+        }[];
+      };
+      if (cancelled) return;
       const mapped = s.actions.map((a) => ({
         clientKey: `k-${a.id}`,
         name: a.name,
         actionType: a.actionType as SituationEditorFormValues['actions'][number]['actionType'],
         sizeBb: a.sizeBb,
-        colorHex: a.colorHex
-      }))
+        colorHex: a.colorHex,
+      }));
       reset({
         name: s.name,
         groupId: s.groupId,
         position: s.position as SituationEditorFormValues['position'],
         description: s.description ?? '',
         effectiveStack: s.effectiveStack,
-        actions: mapped
-      })
-      setActiveActionKey(mapped[0]?.clientKey ?? '')
+        actions: mapped,
+      });
+      setActiveActionKey(mapped[0]?.clientKey ?? '');
       setCells(
         s.rangeCells
           .map((c) => ({
             actionClientKey: `k-${c.actionId}`,
             rowIndex: c.rowIndex,
             colIndex: c.colIndex,
-            frequency: c.frequency
+            frequency: c.frequency,
           }))
-          .filter((c) => mapped.some((m) => m.clientKey === c.actionClientKey))
-      )
-    })()
+          .filter((c) => mapped.some((m) => m.clientKey === c.actionClientKey)),
+      );
+    })();
     return () => {
-      cancelled = true
-    }
-  }, [id, isNew, reset])
+      cancelled = true;
+    };
+  }, [id, isNew, reset]);
 
   function addAction(): void {
     const row: SituationEditorFormValues['actions'][number] = {
@@ -168,23 +173,23 @@ export function SituationEditPage(): React.ReactElement {
       name: 'Nova ação',
       actionType: 'CALL',
       sizeBb: null,
-      colorHex: '#3498DB'
-    }
-    append(row)
-    setActiveActionKey(row.clientKey)
+      colorHex: '#3498DB',
+    };
+    append(row);
+    setActiveActionKey(row.clientKey);
   }
 
   function removeAt(index: number): void {
-    const all = getValues('actions')
-    const key = all[index]?.clientKey
-    const nextFirst = all.filter((_, i) => i !== index)[0]?.clientKey ?? ''
-    remove(index)
-    if (key) setCells((prev) => prev.filter((c) => c.actionClientKey !== key))
-    if (key && activeActionKey === key) setActiveActionKey(nextFirst)
+    const all = getValues('actions');
+    const key = all[index]?.clientKey;
+    const nextFirst = all.filter((_, i) => i !== index)[0]?.clientKey ?? '';
+    remove(index);
+    if (key) setCells((prev) => prev.filter((c) => c.actionClientKey !== key));
+    if (key && activeActionKey === key) setActiveActionKey(nextFirst);
   }
 
   async function onValid(values: SituationEditorFormValues): Promise<void> {
-    clearErrors('root')
+    clearErrors('root');
     const payload = {
       name: values.name.trim(),
       groupId: values.groupId,
@@ -197,48 +202,56 @@ export function SituationEditPage(): React.ReactElement {
         actionType: a.actionType,
         sizeBb: a.sizeBb,
         colorHex: a.colorHex,
-        sortOrder: a.sortOrder ?? i
+        sortOrder: a.sortOrder ?? i,
       })),
-      rangeCells: cells
-    }
-    const parsed = situationPayloadSchema.safeParse(payload)
+      rangeCells: cells,
+    };
+    const parsed = situationPayloadSchema.safeParse(payload);
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message ?? 'Dados inválidos'
-      setError('root', { message: msg })
-      return
+      const msg = parsed.error.issues[0]?.message ?? 'Dados inválidos';
+      setError('root', { message: msg });
+      return;
     }
     try {
       if (isNew) {
-        await window.api.situations.create(parsed.data)
+        await window.api.situations.create(parsed.data);
       } else {
-        await window.api.situations.update(Number(id), parsed.data)
+        await window.api.situations.update(Number(id), parsed.data);
       }
-      navigate('/situations')
+      navigate('/situations');
     } catch (err) {
-      setError('root', { message: ipcErrorMessage(err) })
+      setError('root', { message: ipcErrorMessage(err) });
     }
   }
 
   const gridActions =
-    watchedActions?.map((a) => ({ clientKey: a.clientKey, colorHex: a.colorHex, name: a.name })) ?? []
+    watchedActions?.map((a) => ({
+      clientKey: a.clientKey,
+      colorHex: a.colorHex,
+      name: a.name,
+    })) ?? [];
 
   const actionCombos = useMemo(() => {
-    const totals = new Map<string, number>()
+    const totals = new Map<string, number>();
     for (const c of cells) {
-      const combos = countCombosForCell(c.rowIndex, c.colIndex) * c.frequency
-      totals.set(c.actionClientKey, (totals.get(c.actionClientKey) ?? 0) + combos)
+      const combos = countCombosForCell(c.rowIndex, c.colIndex) * c.frequency;
+      totals.set(c.actionClientKey, (totals.get(c.actionClientKey) ?? 0) + combos);
     }
-    return totals
-  }, [cells])
+    return totals;
+  }, [cells]);
 
   const totalCombos = useMemo(() => {
-    let sum = 0
-    for (const v of actionCombos.values()) sum += v
-    return sum
-  }, [actionCombos])
+    let sum = 0;
+    for (const v of actionCombos.values()) sum += v;
+    return sum;
+  }, [actionCombos]);
 
   return (
-    <form className="max-w-6xl space-y-6" onSubmit={(e) => void handleSubmit(onValid)(e)} noValidate>
+    <form
+      className="max-w-6xl space-y-6"
+      onSubmit={(e) => void handleSubmit(onValid)(e)}
+      noValidate
+    >
       <div className="flex items-center justify-between gap-4">
         <h1 className="pt-page-title">{isNew ? 'Nova situação' : 'Editar situação'}</h1>
         <button type="submit" className="pt-btn-primary">
@@ -274,10 +287,10 @@ export function SituationEditPage(): React.ReactElement {
             aria-invalid={errors.groupId ? true : undefined}
             {...register('groupId', {
               setValueAs: (v) => {
-                if (v === '' || v === undefined || v === null) return 0
-                const n = Number(v)
-                return Number.isNaN(n) ? 0 : n
-              }
+                if (v === '' || v === undefined || v === null) return 0;
+                const n = Number(v);
+                return Number.isNaN(n) ? 0 : n;
+              },
             })}
           >
             <option value="">Selecione um grupo…</option>
@@ -288,7 +301,11 @@ export function SituationEditPage(): React.ReactElement {
             ))}
           </select>
           {errors.groupId && (
-            <p className="mt-1 text-sm text-destructive" role="alert" data-testid="situation-group-error">
+            <p
+              className="mt-1 text-sm text-destructive"
+              role="alert"
+              data-testid="situation-group-error"
+            >
               {errors.groupId.message}
             </p>
           )}
@@ -322,11 +339,18 @@ export function SituationEditPage(): React.ReactElement {
         </label>
         <label className="block md:col-span-2" htmlFor="situation-description">
           <span className="pt-label">Descrição</span>
-          <textarea id="situation-description" className="pt-input min-h-[72px]" {...register('description')} />
+          <textarea
+            id="situation-description"
+            className="pt-input min-h-18"
+            {...register('description')}
+          />
         </label>
       </div>
 
-      <div className="space-y-3 rounded-xl border border-border bg-card p-4" data-testid="situation-actions-panel">
+      <div
+        className="space-y-3 rounded-xl border border-border bg-card p-4"
+        data-testid="situation-actions-panel"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-baseline gap-3">
             <h2 className="font-display text-lg font-semibold text-foreground">Ações</h2>
@@ -342,7 +366,11 @@ export function SituationEditPage(): React.ReactElement {
             >
               Limpar tudo
             </button>
-            <button type="button" className="text-sm font-medium text-primary hover:underline" onClick={addAction}>
+            <button
+              type="button"
+              className="text-sm font-medium text-primary hover:underline"
+              onClick={addAction}
+            >
               + Adicionar
             </button>
           </div>
@@ -354,26 +382,31 @@ export function SituationEditPage(): React.ReactElement {
         )}
         <div className="space-y-2">
           {fields.map((field, index) => {
-            const clientKey = getValues(`actions.${index}.clientKey`)
-            const isActive = clientKey === activeActionKey
-            const combos = actionCombos.get(clientKey) ?? 0
-            const pct = ((combos / 1326) * 100).toFixed(1)
+            const clientKey = getValues(`actions.${index}.clientKey`);
+            const isActive = clientKey === activeActionKey;
+            const combos = actionCombos.get(clientKey) ?? 0;
+            const pct = ((combos / 1326) * 100).toFixed(1);
             return (
               <div
                 key={field.id}
                 data-testid="situation-action-row"
                 className={[
                   'flex flex-wrap items-center gap-2 rounded-lg p-2 transition-colors',
-                  isActive ? 'border-2 border-primary/40 bg-muted' : 'border border-border bg-muted/40'
+                  isActive
+                    ? 'border-2 border-primary/40 bg-muted'
+                    : 'border border-border bg-muted/40',
                 ].join(' ')}
               >
                 <input
-                  className="pt-input mt-0 min-w-[120px] flex-1 py-1 text-sm"
+                  className="pt-input mt-0 min-w-30 flex-1 py-1 text-sm"
                   aria-invalid={errors.actions?.[index]?.name ? true : undefined}
                   {...register(`actions.${index}.name`)}
                 />
                 <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-                <select className="pt-input mt-0 w-auto py-1 text-sm" {...register(`actions.${index}.actionType`)}>
+                <select
+                  className="pt-input mt-0 w-auto py-1 text-sm"
+                  {...register(`actions.${index}.actionType`)}
+                >
                   {ACTION_TYPES.map((t) => (
                     <option key={t} value={t}>
                       {t}
@@ -388,14 +421,20 @@ export function SituationEditPage(): React.ReactElement {
                   aria-invalid={errors.actions?.[index]?.sizeBb ? true : undefined}
                   {...register(`actions.${index}.sizeBb`, {
                     setValueAs: (v) => {
-                      if (v === '' || v === undefined || v === null) return null
-                      const n = Number(v)
-                      return Number.isNaN(n) ? null : n
-                    }
+                      if (v === '' || v === undefined || v === null) return null;
+                      const n = Number(v);
+                      return Number.isNaN(n) ? null : n;
+                    },
                   })}
                 />
-                <input type="color" className="h-8 w-10 border-0 bg-transparent" {...register(`actions.${index}.colorHex`)} />
-                <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">{pct}%</span>
+                <input
+                  type="color"
+                  className="h-8 w-10 border-0 bg-transparent"
+                  {...register(`actions.${index}.colorHex`)}
+                />
+                <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">
+                  {pct}%
+                </span>
                 <button
                   type="button"
                   className="text-xs font-medium text-primary hover:underline"
@@ -406,11 +445,17 @@ export function SituationEditPage(): React.ReactElement {
                 <button
                   type="button"
                   className="text-xs text-muted-foreground hover:text-foreground"
-                  onClick={() => setCells((prev) => prev.filter((c) => c.actionClientKey !== clientKey))}
+                  onClick={() =>
+                    setCells((prev) => prev.filter((c) => c.actionClientKey !== clientKey))
+                  }
                 >
                   Limpar
                 </button>
-                <button type="button" className="text-xs text-destructive hover:underline" onClick={() => removeAt(index)}>
+                <button
+                  type="button"
+                  className="text-xs text-destructive hover:underline"
+                  onClick={() => removeAt(index)}
+                >
                   Remover
                 </button>
                 {(errors.actions?.[index]?.name ||
@@ -423,7 +468,7 @@ export function SituationEditPage(): React.ReactElement {
                   </p>
                 )}
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -435,5 +480,5 @@ export function SituationEditPage(): React.ReactElement {
         onChange={setCells}
       />
     </form>
-  )
+  );
 }

@@ -4,49 +4,54 @@
  */
 
 export type SituationActionFoldPick = {
-  clientKey: string
-  actionType: string
-  sortOrder?: number
-}
+  clientKey: string;
+  actionType: string;
+  sortOrder?: number;
+};
 
 export type SituationRangeCellInput = {
-  actionClientKey: string
-  rowIndex: number
-  colIndex: number
-  frequency: number
-}
+  actionClientKey: string;
+  rowIndex: number;
+  colIndex: number;
+  frequency: number;
+};
 
 export function pickFoldClientKeyForImplicit(actions: SituationActionFoldPick[]): string | null {
   const folds = actions
-    .map((a, index) => ({ clientKey: a.clientKey, actionType: a.actionType, sortOrder: a.sortOrder, index }))
-    .filter((a) => a.actionType === 'FOLD')
-  if (folds.length === 0) return null
+    .map((a, index) => ({
+      clientKey: a.clientKey,
+      actionType: a.actionType,
+      sortOrder: a.sortOrder,
+      index,
+    }))
+    .filter((a) => a.actionType === 'FOLD');
+  if (folds.length === 0) return null;
   folds.sort((a, b) => {
-    const sa = a.sortOrder ?? a.index
-    const sb = b.sortOrder ?? b.index
-    if (sa !== sb) return sa - sb
-    return a.index - b.index
-  })
-  return folds[0]!.clientKey
+    const sa = a.sortOrder ?? a.index;
+    const sb = b.sortOrder ?? b.index;
+    if (sa !== sb) return sa - sb;
+    return a.index - b.index;
+  });
+  return folds[0]!.clientKey;
 }
 
 /** Preenche cada (row,col) sem entradas com uma linha fold a frequência 1. */
 export function appendImplicitFoldRangeCells(
   actions: SituationActionFoldPick[],
-  rangeCells: SituationRangeCellInput[]
+  rangeCells: SituationRangeCellInput[],
 ): SituationRangeCellInput[] {
-  const foldKey = pickFoldClientKeyForImplicit(actions)
-  if (foldKey === null) return rangeCells.slice()
+  const foldKey = pickFoldClientKeyForImplicit(actions);
+  if (foldKey === null) return rangeCells.slice();
 
-  const painted = new Set(rangeCells.map((c) => `${c.rowIndex},${c.colIndex}`))
-  const extra: SituationRangeCellInput[] = []
+  const painted = new Set(rangeCells.map((c) => `${c.rowIndex},${c.colIndex}`));
+  const extra: SituationRangeCellInput[] = [];
   for (let row = 0; row < 13; row++) {
     for (let col = 0; col < 13; col++) {
-      const k = `${row},${col}`
+      const k = `${row},${col}`;
       if (!painted.has(k)) {
-        extra.push({ actionClientKey: foldKey, rowIndex: row, colIndex: col, frequency: 1 })
+        extra.push({ actionClientKey: foldKey, rowIndex: row, colIndex: col, frequency: 1 });
       }
     }
   }
-  return rangeCells.length === 0 ? extra : [...rangeCells, ...extra]
+  return rangeCells.length === 0 ? extra : [...rangeCells, ...extra];
 }

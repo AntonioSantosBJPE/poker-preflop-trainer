@@ -9,6 +9,7 @@
 ## Estratégia
 
 Os ajustes são mínimos e seguros — o isolamento já existe no fixture. O trabalho é:
+
 1. Corrigir a geração de credenciais (único risco real de colisão)
 2. Activar paralelismo na config do Playwright
 3. Actualizar skill e rule para reflectir o novo estado
@@ -29,15 +30,16 @@ T-1 (credentials) → T-2 (playwright.config) → T-3 (validação) → T-4 (ski
 
 ```ts
 // antes
-const stamp = Date.now()
+const stamp = Date.now();
 
 // depois — unicidade garantida mesmo com múltiplos workers
-const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 ```
 
 **Ambas as funções** (`uniqueUserCredentials` e `uniqueSituationName`) usam `stamp`, logo a mudança é aplicada uma vez na variável local.
 
 **Done when:**
+
 - `e2e/helpers/credentials.ts` usa `${Date.now()}-${Math.random().toString(36).slice(2, 8)}` como stamp
 - Formato do email: `e2e-<stamp>@test.local`
 - Formato do nome: `Tester <stamp>`
@@ -58,20 +60,22 @@ const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 ```ts
 export default defineConfig({
   testDir: 'e2e',
-  fullyParallel: true,                                    // cada test() corre em worker próprio
-  workers: process.env.CI ? 1 : 2,                       // local: 2 workers; CI: mantém 1 (sem display dedicado)
+  fullyParallel: true, // cada test() corre em worker próprio
+  workers: process.env.CI ? 1 : 2, // local: 2 workers; CI: mantém 1 (sem display dedicado)
   timeout: 120_000,
   expect: { timeout: 35_000 },
   forbidOnly: !!process.env.CI,
-  reporter: process.env.CI ? [['github'], ['list']] : [['list']]
-})
+  reporter: process.env.CI ? [['github'], ['list']] : [['list']],
+});
 ```
 
 **Justificação de `workers: process.env.CI ? 1 : 2`:**
+
 - **Local**: 2 workers → ganho de velocidade imediato sem pressão de recursos
 - **CI** (GitHub Actions, sem display Electron dedicado): 1 worker mantém estabilidade. O CI já só corre `pnpm test:unit` conforme documentado; E2E em CI dedicado pode aumentar workers quando houver infra própria.
 
 **Done when:**
+
 - `playwright.config.ts` tem `fullyParallel: true` e `workers: process.env.CI ? 1 : 2`
 - Sem erros de TypeScript
 
@@ -86,16 +90,19 @@ export default defineConfig({
 **Onde:** Linha de comandos
 
 **Comando:**
+
 ```bash
 pnpm test:e2e:ci
 ```
 
 Em ambiente headless (sem display):
+
 ```bash
 xvfb-run -a pnpm test:e2e:ci
 ```
 
 **Done when:**
+
 - Todos os testes passam (0 falhas, 0 flakiness)
 - Tempo de execução total inferior ao baseline com `workers: 1`
 - Nenhuma colisão de credenciais
@@ -107,6 +114,7 @@ xvfb-run -a pnpm test:e2e:ci
 ## T-4 — Actualizar skill `preflop-e2e-playwright`
 
 **O quê:** A skill documenta `workers: 1` como invariante a manter. Após os ajustes, esta restrição deixa de existir. A skill deve:
+
 - Remover a nota de "Manter `workers: 1`"
 - Documentar as novas regras de paralelismo (isolamento por fixture, credentials com entropia)
 - Actualizar a secção "Paralelismo"
@@ -114,6 +122,7 @@ xvfb-run -a pnpm test:e2e:ci
 **Onde:** `.cursor/skills/preflop-e2e-playwright/SKILL.md`
 
 **Done when:**
+
 - Secção "Paralelismo" reflecte `fullyParallel: true` e `workers: 2` (local) / `workers: 1` (CI)
 - Documentada a regra de unicidade de credenciais com `Date.now() + Math.random()`
 - Sem referências desactualizadas a `workers: 1` obrigatório
@@ -129,6 +138,7 @@ xvfb-run -a pnpm test:e2e:ci
 **Onde:** `.cursor/rules/electron-security.mdc`, `AGENTS.md`
 
 **Done when:**
+
 - Rules relevantes reflectem o estado actual dos testes E2E
 - Sem informação contraditória entre skill e rules
 
@@ -138,10 +148,10 @@ xvfb-run -a pnpm test:e2e:ci
 
 ## Status das Tasks
 
-| Task | Status | Observações |
-|------|--------|-------------|
-| T-1  | done   | `uniqueStamp()` com `${Date.now()}-${Math.random().toString(36).slice(2, 8)}` |
-| T-2  | done   | `fullyParallel: true`, `workers: process.env.CI ? 1 : 2` |
-| T-3  | done   | 30 passed em 37.4s com 2 workers — zero falhas |
-| T-4  | done   | Secção "Paralelismo" da skill actualizada com regras de isolamento e unicidade |
+| Task | Status | Observações                                                                                   |
+| ---- | ------ | --------------------------------------------------------------------------------------------- |
+| T-1  | done   | `uniqueStamp()` com `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`                 |
+| T-2  | done   | `fullyParallel: true`, `workers: process.env.CI ? 1 : 2`                                      |
+| T-3  | done   | 30 passed em 37.4s com 2 workers — zero falhas                                                |
+| T-4  | done   | Secção "Paralelismo" da skill actualizada com regras de isolamento e unicidade                |
 | T-5  | done   | `electron-security.mdc` actualizada com excepção explícita para `PT_E2E_TOKEN_FILE` em testes |

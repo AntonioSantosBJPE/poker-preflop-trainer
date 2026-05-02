@@ -4,21 +4,21 @@
 
 ## Decisões
 
-| ID  | Decisão | Racional | Data |
-|-----|---------|----------|------|
-| D-01 | Usar pnpm como package manager | Melhor gestão de dependências nativas Electron (better-sqlite3, keytar) via `onlyBuiltDependencies` | 2026-05-01 |
-| D-02 | Adiar actualização React 18→19 e react-router 6→7 para fase própria | Breaking changes significativos; requerem validação E2E completa | 2026-05-01 |
-| D-03 | Adiar electron 33→41, electron-vite 2→5 e vite 5→8 para fase própria | Saltos de versão major com potencial impacto no build e IPC | 2026-05-01 |
-| D-04 | [situation-groups] Arquivar grupo arquiva situações em cascata | Modelo mental mais simples; consistência de estado | 2026-05-01 |
-| D-05 | [situation-groups] UI de treino: escolher grupo primeiro, depois situações do grupo | Evita mistura cross-group naturalmente; fluxo claro | 2026-05-01 |
-| D-06 | [situation-groups] Stats filtradas por tabs horizontais por grupo | Acesso rápido; adequado para < 10 grupos | 2026-05-01 |
-| D-07 | [situation-groups] Migração limpa DB (sem preservação de dados antigos) | Sistema em desenvolvimento; sem dados de produção a preservar | 2026-05-01 |
+| ID   | Decisão                                                                             | Racional                                                                                            | Data       |
+| ---- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------- |
+| D-01 | Usar pnpm como package manager                                                      | Melhor gestão de dependências nativas Electron (better-sqlite3, keytar) via `onlyBuiltDependencies` | 2026-05-01 |
+| D-02 | Adiar actualização React 18→19 e react-router 6→7 para fase própria                 | Breaking changes significativos; requerem validação E2E completa                                    | 2026-05-01 |
+| D-03 | Adiar electron 33→41, electron-vite 2→5 e vite 5→8 para fase própria                | Saltos de versão major com potencial impacto no build e IPC                                         | 2026-05-01 |
+| D-04 | [situation-groups] Arquivar grupo arquiva situações em cascata                      | Modelo mental mais simples; consistência de estado                                                  | 2026-05-01 |
+| D-05 | [situation-groups] UI de treino: escolher grupo primeiro, depois situações do grupo | Evita mistura cross-group naturalmente; fluxo claro                                                 | 2026-05-01 |
+| D-06 | [situation-groups] Stats filtradas por tabs horizontais por grupo                   | Acesso rápido; adequado para < 10 grupos                                                            | 2026-05-01 |
+| D-07 | [situation-groups] Migração limpa DB (sem preservação de dados antigos)             | Sistema em desenvolvimento; sem dados de produção a preservar                                       | 2026-05-01 |
 
 ## Features Concluídas
 
-| Feature | Data | Notas |
-|---------|------|-------|
-| situation-groups (GRP-01..16) | 2026-05-01 | 25 tasks, 65 unit tests, 8 E2E novos (38 total) |
+| Feature                                | Data       | Notas                                                                                |
+| -------------------------------------- | ---------- | ------------------------------------------------------------------------------------ |
+| situation-groups (GRP-01..16)          | 2026-05-01 | 25 tasks, 65 unit tests, 8 E2E novos (38 total)                                      |
 | situation-range-editor (SRANGE-01..04) | 2026-05-01 | T1 fold implícito shared; T2 N/A (parse no main); T3 `RangeGrid13` min 36px + scroll |
 
 ## Blockers Activos

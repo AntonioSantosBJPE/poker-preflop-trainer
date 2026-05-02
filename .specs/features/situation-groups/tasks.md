@@ -3,15 +3,15 @@
 **Status:** Done ✓  
 **Spec:** `spec.md` (GRP-01 a GRP-16 — P1 MVP)  
 **Design:** `design.md`  
-**Requisitos cobertos:** GRP-01 a GRP-16  
+**Requisitos cobertos:** GRP-01 a GRP-16
 
 ---
 
 ## Convenções
 
-- `[P]` — pode correr em paralelo com outras tasks do mesmo bloco  
-- **Gate check** para cada task: comando a correr para verificar que passou  
-- **SPEC_DEVIATION** — marcado no PR/commit se a implementação divergir do design  
+- `[P]` — pode correr em paralelo com outras tasks do mesmo bloco
+- **Gate check** para cada task: comando a correr para verificar que passou
+- **SPEC_DEVIATION** — marcado no PR/commit se a implementação divergir do design
 - Sub-agentes recebem: esta task + design.md (secção relevante) + CONVENTIONS.md + TESTING.md (quando há gate)
 
 ---
@@ -27,11 +27,13 @@
 **O quê:** Adicionar `situationGroups` ao `schema.ts`; adicionar `groupId` às tabelas `situations` e `trainingSessions`.
 
 **Onde:**
+
 - `src/main/db/schema.ts`
 
 **Design ref:** §2.1, §2.2, §2.3, §2.4
 
 **O que fazer:**
+
 1. Adicionar export `situationGroups` com colunas: `id`, `userId` (FK→users, cascade delete), `name`, `sortOrder`, `isActive`, `createdAt`, `updatedAt`.
 2. Adicionar unique constraint `(userId, name)` via `.unique()` na coluna ou `.uniqueIndex`.
 3. Adicionar coluna `groupId: integer('group_id').notNull().references(() => situationGroups.id)` à tabela `situations`.
@@ -43,6 +45,7 @@
 **Reuses:** Padrão das tabelas existentes (`users`, `situations`) em `schema.ts`.
 
 **Done when:**
+
 - `pnpm typecheck` passa sem erros relacionados com o schema.
 - Os tipos gerados pelo Drizzle incluem `groupId` em `situations` e `trainingSessions`.
 
@@ -55,12 +58,14 @@
 **O quê:** Gerar o ficheiro SQL de migração após T-01 e documentar o procedimento de reset.
 
 **Onde:**
+
 - `src/main/db/migrations/` (novo ficheiro gerado)
 - `package.json` (verificar scripts `db:generate`, `db:reset`)
 
 **Design ref:** §2.5, §10
 
 **O que fazer:**
+
 1. Após T-01 estar merged: `pnpm db:generate` para gerar a migration.
 2. Verificar que o SQL gerado cria `situation_groups`, adiciona `group_id` a `situations` (NOT NULL) e a `training_sessions` (nullable).
 3. Verificar que `pnpm db:reset` funciona (limpa + re-migra) — executar em dev.
@@ -69,6 +74,7 @@
 **Depends on:** T-01
 
 **Done when:**
+
 - Ficheiro `src/main/db/migrations/XXXX_situation_groups.sql` existe e contém a DDL esperada.
 - `pnpm db:reset && pnpm db:migrate` (ou equivalente) completa sem erros.
 
@@ -81,11 +87,13 @@
 **O quê:** Adicionar `GroupSummaryDto` e atualizar tipos existentes em `src/shared/ipc/types.ts`.
 
 **Onde:**
+
 - `src/shared/ipc/types.ts`
 
 **Design ref:** §5
 
 **O que fazer:**
+
 1. Adicionar export `GroupSummaryDto` com campos: `id`, `name`, `sortOrder`, `isActive`, `situationCount`.
 2. Adicionar campo `groupId: number` a `SituationSummaryDto`.
 3. Adicionar campo `groupId: number` a `TrainingSessionConfig` (obrigatório).
@@ -106,6 +114,7 @@
 **O quê:** Criar `src/shared/forms/groupSchemas.ts` e atualizar `situationSchemas.ts` e `trainingSchemas.ts`.
 
 **Onde:**
+
 - `src/shared/forms/groupSchemas.ts` (novo)
 - `src/shared/forms/situationSchemas.ts`
 - `src/shared/forms/trainingSchemas.ts`
@@ -113,6 +122,7 @@
 **Design ref:** §6
 
 **O que fazer:**
+
 1. Criar `groupSchemas.ts` com:
    - `groupCreateSchema`: `{ name: z.string().trim().min(1).max(100) }`
    - `groupRenameSchema`: `{ id: z.number().int().positive(), name: ... }`
@@ -143,11 +153,13 @@
 **O quê:** Criar o módulo de funções puras de DB para grupos.
 
 **Onde:**
+
 - `src/main/db/groups.ts` (novo)
 
 **Design ref:** §3
 
 **O que fazer:**
+
 1. Implementar `listGroups(db, userId): Promise<GroupSummaryDto[]>` — lista grupos ativos com `situationCount` (subquery COUNT situações ativas).
 2. Implementar `createGroup(db, userId, name): Promise<{ id: number }>` — verifica unicidade `(userId, name)` antes de inserir; lança `'Nome de grupo já existe'` se duplicado.
 3. Implementar `renameGroup(db, userId, id, name): Promise<void>` — atualiza nome; verifica unicidade excluindo o próprio id.
@@ -161,6 +173,7 @@
 **Done when:** `pnpm typecheck` passa; testes unitários cobrem todos os cenários críticos.
 
 **Tests:** Criar `src/main/db/groups.test.ts` com testes unitários (usando in-memory SQLite ou mock do `db`):
+
 - `listGroups`: retorna lista vazia; retorna grupos com contagem correta.
 - `createGroup`: sucesso; lança em nome duplicado.
 - `renameGroup`: sucesso; lança em nome duplicado para outro grupo.
@@ -177,11 +190,13 @@
 **O quê:** Criar os handlers IPC `groups:list`, `groups:create`, `groups:rename`, `groups:archive`.
 
 **Onde:**
+
 - `src/main/ipc/groups.ts` (novo)
 
 **Design ref:** §4
 
 **O que fazer:**
+
 1. Implementar `registerGroupsIpc()` com `ipcMain.handle` para cada canal.
 2. `groups:list` — chama `listGroups`; retorna `GroupSummaryDto[]`.
 3. `groups:create` — valida com `parseGroupCreate`; chama `createGroup`; retorna `{ id }`.
@@ -195,6 +210,7 @@
 **Done when:** `pnpm typecheck` passa; testes unitários cobrem handlers.
 
 **Tests:** Criar `src/main/ipc/groups.test.ts`:
+
 - Mock de `requireUserId`, `getDb`, funções DB.
 - Testar: validação de input inválido rejeita; input válido delega para DB; erros de DB propagados.
 - Meta: ≥ 80% statement coverage.
@@ -208,11 +224,13 @@
 **O quê:** Adicionar `registerGroupsIpc()` ao `registerAllIpc()`.
 
 **Onde:**
+
 - `src/main/ipc/register.ts`
 
 **Design ref:** §4
 
 **O que fazer:**
+
 1. Importar `registerGroupsIpc` de `./groups`.
 2. Chamar `registerGroupsIpc()` dentro de `registerAllIpc()`.
 
@@ -229,11 +247,13 @@
 **O quê:** Atualizar os handlers IPC de situações para suportar `groupId`.
 
 **Onde:**
+
 - `src/main/ipc/situations.ts`
 
 **Design ref:** §4.1
 
 **O que fazer:**
+
 1. `situations:list` — aceitar filtro opcional `{ groupId?: number }`; adicionar cláusula `eq(situations.groupId, groupId)` quando presente.
 2. `situations:create` — payload agora inclui `groupId` (obrigatório via schema atualizado em T-04); persistir `groupId`.
 3. `situations:update` — payload inclui `groupId` (permite mover situação para outro grupo — GRP-07).
@@ -253,11 +273,13 @@
 **O quê:** Atualizar `training:startSession` para validar cross-group e persistir `groupId`.
 
 **Onde:**
+
 - `src/main/ipc/training.ts`
 
 **Design ref:** §4.1 (training:startSession)
 
 **O que fazer:**
+
 1. `parseTrainingStartSession` já incluirá `groupId` após T-04 — usar resultado parseado.
 2. Após parse, buscar `groupId` de todas as `situationIds` fornecidas.
 3. Validar que `distinct.size === 1` e que esse valor `=== parsed.groupId`; caso contrário lança erro descritivo.
@@ -276,11 +298,13 @@
 **O quê:** Adicionar filtro por `groupId` a `sessionWhereClause` e a todos os canais de stats.
 
 **Onde:**
+
 - `src/main/ipc/stats.ts`
 
-**Design ref:** §4.1 (stats:*)
+**Design ref:** §4.1 (stats:\*)
 
 **O que fazer:**
+
 1. Em `sessionWhereClause`, adicionar: se `filters?.groupId !== undefined`, adicionar `eq(trainingSessions.groupId, filters.groupId)`.
 2. Verificar que todos os canais (`stats:overview`, `stats:bySituation`, `stats:timeline`, `stats:worstHands`) passam `filters` para `sessionWhereClause`.
 
@@ -299,11 +323,13 @@
 **O quê:** Expor `window.api.groups` via contextBridge.
 
 **Onde:**
+
 - `src/preload/index.ts`
 
 **Design ref:** §7
 
 **O que fazer:**
+
 1. Adicionar namespace `groups` ao objeto `api`:
    - `list: () => ipcRenderer.invoke('groups:list')`
    - `create: (name: string) => ipcRenderer.invoke('groups:create', { name })`
@@ -330,12 +356,14 @@
 **O quê:** Criar a página de listagem/criação/renomeação/arquivo de grupos.
 
 **Onde:**
+
 - `src/renderer/src/pages/GroupsPage.tsx` (novo)
 - `src/renderer/src/components/groups/GroupCard.tsx` (novo)
 
 **Design ref:** §8.1, §8.2
 
 **O que fazer:**
+
 1. `GroupCard` — card com nome do grupo, contagem de situações, botões "Renomear" e "Arquivar".
 2. `GroupsPage` — lista grupos via `window.api.groups.list()`; botão "Novo Grupo" abre inline form (input + confirm); renomear abre inline edit; arquivar pede confirmação.
 3. Estado vazio: mensagem + CTA "Criar primeiro grupo".
@@ -355,11 +383,13 @@
 **O quê:** Criar a página de detalhe de um grupo com lista de situações.
 
 **Onde:**
+
 - `src/renderer/src/pages/GroupDetailPage.tsx` (novo)
 
 **Design ref:** §8.1, §8.2 (GRP-17/P2)
 
 **O que fazer:**
+
 1. Carregar grupo por id (`window.api.groups.list()` + filtro, ou `window.api.situations.list({ groupId })`).
 2. Listar situações do grupo com ações rápidas (editar, arquivar, duplicar).
 3. Estado vazio com CTA "Nova situação" (pré-preenche `groupId` via query param ou state).
@@ -378,11 +408,13 @@
 **O quê:** Adicionar dropdown de grupo à página de situações para filtrar a listagem.
 
 **Onde:**
+
 - `src/renderer/src/pages/SituationsPage.tsx`
 
 **Design ref:** §8.3
 
 **O que fazer:**
+
 1. Carregar lista de grupos com `window.api.groups.list()`.
 2. Adicionar dropdown "Filtrar por grupo" (opção "Todos" + um item por grupo).
 3. Ao selecionar grupo, chamar `window.api.situations.list({ groupId })`.
@@ -401,11 +433,13 @@
 **O quê:** Adicionar campo select obrigatório "Grupo" ao formulário de criação/edição de situação.
 
 **Onde:**
+
 - `src/renderer/src/pages/SituationEditPage.tsx`
 
 **Design ref:** §8.3 (GRP-05, GRP-07, GRP-18)
 
 **O que fazer:**
+
 1. Carregar grupos com `window.api.groups.list()`.
 2. Adicionar campo `<select>` obrigatório "Grupo" (label visível, opção placeholder vazia).
 3. Ao submeter sem grupo selecionado, mostrar mensagem de erro de validação (GRP-05).
@@ -426,11 +460,13 @@
 **O quê:** Redesenhar a página de configuração de treino com o fluxo grupo-primeiro.
 
 **Onde:**
+
 - `src/renderer/src/pages/TrainingConfigPage.tsx`
 
 **Design ref:** §8.3, §9 (GRP-10, GRP-11, GRP-12, DC-02)
 
 **O que fazer:**
+
 1. Passo 1: dropdown/radio de grupos ativos. Ao selecionar grupo, avançar para passo 2.
 2. Passo 2: checkboxes das situações do grupo selecionado. Botão "Selecionar todas".
 3. Botão "Voltar" regressa ao passo 1 e limpa a seleção.
@@ -451,11 +487,13 @@
 **O quê:** Adicionar tabs de grupo à página de estatísticas.
 
 **Onde:**
+
 - `src/renderer/src/pages/StatsPage.tsx`
 
 **Design ref:** §8.3 (GRP-14, GRP-15, GRP-16, DC-03)
 
 **O que fazer:**
+
 1. Carregar grupos com `window.api.groups.list()`.
 2. Render de tabs: "Todos" + uma tab por grupo ativo.
 3. Estado da tab ativa em `useState` local.
@@ -475,12 +513,14 @@
 **O quê:** Adicionar rotas `/groups` e `/groups/:groupId`; adicionar item "Grupos" à sidebar.
 
 **Onde:**
+
 - `src/renderer/src/App.tsx`
 - `src/renderer/src/components/Layout.tsx`
 
 **Design ref:** §8.1, §8.3
 
 **O que fazer:**
+
 1. Em `App.tsx`: importar `GroupsPage` e `GroupDetailPage`; adicionar rotas `/groups` e `/groups/:groupId` protegidas.
 2. Em `Layout.tsx`: adicionar `NavLink` "Grupos" com link para `/groups` entre "Situações" e "Treino".
 
@@ -507,6 +547,7 @@
 **Design ref:** spec.md §Testing Strategy — E2E-GRP-01, E2E-GRP-02
 
 **O que fazer:**
+
 1. E2E-GRP-01: criar grupo "NL5" → renomear para "NL5 6-Max" → arquivar → verificar que não aparece na lista.
 2. E2E-GRP-02: criar grupo com nome duplicado → verificar erro de validação visível na UI.
 3. Usar fixtures `PT_E2E_*` e helpers existentes (ver skill `preflop-e2e-playwright`).
@@ -525,6 +566,7 @@
 **Onde:** `e2e/situation-groups/situation-group-field.spec.ts` (novo)
 
 **O que fazer:**
+
 1. E2E-GRP-03: tentar criar situação sem selecionar grupo → formulário bloqueia com mensagem de erro.
 
 **Depends on:** T-15, T-18
@@ -540,6 +582,7 @@
 **Onde:** `e2e/situation-groups/archive-cascade.spec.ts` (novo)
 
 **O que fazer:**
+
 1. E2E-GRP-04: criar grupo com situações → arquivar grupo → verificar que situações desaparecem das listas ativas.
 
 **Depends on:** T-12, T-14, T-18
@@ -555,6 +598,7 @@
 **Onde:** `e2e/situation-groups/training-selection.spec.ts` (novo)
 
 **O que fazer:**
+
 1. E2E-GRP-05: selecionar grupo "NL5" → grupo "NL10" fica bloqueado; desmarcar todas NL5 → NL10 disponível.
 2. E2E-GRP-06: bypass deliberado da UI (chamar `window.api.training.startSession` com `situationIds` de grupos misturados) → verificar que o main process rejeita com erro.
 
@@ -571,6 +615,7 @@
 **Onde:** `e2e/situation-groups/stats-filter.spec.ts` (novo)
 
 **O que fazer:**
+
 1. E2E-GRP-07: treinar só com NL5 → abrir stats → tab NL2 mostra estado vazio → tab NL5 mostra dados.
 
 **Depends on:** T-17, T-18
@@ -586,6 +631,7 @@
 **Onde:** `e2e/situation-groups/full-flow.spec.ts` (novo)
 
 **O que fazer:**
+
 1. E2E-GRP-08: criar grupo → criar situação → treinar → ver stats filtradas por grupo.
 2. Este é o teste de maior valor — cobrir o happy path completo end-to-end.
 
@@ -604,6 +650,7 @@
 **Onde:** — (sem ficheiros a alterar)
 
 **O que fazer:**
+
 1. `pnpm typecheck` — zero erros.
 2. `pnpm test:unit` — todos os testes passam; novos módulos de grupos com ≥ 80% statement coverage.
 3. `pnpm test` — incluindo E2E; os 8 testes E2E-GRP-01 a GRP-08 passam.
@@ -640,24 +687,24 @@ Bloco 5:            T-25
 
 ## Rastreabilidade Spec → Tasks
 
-| Requirement ID | Task(s) | Status |
-|----------------|---------|--------|
-| GRP-01 | T-01, T-05, T-06, T-07, T-11, T-12 | Done |
-| GRP-02 | T-01, T-04, T-05, T-06, T-12 | Done |
-| GRP-03 | T-05, T-06, T-12 | Done |
-| GRP-04 | T-05, T-06, T-12 | Done |
-| GRP-05 | T-04, T-08, T-15 | Done |
-| GRP-06 | T-08, T-14 | Done |
-| GRP-07 | T-04, T-08, T-15 | Done |
-| GRP-08 | T-01, T-02 | Done |
-| GRP-09 | T-08 | Done |
-| GRP-10 | T-09, T-16 | Done |
-| GRP-11 | T-16 | Done |
-| GRP-12 | T-04, T-09 | Done |
-| GRP-13 | T-01, T-09 | Done |
-| GRP-14 | T-10, T-17 | Done |
-| GRP-15 | T-03, T-10, T-17 | Done |
-| GRP-16 | T-17 | Done |
+| Requirement ID | Task(s)                            | Status |
+| -------------- | ---------------------------------- | ------ |
+| GRP-01         | T-01, T-05, T-06, T-07, T-11, T-12 | Done   |
+| GRP-02         | T-01, T-04, T-05, T-06, T-12       | Done   |
+| GRP-03         | T-05, T-06, T-12                   | Done   |
+| GRP-04         | T-05, T-06, T-12                   | Done   |
+| GRP-05         | T-04, T-08, T-15                   | Done   |
+| GRP-06         | T-08, T-14                         | Done   |
+| GRP-07         | T-04, T-08, T-15                   | Done   |
+| GRP-08         | T-01, T-02                         | Done   |
+| GRP-09         | T-08                               | Done   |
+| GRP-10         | T-09, T-16                         | Done   |
+| GRP-11         | T-16                               | Done   |
+| GRP-12         | T-04, T-09                         | Done   |
+| GRP-13         | T-01, T-09                         | Done   |
+| GRP-14         | T-10, T-17                         | Done   |
+| GRP-15         | T-03, T-10, T-17                   | Done   |
+| GRP-16         | T-17                               | Done   |
 
 **Total tasks P1 MVP:** 25 (T-01 a T-25)  
 **Coverage:** GRP-01 a GRP-16 todos cobertos.

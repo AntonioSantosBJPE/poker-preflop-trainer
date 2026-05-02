@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "codenavi": {
+      "source": "tech-leads-club/agent-skills",
+      "sourceType": "github",
+      "skillPath": "packages/skills-catalog/skills/(development)/codenavi/SKILL.md",
+      "computedHash": "ddca2f0860152b4c864a9d657c3cf8183597c8450f1ddfc7090953afece4cdf0"
+    },
     "electron": {
       "source": "teachingai/full-stack-skills",
       "sourceType": "github",
@@ -18,6 +24,12 @@
       "sourceType": "github",
       "skillPath": "skills/git-commit/SKILL.md",
       "computedHash": "2607fc60629b82b257136dd2a7a373f0a4466c0b49df7746d845d59313c99b21"
+    },
+    "mermaid-studio": {
+      "source": "tech-leads-club/agent-skills",
+      "sourceType": "github",
+      "skillPath": "packages/skills-catalog/skills/(tooling)/mermaid-studio/SKILL.md",
+      "computedHash": "ac6c344e21319a5c7426a1b8c21229afe9a687aa743bd366bf11cad66bef328d"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",

@@ -14,13 +14,13 @@ Atualmente as situações existem de forma plana, sem organização hierárquica
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| Grupos aninhados (sub-grupos) | Complexidade desnecessária; NL2/NL5 como nível único é suficiente |
-| Partilha de grupos entre utilizadores | Fora do MVP; autenticação é local |
-| Import/Export de grupos | Fora do MVP (já listado no PROJECT.md) |
-| Ordenação manual de situações dentro do grupo | Pode ser adicionado numa iteração futura |
-| Estatísticas inter-grupos (comparar NL2 vs NL10) | P3 diferido; filtro por grupo cobre o caso de uso imediato |
+| Feature                                          | Reason                                                            |
+| ------------------------------------------------ | ----------------------------------------------------------------- |
+| Grupos aninhados (sub-grupos)                    | Complexidade desnecessária; NL2/NL5 como nível único é suficiente |
+| Partilha de grupos entre utilizadores            | Fora do MVP; autenticação é local                                 |
+| Import/Export de grupos                          | Fora do MVP (já listado no PROJECT.md)                            |
+| Ordenação manual de situações dentro do grupo    | Pode ser adicionado numa iteração futura                          |
+| Estatísticas inter-grupos (comparar NL2 vs NL10) | P3 diferido; filtro por grupo cobre o caso de uso imediato        |
 
 ---
 
@@ -160,18 +160,19 @@ Esta feature atravessa todas as camadas do sistema — schema, IPC, renderer e i
 
 Os testes E2E são o principal mecanismo de verificação de que cada User Story funciona no sistema real (sem mocks de IPC nem de DB). A spec toca o schema, os handlers IPC, o renderer e o fluxo de treino de ponta a ponta — o que torna os E2E insubstituíveis para garantir que as peças se encaixam correctamente. Cada critério de aceitação listado abaixo **deve** ter cobertura num `*.spec.ts` em `e2e/`.
 
-| Test ID | Critério coberto | Ficheiro sugerido |
-|---------|-----------------|-------------------|
-| E2E-GRP-01 | Criar grupo "NL5", renomear para "NL5 6-Max", arquivar; grupo desaparece da lista | `e2e/situation-groups/crud-groups.spec.ts` |
-| E2E-GRP-02 | Criar grupo com nome duplicado → erro de validação visível na UI | `e2e/situation-groups/crud-groups.spec.ts` |
-| E2E-GRP-03 | Criar situação sem selecionar grupo → formulário bloqueia com mensagem de erro | `e2e/situation-groups/situation-group-field.spec.ts` |
-| E2E-GRP-04 | Arquivar grupo com situações → situações desaparecem das listas ativas | `e2e/situation-groups/archive-cascade.spec.ts` |
-| E2E-GRP-05 | Selecionar grupo "NL5" na configuração de treino → NL10 fica bloqueado; desmarcar NL5 → NL10 disponível | `e2e/situation-groups/training-selection.spec.ts` |
-| E2E-GRP-06 | Iniciar sessão de treino com situações de grupos misturados via bypass de UI → main process rejeita | `e2e/situation-groups/training-selection.spec.ts` |
-| E2E-GRP-07 | Treinar só com NL5 → stats com tab NL2 mostra estado vazio; tab NL5 mostra dados | `e2e/situation-groups/stats-filter.spec.ts` |
-| E2E-GRP-08 | Fluxo completo: criar grupo → criar situação → treinar → ver stats filtradas por grupo | `e2e/situation-groups/full-flow.spec.ts` |
+| Test ID    | Critério coberto                                                                                        | Ficheiro sugerido                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| E2E-GRP-01 | Criar grupo "NL5", renomear para "NL5 6-Max", arquivar; grupo desaparece da lista                       | `e2e/situation-groups/crud-groups.spec.ts`           |
+| E2E-GRP-02 | Criar grupo com nome duplicado → erro de validação visível na UI                                        | `e2e/situation-groups/crud-groups.spec.ts`           |
+| E2E-GRP-03 | Criar situação sem selecionar grupo → formulário bloqueia com mensagem de erro                          | `e2e/situation-groups/situation-group-field.spec.ts` |
+| E2E-GRP-04 | Arquivar grupo com situações → situações desaparecem das listas ativas                                  | `e2e/situation-groups/archive-cascade.spec.ts`       |
+| E2E-GRP-05 | Selecionar grupo "NL5" na configuração de treino → NL10 fica bloqueado; desmarcar NL5 → NL10 disponível | `e2e/situation-groups/training-selection.spec.ts`    |
+| E2E-GRP-06 | Iniciar sessão de treino com situações de grupos misturados via bypass de UI → main process rejeita     | `e2e/situation-groups/training-selection.spec.ts`    |
+| E2E-GRP-07 | Treinar só com NL5 → stats com tab NL2 mostra estado vazio; tab NL5 mostra dados                        | `e2e/situation-groups/stats-filter.spec.ts`          |
+| E2E-GRP-08 | Fluxo completo: criar grupo → criar situação → treinar → ver stats filtradas por grupo                  | `e2e/situation-groups/full-flow.spec.ts`             |
 
 **Regras para os testes E2E desta feature:**
+
 - Usar os fixtures `PT_E2E_*` e os helpers de `e2e/helpers/` já estabelecidos no projeto (ver skill `preflop-e2e-playwright`).
 - Cada spec deve ser independente: criar os dados de que precisa e não assumir estado global.
 - O fluxo completo (E2E-GRP-08) é o teste de maior valor — priorizá-lo se o tempo for limitado.
@@ -181,13 +182,13 @@ Os testes E2E são o principal mecanismo de verificação de que cada User Story
 
 A feature toca módulos críticos que actualmente têm cobertura unitária insuficiente. A implementação deve ser aproveitada para aumentar essa cobertura de forma deliberada.
 
-| Módulo | O que testar | Prioridade |
-|--------|-------------|------------|
-| `src/main/db/groups` (novo) | `createGroup`, `renameGroup`, `archiveGroup` (incluindo cascata), `listGroups` — cenários de erro e edge cases | P1 |
-| `src/main/ipc/groups` (novo) | Handler de cada canal: validação de input, delegação para DB, erros formatados | P1 |
-| `src/shared/poker` | Invariantes que envolvem `groupId` em `TrainingSession`; validação cross-group | P1 |
-| `src/main/db/situations` | `moveSituation` (mudança de grupo), `duplicateSituation` (preserva grupo) | P2 |
-| `src/main/db/stats` | Queries filtradas por `groupId`; resultado vazio quando não há sessões | P2 |
+| Módulo                       | O que testar                                                                                                   | Prioridade |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------- |
+| `src/main/db/groups` (novo)  | `createGroup`, `renameGroup`, `archiveGroup` (incluindo cascata), `listGroups` — cenários de erro e edge cases | P1         |
+| `src/main/ipc/groups` (novo) | Handler de cada canal: validação de input, delegação para DB, erros formatados                                 | P1         |
+| `src/shared/poker`           | Invariantes que envolvem `groupId` em `TrainingSession`; validação cross-group                                 | P1         |
+| `src/main/db/situations`     | `moveSituation` (mudança de grupo), `duplicateSituation` (preserva grupo)                                      | P2         |
+| `src/main/db/stats`          | Queries filtradas por `groupId`; resultado vazio quando não há sessões                                         | P2         |
 
 **Meta de cobertura:** Todos os novos módulos do main criados para grupos devem atingir ≥ 80 % de cobertura de statements nos testes unitários (`pnpm test:unit`).
 
@@ -195,28 +196,28 @@ A feature toca módulos críticos que actualmente têm cobertura unitária insuf
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
-|----------------|-------|-------|--------|
-| GRP-01 | P1: CRUD Grupos — listar | Design | Done |
-| GRP-02 | P1: CRUD Grupos — criar com validação de nome único | Design | Done |
-| GRP-03 | P1: CRUD Grupos — renomear | Design | Done |
-| GRP-04 | P1: CRUD Grupos — arquivar (soft-delete) | Design | Done |
-| GRP-05 | P1: Situações — grupo obrigatório na criação | Design | Done |
-| GRP-06 | P1: Situações — listar por grupo | Design | Done |
-| GRP-07 | P1: Situações — mover para outro grupo na edição | Design | Done |
-| GRP-08 | P1: Migração — DB limpa (dados existentes descartados; utilizador começa do zero) | Design | Done |
-| GRP-09 | P1: Situações — duplicar preserva grupo | Design | Done |
-| GRP-10 | P1: Treino — seleção por grupo (select-all) | Design | Done |
-| GRP-11 | P1: Treino — bloqueio de seleção cross-group | Design | Done |
-| GRP-12 | P1: Treino — validação cross-group no main process | Design | Done |
-| GRP-13 | P1: Treino — persistir groupId em training_sessions | Design | Done |
-| GRP-14 | P1: Stats — seletor de grupo | Design | Done |
-| GRP-15 | P1: Stats — filtrar dados por grupo | Design | Done |
-| GRP-16 | P1: Stats — estado vazio por grupo | Design | Done |
-| GRP-17 | P2: Vista de grupo com lista de situações | - | Pending |
-| GRP-18 | P2: Pré-preencher grupo ao criar situação a partir de grupo | - | Pending |
-| GRP-19 | P2: Dashboard — card de resumo por grupo | - | Pending |
-| GRP-20 | P3: Ordenação de grupos | - | Pending |
+| Requirement ID | Story                                                                             | Phase  | Status  |
+| -------------- | --------------------------------------------------------------------------------- | ------ | ------- |
+| GRP-01         | P1: CRUD Grupos — listar                                                          | Design | Done    |
+| GRP-02         | P1: CRUD Grupos — criar com validação de nome único                               | Design | Done    |
+| GRP-03         | P1: CRUD Grupos — renomear                                                        | Design | Done    |
+| GRP-04         | P1: CRUD Grupos — arquivar (soft-delete)                                          | Design | Done    |
+| GRP-05         | P1: Situações — grupo obrigatório na criação                                      | Design | Done    |
+| GRP-06         | P1: Situações — listar por grupo                                                  | Design | Done    |
+| GRP-07         | P1: Situações — mover para outro grupo na edição                                  | Design | Done    |
+| GRP-08         | P1: Migração — DB limpa (dados existentes descartados; utilizador começa do zero) | Design | Done    |
+| GRP-09         | P1: Situações — duplicar preserva grupo                                           | Design | Done    |
+| GRP-10         | P1: Treino — seleção por grupo (select-all)                                       | Design | Done    |
+| GRP-11         | P1: Treino — bloqueio de seleção cross-group                                      | Design | Done    |
+| GRP-12         | P1: Treino — validação cross-group no main process                                | Design | Done    |
+| GRP-13         | P1: Treino — persistir groupId em training_sessions                               | Design | Done    |
+| GRP-14         | P1: Stats — seletor de grupo                                                      | Design | Done    |
+| GRP-15         | P1: Stats — filtrar dados por grupo                                               | Design | Done    |
+| GRP-16         | P1: Stats — estado vazio por grupo                                                | Design | Done    |
+| GRP-17         | P2: Vista de grupo com lista de situações                                         | -      | Pending |
+| GRP-18         | P2: Pré-preencher grupo ao criar situação a partir de grupo                       | -      | Pending |
+| GRP-19         | P2: Dashboard — card de resumo por grupo                                          | -      | Pending |
+| GRP-20         | P3: Ordenação de grupos                                                           | -      | Pending |
 
 **Coverage:** 20 total, 16 P1 Design concluídos, 4 P2/P3 pendentes.
 

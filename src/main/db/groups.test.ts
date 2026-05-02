@@ -1,18 +1,12 @@
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/sql-js";
-import initSqlJs from "sql.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  archiveGroup,
-  createGroup,
-  getGroupOrThrow,
-  listGroups,
-  renameGroup,
-} from "./groups";
-import * as schema from "./schema";
-import { situationGroups, situations, users } from "./schema";
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/sql-js';
+import initSqlJs from 'sql.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { archiveGroup, createGroup, getGroupOrThrow, listGroups, renameGroup } from './groups';
+import * as schema from './schema';
+import { situationGroups, situations, users } from './schema';
 
-vi.mock("better-sqlite3");
+vi.mock('better-sqlite3');
 
 async function createTestDb() {
   const SQL = await initSqlJs();
@@ -52,30 +46,30 @@ async function createTestDb() {
   return drizzle(sqlite, { schema });
 }
 
-describe("groups DB", () => {
+describe('groups DB', () => {
   let db: Awaited<ReturnType<typeof createTestDb>>;
 
   beforeEach(async () => {
     db = await createTestDb();
   });
 
-  function seedUser(email = "u@test.local") {
+  function seedUser(email = 'u@test.local') {
     const now = new Date();
     const rows = db
       .insert(users)
-      .values({ name: "Test", email, passwordHash: "x", createdAt: now })
+      .values({ name: 'Test', email, passwordHash: 'x', createdAt: now })
       .returning({ id: users.id })
       .all();
     return rows[0]!.id;
   }
 
-  describe("listGroups", () => {
-    it("returns empty when user has no active groups", async () => {
+  describe('listGroups', () => {
+    it('returns empty when user has no active groups', async () => {
       const userId = seedUser();
       await expect(listGroups(db, userId)).resolves.toEqual([]);
     });
 
-    it("returns active groups with correct active situation counts and sortOrder", async () => {
+    it('returns active groups with correct active situation counts and sortOrder', async () => {
       const userId = seedUser();
       const now = new Date();
 
@@ -83,7 +77,7 @@ describe("groups DB", () => {
         .values([
           {
             userId,
-            name: "G-B",
+            name: 'G-B',
             sortOrder: 1,
             isActive: true,
             createdAt: now,
@@ -91,7 +85,7 @@ describe("groups DB", () => {
           },
           {
             userId,
-            name: "G-A",
+            name: 'G-A',
             sortOrder: 0,
             isActive: true,
             createdAt: now,
@@ -99,7 +93,7 @@ describe("groups DB", () => {
           },
           {
             userId,
-            name: "Hidden",
+            name: 'Hidden',
             sortOrder: 2,
             isActive: false,
             createdAt: now,
@@ -113,16 +107,16 @@ describe("groups DB", () => {
         .from(situationGroups)
         .where(eq(situationGroups.userId, userId))
         .all();
-      const gA = groups.find((g) => g.name === "G-A")!;
-      const gB = groups.find((g) => g.name === "G-B")!;
+      const gA = groups.find((g) => g.name === 'G-A')!;
+      const gB = groups.find((g) => g.name === 'G-B')!;
 
       db.insert(situations)
         .values([
           {
             userId,
             groupId: gA.id,
-            name: "S1",
-            position: "UTG",
+            name: 'S1',
+            position: 'UTG',
             isActive: true,
             createdAt: now,
             updatedAt: now,
@@ -130,8 +124,8 @@ describe("groups DB", () => {
           {
             userId,
             groupId: gA.id,
-            name: "S-inact",
-            position: "CO",
+            name: 'S-inact',
+            position: 'CO',
             isActive: false,
             createdAt: now,
             updatedAt: now,
@@ -139,8 +133,8 @@ describe("groups DB", () => {
           {
             userId,
             groupId: gB.id,
-            name: "S2",
-            position: "BB",
+            name: 'S2',
+            position: 'BB',
             isActive: true,
             createdAt: now,
             updatedAt: now,
@@ -148,8 +142,8 @@ describe("groups DB", () => {
           {
             userId,
             groupId: gB.id,
-            name: "S3",
-            position: "BTN",
+            name: 'S3',
+            position: 'BTN',
             isActive: true,
             createdAt: now,
             updatedAt: now,
@@ -160,13 +154,13 @@ describe("groups DB", () => {
       const list = await listGroups(db, userId);
       expect(list).toHaveLength(2);
       expect(list[0]).toMatchObject({
-        name: "G-A",
+        name: 'G-A',
         sortOrder: 0,
         isActive: true,
         situationCount: 1,
       });
       expect(list[1]).toMatchObject({
-        name: "G-B",
+        name: 'G-B',
         sortOrder: 1,
         isActive: true,
         situationCount: 2,
@@ -174,49 +168,47 @@ describe("groups DB", () => {
     });
   });
 
-  describe("createGroup", () => {
-    it("returns inserted id on success", async () => {
+  describe('createGroup', () => {
+    it('returns inserted id on success', async () => {
       const userId = seedUser();
-      await expect(createGroup(db, userId, "My group")).resolves.toEqual({
+      await expect(createGroup(db, userId, 'My group')).resolves.toEqual({
         id: expect.any(Number),
       });
       const rows = db.select().from(situationGroups).all();
       expect(rows).toHaveLength(1);
       expect(rows[0]).toMatchObject({
-        name: "My group",
+        name: 'My group',
         sortOrder: 0,
         isActive: true,
       });
     });
 
-    it("throws when name already exists for user (including inactive)", async () => {
+    it('throws when name already exists for user (including inactive)', async () => {
       const userId = seedUser();
       const now = new Date();
       db.insert(situationGroups)
         .values({
           userId,
-          name: "Dup",
+          name: 'Dup',
           sortOrder: 0,
           isActive: false,
           createdAt: now,
           updatedAt: now,
         })
         .run();
-      await expect(createGroup(db, userId, "Dup")).rejects.toThrow(
-        "Nome de grupo já existe"
-      );
+      await expect(createGroup(db, userId, 'Dup')).rejects.toThrow('Nome de grupo já existe');
     });
   });
 
-  describe("renameGroup", () => {
-    it("updates name when unique", async () => {
+  describe('renameGroup', () => {
+    it('updates name when unique', async () => {
       const userId = seedUser();
       const now = new Date();
       const inserted = db
         .insert(situationGroups)
         .values({
           userId,
-          name: "Old",
+          name: 'Old',
           sortOrder: 0,
           isActive: true,
           createdAt: now,
@@ -224,23 +216,23 @@ describe("groups DB", () => {
         })
         .returning({ id: situationGroups.id })
         .all();
-      await renameGroup(db, userId, inserted[0]!.id, "New");
+      await renameGroup(db, userId, inserted[0]!.id, 'New');
       const row = db
         .select()
         .from(situationGroups)
         .where(eq(situationGroups.id, inserted[0]!.id))
         .get();
-      expect(row?.name).toBe("New");
+      expect(row?.name).toBe('New');
     });
 
-    it("throws when name collides with another group", async () => {
+    it('throws when name collides with another group', async () => {
       const userId = seedUser();
       const now = new Date();
       db.insert(situationGroups)
         .values([
           {
             userId,
-            name: "Alpha",
+            name: 'Alpha',
             sortOrder: 0,
             isActive: true,
             createdAt: now,
@@ -248,7 +240,7 @@ describe("groups DB", () => {
           },
           {
             userId,
-            name: "Beta",
+            name: 'Beta',
             sortOrder: 1,
             isActive: true,
             createdAt: now,
@@ -259,23 +251,23 @@ describe("groups DB", () => {
       const beta = db
         .select({ id: situationGroups.id })
         .from(situationGroups)
-        .where(eq(situationGroups.name, "Beta"))
+        .where(eq(situationGroups.name, 'Beta'))
         .get()!;
-      await expect(renameGroup(db, userId, beta.id, "Alpha")).rejects.toThrow(
-        "Nome de grupo já existe"
+      await expect(renameGroup(db, userId, beta.id, 'Alpha')).rejects.toThrow(
+        'Nome de grupo já existe',
       );
     });
   });
 
-  describe("archiveGroup", () => {
-    it("soft-deletes group and its situations", async () => {
+  describe('archiveGroup', () => {
+    it('soft-deletes group and its situations', async () => {
       const userId = seedUser();
       const now = new Date();
       const gidRows = db
         .insert(situationGroups)
         .values({
           userId,
-          name: "G",
+          name: 'G',
           sortOrder: 0,
           isActive: true,
           createdAt: now,
@@ -289,8 +281,8 @@ describe("groups DB", () => {
           {
             userId,
             groupId: gid,
-            name: "S-one",
-            position: "UTG",
+            name: 'S-one',
+            position: 'UTG',
             isActive: true,
             createdAt: now,
             updatedAt: now,
@@ -298,8 +290,8 @@ describe("groups DB", () => {
           {
             userId,
             groupId: gid,
-            name: "S-two",
-            position: "CO",
+            name: 'S-two',
+            position: 'CO',
             isActive: true,
             createdAt: now,
             updatedAt: now,
@@ -309,44 +301,32 @@ describe("groups DB", () => {
 
       await archiveGroup(db, userId, gid);
 
-      const g = db
-        .select()
-        .from(situationGroups)
-        .where(eq(situationGroups.id, gid))
-        .get();
+      const g = db.select().from(situationGroups).where(eq(situationGroups.id, gid)).get();
       expect(g?.isActive).toBe(false);
-      const sits = db
-        .select()
-        .from(situations)
-        .where(eq(situations.groupId, gid))
-        .all();
+      const sits = db.select().from(situations).where(eq(situations.groupId, gid)).all();
       expect(sits.every((s) => s.isActive === false)).toBe(true);
     });
 
-    it("throws when group not found", async () => {
+    it('throws when group not found', async () => {
       const userId = seedUser();
-      await expect(archiveGroup(db, userId, 99999)).rejects.toThrow(
-        "Grupo não encontrado"
-      );
+      await expect(archiveGroup(db, userId, 99999)).rejects.toThrow('Grupo não encontrado');
     });
   });
 
-  describe("getGroupOrThrow", () => {
-    it("throws when missing", async () => {
+  describe('getGroupOrThrow', () => {
+    it('throws when missing', async () => {
       const userId = seedUser();
-      await expect(getGroupOrThrow(db, userId, 42)).rejects.toThrow(
-        "Grupo não encontrado"
-      );
+      await expect(getGroupOrThrow(db, userId, 42)).rejects.toThrow('Grupo não encontrado');
     });
 
-    it("returns row when present", async () => {
+    it('returns row when present', async () => {
       const userId = seedUser();
       const now = new Date();
       const inserted = db
         .insert(situationGroups)
         .values({
           userId,
-          name: "X",
+          name: 'X',
           sortOrder: 3,
           isActive: true,
           createdAt: now,
@@ -354,11 +334,9 @@ describe("groups DB", () => {
         })
         .returning()
         .all();
-      await expect(
-        getGroupOrThrow(db, userId, inserted[0]!.id)
-      ).resolves.toMatchObject({
+      await expect(getGroupOrThrow(db, userId, inserted[0]!.id)).resolves.toMatchObject({
         id: inserted[0]!.id,
-        name: "X",
+        name: 'X',
         sortOrder: 3,
       });
     });

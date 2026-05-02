@@ -1,38 +1,58 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import type { GroupSummaryDto, SituationSummaryDto } from '@shared/ipc/types'
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import type { GroupSummaryDto, SituationSummaryDto } from '@shared/ipc/types';
 
-type Row = Pick<SituationSummaryDto, 'id' | 'name' | 'position' | 'effectiveStack' | 'groupId'>
+type Row = Pick<SituationSummaryDto, 'id' | 'name' | 'position' | 'effectiveStack' | 'groupId'>;
 
 export function SituationsPage(): React.ReactElement {
-  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
-  const [rows, setRows] = useState<Row[]>([])
-  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
-  const navigate = useNavigate()
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
+  const [archivingId, setArchivingId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   async function load(groupId?: number): Promise<void> {
-    const list = (await window.api.situations.list(groupId != null ? { groupId } : undefined)) as Row[]
-    setRows(list)
+    const list = (await window.api.situations.list(
+      groupId != null ? { groupId } : undefined,
+    )) as Row[];
+    setRows(list);
   }
 
-  const reload = useCallback(() => load(selectedGroupId ?? undefined), [selectedGroupId])
+  const reload = useCallback(() => load(selectedGroupId ?? undefined), [selectedGroupId]);
+
+  async function handleArchive(row: Row): Promise<void> {
+    if (archivingId === row.id) return;
+    const ok = confirm(`Arquivar situação "${row.name}"?`);
+    if (!ok) return;
+    setArchivingId(row.id);
+    try {
+      await window.api.situations.delete(row.id);
+      await reload();
+    } finally {
+      setArchivingId(null);
+    }
+  }
 
   useEffect(() => {
     void (async () => {
-      const g = (await window.api.groups.list()) as GroupSummaryDto[]
-      setGroups(g)
-    })()
-  }, [])
+      const g = (await window.api.groups.list()) as GroupSummaryDto[];
+      setGroups(g);
+    })();
+  }, []);
 
   useEffect(() => {
-    void reload()
-  }, [reload])
+    void reload();
+  }, [reload]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="pt-page-title">Situações</h1>
-        <button type="button" className="pt-btn-primary text-sm" onClick={() => navigate('/situations/new')}>
+        <button
+          type="button"
+          className="pt-btn-primary text-sm"
+          onClick={() => navigate('/situations/new')}
+        >
           Nova situação
         </button>
       </div>
@@ -45,8 +65,8 @@ export function SituationsPage(): React.ReactElement {
             className="pt-input"
             value={selectedGroupId ?? ''}
             onChange={(e) => {
-              const v = e.target.value
-              setSelectedGroupId(v === '' ? null : Number(v))
+              const v = e.target.value;
+              setSelectedGroupId(v === '' ? null : Number(v));
             }}
           >
             <option value="">Todos os grupos</option>
@@ -93,8 +113,8 @@ export function SituationsPage(): React.ReactElement {
                     type="button"
                     className="text-muted-foreground hover:text-foreground"
                     onClick={async () => {
-                      await window.api.situations.duplicate(r.id)
-                      void reload()
+                      await window.api.situations.duplicate(r.id);
+                      void reload();
                     }}
                   >
                     Duplicar
@@ -102,10 +122,8 @@ export function SituationsPage(): React.ReactElement {
                   <button
                     type="button"
                     className="text-destructive hover:underline"
-                    onClick={async () => {
-                      await window.api.situations.delete(r.id)
-                      void reload()
-                    }}
+                    disabled={archivingId === r.id}
+                    onClick={() => void handleArchive(r)}
                   >
                     Arquivar
                   </button>
@@ -126,5 +144,5 @@ export function SituationsPage(): React.ReactElement {
         </table>
       </div>
     </div>
-  )
+  );
 }

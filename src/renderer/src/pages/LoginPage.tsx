@@ -1,62 +1,65 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
-import { createAuthFormSchema, type AuthFormFields } from '@shared/forms/authSchemas'
-import { useAuthStore } from '../stores/auth'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { createAuthFormSchema, type AuthFormFields } from '@shared/forms/authSchemas';
+import { useAuthStore } from '../stores/auth';
 
-type AuthTab = 'login' | 'register'
+type AuthTab = 'login' | 'register';
 
-type FormValues = AuthFormFields
+type FormValues = AuthFormFields;
 
 function ipcErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message
+  if (err instanceof Error) return err.message;
   if (typeof err === 'object' && err !== null && 'message' in err) {
-    return String((err as { message: unknown }).message)
+    return String((err as { message: unknown }).message);
   }
-  return 'Erro'
+  return 'Erro';
 }
 
 export function LoginPage(): React.ReactElement {
-  const [tab, setTab] = useState<AuthTab>('login')
-  const navigate = useNavigate()
-  const setUser = useAuthStore((s) => s.setUser)
+  const [tab, setTab] = useState<AuthTab>('login');
+  const navigate = useNavigate();
+  const setUser = useAuthStore((s) => s.setUser);
 
-  const resolver = useMemo(() => zodResolver(createAuthFormSchema(tab)), [tab])
+  const resolver = useMemo(() => zodResolver(createAuthFormSchema(tab)), [tab]);
 
   const {
     register,
     handleSubmit,
     clearErrors,
     setError,
-    formState: { errors }
+    formState: { errors },
   } = useForm<FormValues>({
     resolver,
     defaultValues: { name: '', email: '', password: '' },
-    mode: 'onSubmit'
-  })
+    mode: 'onSubmit',
+  });
 
   useEffect(() => {
-    void useAuthStore.getState().refresh().then(() => {
-      if (useAuthStore.getState().user) navigate('/', { replace: true })
-    })
-  }, [navigate])
+    void useAuthStore
+      .getState()
+      .refresh()
+      .then(() => {
+        if (useAuthStore.getState().user) navigate('/', { replace: true });
+      });
+  }, [navigate]);
 
   useEffect(() => {
-    clearErrors()
-  }, [tab, clearErrors])
+    clearErrors();
+  }, [tab, clearErrors]);
 
   async function onSubmit(values: FormValues): Promise<void> {
-    clearErrors('root')
+    clearErrors('root');
     try {
       if (tab === 'register') {
-        await window.api.auth.register(values.name!.trim(), values.email, values.password)
+        await window.api.auth.register(values.name!.trim(), values.email, values.password);
       }
-      const res = await window.api.auth.login(values.email, values.password)
-      setUser(res.user)
-      navigate('/')
+      const res = await window.api.auth.login(values.email, values.password);
+      setUser(res.user);
+      navigate('/');
     } catch (err) {
-      setError('root', { message: ipcErrorMessage(err) })
+      setError('root', { message: ipcErrorMessage(err) });
     }
   }
 
@@ -71,7 +74,9 @@ export function LoginPage(): React.ReactElement {
       </div>
       <div className="pt-card w-full max-w-md space-y-6 p-8 shadow-lg">
         <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Preflop Trainer</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            Preflop Trainer
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Treino offline de ranges pré-flop NLHE 6-max.
           </p>
@@ -81,7 +86,9 @@ export function LoginPage(): React.ReactElement {
             type="button"
             data-testid="auth-tab-login"
             className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-              tab === 'login' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              tab === 'login'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
             onClick={() => setTab('login')}
           >
@@ -91,7 +98,9 @@ export function LoginPage(): React.ReactElement {
             type="button"
             data-testid="auth-tab-register"
             className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-              tab === 'register' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              tab === 'register'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
             onClick={() => setTab('register')}
           >
@@ -173,5 +182,5 @@ export function LoginPage(): React.ReactElement {
         </p>
       </div>
     </div>
-  )
+  );
 }

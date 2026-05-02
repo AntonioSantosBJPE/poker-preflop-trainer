@@ -17,6 +17,7 @@ O único obstáculo real ao paralelismo é **a geração de credenciais baseada 
 ## Análise do Estado Actual
 
 ### O que já funciona para paralelismo
+
 - `fixtures.ts`: cada teste lança instância Electron própria com `tmp` isolado (`mkdtempSync`)
 - `PT_E2E_USER_DATA`: directório SQLite único por teste
 - `PT_E2E_TOKEN_FILE`: JWT em ficheiro único por teste
@@ -25,23 +26,23 @@ O único obstáculo real ao paralelismo é **a geração de credenciais baseada 
 
 ### O que bloqueia paralelismo
 
-| Problema | Localização | Impacto |
-|----------|-------------|---------|
-| `workers: 1` e `fullyParallel: false` | `playwright.config.ts` | Força execução serial — causa principal da lentidão |
+| Problema                               | Localização                  | Impacto                                               |
+| -------------------------------------- | ---------------------------- | ----------------------------------------------------- |
+| `workers: 1` e `fullyParallel: false`  | `playwright.config.ts`       | Força execução serial — causa principal da lentidão   |
 | `Date.now()` como semente de unicidade | `e2e/helpers/credentials.ts` | Colisão possível com ≥2 workers no mesmo milissegundo |
 
 ---
 
 ## Requisitos
 
-| ID | Requisito |
-|----|-----------|
-| R-01 | Os testes E2E devem executar com ≥2 workers em paralelo sem flakiness |
-| R-02 | Cada teste deve continuar a ter isolamento total (BD, sessão, JWT) |
-| R-03 | Credenciais geradas dinamicamente não devem colidir entre workers |
-| R-04 | A suite completa deve passar após os ajustes (`pnpm test:e2e:ci`) |
+| ID   | Requisito                                                                      |
+| ---- | ------------------------------------------------------------------------------ |
+| R-01 | Os testes E2E devem executar com ≥2 workers em paralelo sem flakiness          |
+| R-02 | Cada teste deve continuar a ter isolamento total (BD, sessão, JWT)             |
+| R-03 | Credenciais geradas dinamicamente não devem colidir entre workers              |
+| R-04 | A suite completa deve passar após os ajustes (`pnpm test:e2e:ci`)              |
 | R-05 | A skill `preflop-e2e-playwright` deve reflectir as novas regras de paralelismo |
-| R-06 | Os comandos de execução documentados devem permanecer válidos |
+| R-06 | Os comandos de execução documentados devem permanecer válidos                  |
 
 ---
 
@@ -60,6 +61,7 @@ A app Electron é nativa (não browser headless puro) e cada worker lança um pr
 Com `fullyParallel: true`, cada `test()` dentro de um `describe` pode correr em worker separado. Com `false`, os testes dentro do mesmo ficheiro correm no mesmo worker mas ficheiros diferentes correm em paralelo.
 
 Dado que:
+
 - Cada `test()` já tem fixture `appPage` completamente isolado
 - `range-grid-improvements.spec.ts` usa `beforeEach` que recria estado fresco por teste
 - Nenhum `test()` depende de outro dentro do mesmo ficheiro
@@ -72,10 +74,10 @@ Dado que:
 
 ```ts
 // antes
-const stamp = Date.now()
+const stamp = Date.now();
 
 // depois
-const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 ```
 
 Mantém legibilidade e garante unicidade mesmo com múltiplos workers no mesmo ms.

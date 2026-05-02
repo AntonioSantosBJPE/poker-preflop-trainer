@@ -13,12 +13,12 @@ Em paralelo, o componente de seleção de range (`RangeGrid13`) usa células e t
 
 ## Out of Scope
 
-| Feature | Reason |
-| ------- | ------ |
-| Alterar regras de domínio do grid (mapeamento row/col, suited/offsuit) | Invariantes em `preflop-domain`; fora deste ajuste |
-| Frequências mistas por célula para “fold parcial” | Comportamento actual de multi-acção por célula mantém-se; fold implícito é célula inteiramente não pintada |
-| Novo tipo de acção ou migração de schema SQL | Apenas lógica de payload/persistência e UI |
-| Export/import de ranges | Não solicitado |
+| Feature                                                                | Reason                                                                                                     |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Alterar regras de domínio do grid (mapeamento row/col, suited/offsuit) | Invariantes em `preflop-domain`; fora deste ajuste                                                         |
+| Frequências mistas por célula para “fold parcial”                      | Comportamento actual de multi-acção por célula mantém-se; fold implícito é célula inteiramente não pintada |
+| Novo tipo de acção ou migração de schema SQL                           | Apenas lógica de payload/persistência e UI                                                                 |
+| Export/import de ranges                                                | Não solicitado                                                                                             |
 
 ---
 
@@ -69,12 +69,12 @@ Em paralelo, o componente de seleção de range (`RangeGrid13`) usa células e t
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
-| -------------- | ----- | ----- | ------ |
-| SRANGE-01 | P1: Fold implícito | Implementação | Done |
-| SRANGE-02 | P1: Fold implícito (validação FOLD única / determinística) | Implementação | Done |
-| SRANGE-03 | P1: Grid maior (células e rótulos) | Implementação | Done |
-| SRANGE-04 | P1: Grid responsivo / usabilidade | Implementação | Done |
+| Requirement ID | Story                                                      | Phase         | Status |
+| -------------- | ---------------------------------------------------------- | ------------- | ------ |
+| SRANGE-01      | P1: Fold implícito                                         | Implementação | Done   |
+| SRANGE-02      | P1: Fold implícito (validação FOLD única / determinística) | Implementação | Done   |
+| SRANGE-03      | P1: Grid maior (células e rótulos)                         | Implementação | Done   |
+| SRANGE-04      | P1: Grid responsivo / usabilidade                          | Implementação | Done   |
 
 **Coverage:** 4 requisitos; mapear para `tasks.md` quando a fase Tasks for aberta.
 
