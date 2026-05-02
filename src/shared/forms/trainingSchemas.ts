@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { FEEDBACK_MODES } from '@shared/constants'
+import { z } from 'zod';
+import { FEEDBACK_MODES } from '@shared/constants';
 
 export const trainingStartFormSchema = z.object({
   groupId: z.number().int().positive('Grupo obrigatório'),
@@ -13,38 +13,38 @@ export const trainingStartFormSchema = z.object({
     .number({ message: 'Timer inválido' })
     .int('Timer deve ser inteiro')
     .min(0, 'Timer não pode ser negativo'),
-  feedbackMode: z.enum(FEEDBACK_MODES, { message: 'Modo de feedback inválido' })
-})
+  feedbackMode: z.enum(FEEDBACK_MODES, { message: 'Modo de feedback inválido' }),
+});
 
-export type TrainingStartFormValues = z.infer<typeof trainingStartFormSchema>
+export type TrainingStartFormValues = z.infer<typeof trainingStartFormSchema>;
 
-export const trainingStartSessionSchema = trainingStartFormSchema
+export const trainingStartSessionSchema = trainingStartFormSchema;
 
-export type TrainingStartSessionInput = z.infer<typeof trainingStartSessionSchema>
+export type TrainingStartSessionInput = z.infer<typeof trainingStartSessionSchema>;
 
 export function parseTrainingStartSession(raw: unknown): TrainingStartSessionInput {
-  const r = trainingStartSessionSchema.safeParse(raw)
+  const r = trainingStartSessionSchema.safeParse(raw);
   if (!r.success) {
-    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos')
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
   }
-  return r.data
+  return r.data;
 }
 
 export const simultaneousTrainingStartSchema = trainingStartFormSchema.extend({
-  tableCount: z
-    .coerce.number({ message: 'Número de mesas inválido' })
+  tableCount: z.coerce
+    .number({ message: 'Número de mesas inválido' })
     .int('Número de mesas deve ser inteiro')
     .min(2, 'Mínimo 2 mesas')
-    .max(4, 'Máximo 4 mesas')
-})
+    .max(4, 'Máximo 4 mesas'),
+});
 
-export type SimultaneousTrainingStartInput = z.infer<typeof simultaneousTrainingStartSchema>
-export type SimultaneousTrainingStartFormInput = z.input<typeof simultaneousTrainingStartSchema>
+export type SimultaneousTrainingStartInput = z.infer<typeof simultaneousTrainingStartSchema>;
+export type SimultaneousTrainingStartFormInput = z.input<typeof simultaneousTrainingStartSchema>;
 
 export function parseSimultaneousTrainingStart(raw: unknown): SimultaneousTrainingStartInput {
-  const r = simultaneousTrainingStartSchema.safeParse(raw)
+  const r = simultaneousTrainingStartSchema.safeParse(raw);
   if (!r.success) {
-    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos')
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
   }
-  return r.data
+  return r.data;
 }

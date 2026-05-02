@@ -29,26 +29,26 @@ Fluxo previsto:
 
 ### Existing Components to Leverage
 
-| Component | Location | How to Use |
-|-----------|----------|------------|
-| Schema atual de sessoes | `src/main/db/schema.ts` | Estender `trainingSessions` com colunas de contexto em vez de criar tabela paralela |
-| Criacao de sessao individual | `src/main/ipc/training.ts` | Reaproveitar fluxo atual e apenas enriquecer payload persistido |
-| Criacao de treino simultaneo | `src/main/ipc/simultaneousTraining.ts` | Reaproveitar validacao atual e adicionar transacao + metadados comuns |
-| Queries de stats | `src/main/ipc/stats.ts` | Estender `sessionWhereClause` para suportar filtros novos sem criar novos canais |
-| Contratos compartilhados | `src/shared/ipc/types.ts` | Tipar os novos filtros de stats e o contexto de sessao |
-| Schemas Zod existentes | `src/shared/forms/trainingSchemas.ts` | Manter padrao de parsers compartilhados; criar parser dedicado para stats |
-| API preload | `src/preload/index.ts` | Preservar canais IPC e apenas tipar melhor os filtros |
-| Pagina de estatisticas | `src/renderer/src/pages/StatsPage.tsx` | Expandir estado local e refetch existente, sem trocar o fluxo principal da pagina |
+| Component                    | Location                               | How to Use                                                                          |
+| ---------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------- |
+| Schema atual de sessoes      | `src/main/db/schema.ts`                | Estender `trainingSessions` com colunas de contexto em vez de criar tabela paralela |
+| Criacao de sessao individual | `src/main/ipc/training.ts`             | Reaproveitar fluxo atual e apenas enriquecer payload persistido                     |
+| Criacao de treino simultaneo | `src/main/ipc/simultaneousTraining.ts` | Reaproveitar validacao atual e adicionar transacao + metadados comuns               |
+| Queries de stats             | `src/main/ipc/stats.ts`                | Estender `sessionWhereClause` para suportar filtros novos sem criar novos canais    |
+| Contratos compartilhados     | `src/shared/ipc/types.ts`              | Tipar os novos filtros de stats e o contexto de sessao                              |
+| Schemas Zod existentes       | `src/shared/forms/trainingSchemas.ts`  | Manter padrao de parsers compartilhados; criar parser dedicado para stats           |
+| API preload                  | `src/preload/index.ts`                 | Preservar canais IPC e apenas tipar melhor os filtros                               |
+| Pagina de estatisticas       | `src/renderer/src/pages/StatsPage.tsx` | Expandir estado local e refetch existente, sem trocar o fluxo principal da pagina   |
 
 ### Integration Points
 
-| System | Integration Method |
-|--------|--------------------|
-| SQLite / Drizzle | Novas colunas em `training_sessions` + migration incremental |
-| Main IPC | Mesmo conjunto de canais `training:*`, `simultaneous-training:*` e `stats:*` |
-| Preload | Mesmos metodos expostos em `window.api.stats.*`, agora com filtros tipados |
-| Renderer | Controles adicionais em `StatsPage` compostos com o filtro por grupo ja existente |
-| E2E | Extensao de `e2e/stats.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts` e specs de treino simultaneo |
+| System           | Integration Method                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| SQLite / Drizzle | Novas colunas em `training_sessions` + migration incremental                                              |
+| Main IPC         | Mesmo conjunto de canais `training:*`, `simultaneous-training:*` e `stats:*`                              |
+| Preload          | Mesmos metodos expostos em `window.api.stats.*`, agora com filtros tipados                                |
+| Renderer         | Controles adicionais em `StatsPage` compostos com o filtro por grupo ja existente                         |
+| E2E              | Extensao de `e2e/stats.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts` e specs de treino simultaneo |
 
 ---
 
@@ -113,12 +113,12 @@ Fluxo previsto:
 ### Training Session Context
 
 ```ts
-type SessionType = 'single' | 'simultaneous'
+type SessionType = 'single' | 'simultaneous';
 
 interface TrainingSessionContextColumns {
-  sessionType: SessionType | null
-  sessionBlockId: string | null
-  simultaneousTableCount: number | null
+  sessionType: SessionType | null;
+  sessionBlockId: string | null;
+  simultaneousTableCount: number | null;
 }
 ```
 
@@ -137,16 +137,16 @@ interface TrainingSessionContextColumns {
 ### Stats Filters
 
 ```ts
-type SessionTypeFilter = 'single' | 'simultaneous'
+type SessionTypeFilter = 'single' | 'simultaneous';
 
 interface StatsFilters {
-  groupId?: number
-  situationIds?: number[]
-  fromTs?: number
-  toTs?: number
-  positions?: Position[]
-  sessionType?: SessionTypeFilter
-  simultaneousTableCount?: 2 | 3 | 4
+  groupId?: number;
+  situationIds?: number[];
+  fromTs?: number;
+  toTs?: number;
+  positions?: Position[];
+  sessionType?: SessionTypeFilter;
+  simultaneousTableCount?: 2 | 3 | 4;
 }
 ```
 
@@ -178,27 +178,27 @@ O repositorio ja possui treino simultaneo persistindo multiplas linhas sem `sess
 
 ## Error Handling Strategy
 
-| Error Scenario | Handling | User Impact |
-|----------------|----------|-------------|
-| `sessionType` invalido em `stats:*` | parser rejeita payload com erro claro | filtro nao e aplicado e a UI recebe erro deterministico |
-| `simultaneousTableCount` invalido | parser rejeita payload | evita resultados ambiguos |
-| `simultaneousTableCount` sem `sessionType = 'simultaneous'` | parser rejeita payload e UI deve limpar/desabilitar esse filtro | evita combinacao invalida |
-| falha ao criar uma das linhas do treino simultaneo | usar transacao e abortar tudo | nao deixa bloco parcial persistido |
-| sessoes legadas sem contexto em view filtrada | excluir do subconjunto filtrado | analytics segmentado permanece confiavel |
+| Error Scenario                                              | Handling                                                        | User Impact                                             |
+| ----------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
+| `sessionType` invalido em `stats:*`                         | parser rejeita payload com erro claro                           | filtro nao e aplicado e a UI recebe erro deterministico |
+| `simultaneousTableCount` invalido                           | parser rejeita payload                                          | evita resultados ambiguos                               |
+| `simultaneousTableCount` sem `sessionType = 'simultaneous'` | parser rejeita payload e UI deve limpar/desabilitar esse filtro | evita combinacao invalida                               |
+| falha ao criar uma das linhas do treino simultaneo          | usar transacao e abortar tudo                                   | nao deixa bloco parcial persistido                      |
+| sessoes legadas sem contexto em view filtrada               | excluir do subconjunto filtrado                                 | analytics segmentado permanece confiavel                |
 
 ---
 
 ## Tech Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Onde persistir contexto | Novas colunas em `training_sessions` | O problema e sobre segmentacao das sessoes ja existentes; evita join/tabela paralela |
-| Nome interno do tipo | `'single' | 'simultaneous'` | Alinha com naming atual do codigo e separa labels de UI dos valores persistidos |
-| Identificador de bloco | `sessionBlockId` textual gerado por UUID | Facil de gerar no main, estavel e compartilhavel entre N linhas |
-| Tratamento de legado | Manter `null` e nao inferir | Preserva corretude analitica |
-| Validacao de stats | Parser Zod dedicado | Hoje `stats.ts` aceita `unknown` sem contrato forte; a feature pede validacao backend explicita |
-| Compatibilidade IPC | Reusar os canais `stats:*` existentes | Menor superficie de mudanca em preload, renderer e testes |
-| Atomicidade do treino simultaneo | Insercoes em transacao unica | Necessario para TSC-13 |
+| Decision                         | Choice                                   | Rationale                                                                                       |
+| -------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Onde persistir contexto          | Novas colunas em `training_sessions`     | O problema e sobre segmentacao das sessoes ja existentes; evita join/tabela paralela            |
+| Nome interno do tipo             | `'single'                                | 'simultaneous'`                                                                                 | Alinha com naming atual do codigo e separa labels de UI dos valores persistidos |
+| Identificador de bloco           | `sessionBlockId` textual gerado por UUID | Facil de gerar no main, estavel e compartilhavel entre N linhas                                 |
+| Tratamento de legado             | Manter `null` e nao inferir              | Preserva corretude analitica                                                                    |
+| Validacao de stats               | Parser Zod dedicado                      | Hoje `stats.ts` aceita `unknown` sem contrato forte; a feature pede validacao backend explicita |
+| Compatibilidade IPC              | Reusar os canais `stats:*` existentes    | Menor superficie de mudanca em preload, renderer e testes                                       |
+| Atomicidade do treino simultaneo | Insercoes em transacao unica             | Necessario para TSC-13                                                                          |
 
 ---
 

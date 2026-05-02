@@ -7,23 +7,26 @@
     <link rel="icon" href="/assets/favicon/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/assets/favicon/favicon-256x256.png" />
     <script>
-      ;(function () {
+      (function () {
         try {
-          var raw = localStorage.getItem('pt-theme')
-          var theme = 'dark'
+          var raw = localStorage.getItem('pt-theme');
+          var theme = 'dark';
           if (raw) {
-            var p = JSON.parse(raw)
+            var p = JSON.parse(raw);
             if (p && p.state && (p.state.theme === 'light' || p.state.theme === 'dark')) {
-              theme = p.state.theme
+              theme = p.state.theme;
             }
-          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            theme = 'light'
+          } else if (
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: light)').matches
+          ) {
+            theme = 'light';
           }
-          document.documentElement.classList.toggle('dark', theme === 'dark')
+          document.documentElement.classList.toggle('dark', theme === 'dark');
         } catch (e) {
-          document.documentElement.classList.add('dark')
+          document.documentElement.classList.add('dark');
         }
-      })()
+      })();
     </script>
   </head>
   <body class="min-h-screen bg-background text-foreground antialiased">

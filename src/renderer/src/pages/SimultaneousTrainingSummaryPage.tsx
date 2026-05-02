@@ -1,50 +1,50 @@
-import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 type SessionResult = {
-  session: { id: number }
-  hands: { isCorrect: boolean }[]
-}
+  session: { id: number };
+  hands: { isCorrect: boolean }[];
+};
 
 type TableSummary = {
-  sessionId: number
-  total: number
-  correct: number
-  accuracyPct: number
-}
+  sessionId: number;
+  total: number;
+  correct: number;
+  accuracyPct: number;
+};
 
 export function SimultaneousTrainingSummaryPage(): React.ReactElement {
-  const navigate = useNavigate()
-  const location = useLocation() as { state?: { sessionIds: number[] } }
-  const sessionIds = location.state?.sessionIds ?? []
-  const [tables, setTables] = useState<TableSummary[]>([])
+  const navigate = useNavigate();
+  const location = useLocation() as { state?: { sessionIds: number[] } };
+  const sessionIds = location.state?.sessionIds ?? [];
+  const [tables, setTables] = useState<TableSummary[]>([]);
 
   useEffect(() => {
     if (!sessionIds.length) {
-      navigate('/training/simultaneous', { replace: true })
-      return
+      navigate('/training/simultaneous', { replace: true });
+      return;
     }
     void (async () => {
       const results = (await Promise.all(
-        sessionIds.map((sessionId) => window.api.training.getSessionResult(sessionId))
-      )) as SessionResult[]
+        sessionIds.map((sessionId) => window.api.training.getSessionResult(sessionId)),
+      )) as SessionResult[];
       const tableSummaries = results.map((result) => {
-        const total = result.hands.length
-        const correct = result.hands.filter((h) => h.isCorrect).length
+        const total = result.hands.length;
+        const correct = result.hands.filter((h) => h.isCorrect).length;
         return {
           sessionId: result.session.id,
           total,
           correct,
-          accuracyPct: total ? Math.round((correct / total) * 100) : 0
-        }
-      })
-      setTables(tableSummaries)
-    })()
-  }, [navigate, sessionIds])
+          accuracyPct: total ? Math.round((correct / total) * 100) : 0,
+        };
+      });
+      setTables(tableSummaries);
+    })();
+  }, [navigate, sessionIds]);
 
-  const totalHands = tables.reduce((sum, table) => sum + table.total, 0)
-  const totalCorrect = tables.reduce((sum, table) => sum + table.correct, 0)
-  const accuracy = totalHands ? Math.round((totalCorrect / totalHands) * 100) : 0
+  const totalHands = tables.reduce((sum, table) => sum + table.total, 0);
+  const totalCorrect = tables.reduce((sum, table) => sum + table.correct, 0);
+  const accuracy = totalHands ? Math.round((totalCorrect / totalHands) * 100) : 0;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -82,5 +82,5 @@ export function SimultaneousTrainingSummaryPage(): React.ReactElement {
         </Link>
       </div>
     </div>
-  )
+  );
 }

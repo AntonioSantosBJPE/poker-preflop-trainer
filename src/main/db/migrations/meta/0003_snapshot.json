@@ -64,12 +64,8 @@
           "name": "actions_situation_id_situations_id_fk",
           "tableFrom": "actions",
           "tableTo": "situations",
-          "columnsFrom": [
-            "situation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["situation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -124,12 +120,8 @@
           "name": "range_cells_action_id_actions_id_fk",
           "tableFrom": "range_cells",
           "tableTo": "actions",
-          "columnsFrom": [
-            "action_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["action_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -225,12 +217,8 @@
           "name": "session_hands_session_id_training_sessions_id_fk",
           "tableFrom": "session_hands",
           "tableTo": "training_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -238,12 +226,8 @@
           "name": "session_hands_situation_id_situations_id_fk",
           "tableFrom": "session_hands",
           "tableTo": "situations",
-          "columnsFrom": [
-            "situation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["situation_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -251,12 +235,8 @@
           "name": "session_hands_chosen_action_id_actions_id_fk",
           "tableFrom": "session_hands",
           "tableTo": "actions",
-          "columnsFrom": [
-            "chosen_action_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["chosen_action_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -325,10 +305,7 @@
       "indexes": {
         "uq_groups_user_name": {
           "name": "uq_groups_user_name",
-          "columns": [
-            "user_id",
-            "name"
-          ],
+          "columns": ["user_id", "name"],
           "isUnique": true
         }
       },
@@ -337,12 +314,8 @@
           "name": "situation_groups_user_id_users_id_fk",
           "tableFrom": "situation_groups",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -435,12 +408,8 @@
           "name": "situations_user_id_users_id_fk",
           "tableFrom": "situations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -448,12 +417,8 @@
           "name": "situations_group_id_situation_groups_id_fk",
           "tableFrom": "situations",
           "tableTo": "situation_groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -557,12 +522,8 @@
           "name": "training_sessions_user_id_users_id_fk",
           "tableFrom": "training_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -570,12 +531,8 @@
           "name": "training_sessions_group_id_situation_groups_id_fk",
           "tableFrom": "training_sessions",
           "tableTo": "situation_groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -627,9 +584,7 @@
       "indexes": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

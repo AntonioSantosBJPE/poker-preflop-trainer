@@ -1,25 +1,25 @@
-import { ipcMain } from 'electron'
-import { and, asc, eq, inArray, ne } from 'drizzle-orm'
-import { actions, rangeCells, situations } from '../db/schema'
-import { getDb } from '../db/client'
-import { requireUserId } from '../services/session'
-import { parseSituationPayload } from '@shared/forms/situationSchemas'
+import { ipcMain } from 'electron';
+import { and, asc, eq, inArray, ne } from 'drizzle-orm';
+import { actions, rangeCells, situations } from '../db/schema';
+import { getDb } from '../db/client';
+import { requireUserId } from '../services/session';
+import { parseSituationPayload } from '@shared/forms/situationSchemas';
 
 export function registerSituationsIpc(): void {
   ipcMain.handle('situations:list', async (_e, filter?: { groupId?: number }) => {
-    const userId = await requireUserId()
-    const db = getDb()
-    const whereParts = [eq(situations.userId, userId), eq(situations.isActive, true)]
+    const userId = await requireUserId();
+    const db = getDb();
+    const whereParts = [eq(situations.userId, userId), eq(situations.isActive, true)];
     if (filter?.groupId !== undefined) {
-      whereParts.push(eq(situations.groupId, filter.groupId))
+      whereParts.push(eq(situations.groupId, filter.groupId));
     }
     const rows = await db
       .select()
       .from(situations)
       .where(and(...whereParts))
-      .orderBy(asc(situations.name))
+      .orderBy(asc(situations.name));
 
-    const result = []
+    const result = [];
     for (const s of rows) {
       const acts = await db
         .select({
@@ -28,11 +28,11 @@ export function registerSituationsIpc(): void {
           actionType: actions.actionType,
           sizeBb: actions.sizeBb,
           colorHex: actions.colorHex,
-          sortOrder: actions.sortOrder
+          sortOrder: actions.sortOrder,
         })
         .from(actions)
         .where(eq(actions.situationId, s.id))
-        .orderBy(asc(actions.sortOrder))
+        .orderBy(asc(actions.sortOrder));
       result.push({
         id: s.id,
         groupId: s.groupId,
@@ -40,39 +40,39 @@ export function registerSituationsIpc(): void {
         position: s.position,
         effectiveStack: s.effectiveStack,
         isActive: s.isActive,
-        actions: acts
-      })
+        actions: acts,
+      });
     }
-    return result
-  })
+    return result;
+  });
 
   ipcMain.handle('situations:get', async (_e, id: number) => {
-    const userId = await requireUserId()
-    const db = getDb()
+    const userId = await requireUserId();
+    const db = getDb();
     const row = await db
       .select()
       .from(situations)
       .where(and(eq(situations.id, id), eq(situations.userId, userId)))
-      .limit(1)
-    const s = row[0]
-    if (!s) throw new Error('Situação não encontrada')
+      .limit(1);
+    const s = row[0];
+    if (!s) throw new Error('Situação não encontrada');
     const acts = await db
       .select()
       .from(actions)
       .where(eq(actions.situationId, s.id))
-      .orderBy(asc(actions.sortOrder))
-    const actionIds = acts.map((a) => a.id)
-    let cells: { actionId: number; rowIndex: number; colIndex: number; frequency: number }[] = []
+      .orderBy(asc(actions.sortOrder));
+    const actionIds = acts.map((a) => a.id);
+    let cells: { actionId: number; rowIndex: number; colIndex: number; frequency: number }[] = [];
     if (actionIds.length > 0) {
       cells = await db
         .select({
           actionId: rangeCells.actionId,
           rowIndex: rangeCells.rowIndex,
           colIndex: rangeCells.colIndex,
-          frequency: rangeCells.frequency
+          frequency: rangeCells.frequency,
         })
         .from(rangeCells)
-        .where(inArray(rangeCells.actionId, actionIds))
+        .where(inArray(rangeCells.actionId, actionIds));
     }
     return {
       id: s.id,
@@ -88,25 +88,25 @@ export function registerSituationsIpc(): void {
         actionType: a.actionType,
         sizeBb: a.sizeBb,
         colorHex: a.colorHex,
-        sortOrder: a.sortOrder
+        sortOrder: a.sortOrder,
       })),
-      rangeCells: cells
-    }
-  })
+      rangeCells: cells,
+    };
+  });
 
   ipcMain.handle('situations:create', async (_e, payload: unknown) => {
-    const userId = await requireUserId()
-    const p = parseSituationPayload(payload)
-    const db = getDb()
+    const userId = await requireUserId();
+    const p = parseSituationPayload(payload);
+    const db = getDb();
     const dup = await db
       .select({ id: situations.id })
       .from(situations)
       .where(and(eq(situations.userId, userId), eq(situations.name, p.name)))
-      .limit(1)
-    if (dup.length) throw new Error('Nome de situação já existe')
+      .limit(1);
+    if (dup.length) throw new Error('Nome de situação já existe');
 
     return db.transaction((tx) => {
-      const now = new Date()
+      const now = new Date();
       const insertedSit = tx
         .insert(situations)
         .values({
@@ -118,14 +118,14 @@ export function registerSituationsIpc(): void {
           effectiveStack: p.effectiveStack,
           isActive: true,
           createdAt: now,
-          updatedAt: now
+          updatedAt: now,
         })
         .returning({ id: situations.id })
-        .all()
-      const sid = insertedSit[0]?.id
-      if (!sid) throw new Error('Falha ao criar situação')
+        .all();
+      const sid = insertedSit[0]?.id;
+      if (!sid) throw new Error('Falha ao criar situação');
       for (let i = 0; i < p.actions.length; i++) {
-        const a = p.actions[i]!
+        const a = p.actions[i]!;
         const insertedAct = tx
           .insert(actions)
           .values({
@@ -134,47 +134,47 @@ export function registerSituationsIpc(): void {
             actionType: a.actionType,
             sizeBb: a.sizeBb ?? null,
             colorHex: a.colorHex,
-            sortOrder: a.sortOrder ?? i
+            sortOrder: a.sortOrder ?? i,
           })
           .returning({ id: actions.id })
-          .all()
-        const aid = insertedAct[0]?.id
-        if (!aid) throw new Error('Falha ao criar ação')
-        const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey)
+          .all();
+        const aid = insertedAct[0]?.id;
+        if (!aid) throw new Error('Falha ao criar ação');
+        const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
         for (const c of cells) {
-          tx.insert(rangeCells).values({
-            actionId: aid,
-            rowIndex: c.rowIndex,
-            colIndex: c.colIndex,
-            frequency: c.frequency
-          }).run()
+          tx.insert(rangeCells)
+            .values({
+              actionId: aid,
+              rowIndex: c.rowIndex,
+              colIndex: c.colIndex,
+              frequency: c.frequency,
+            })
+            .run();
         }
       }
-      return sid
-    })
-  })
+      return sid;
+    });
+  });
 
   ipcMain.handle('situations:update', async (_e, id: number, payload: unknown) => {
-    const userId = await requireUserId()
-    const p = parseSituationPayload(payload)
-    const db = getDb()
+    const userId = await requireUserId();
+    const p = parseSituationPayload(payload);
+    const db = getDb();
     const row = await db
       .select()
       .from(situations)
       .where(and(eq(situations.id, id), eq(situations.userId, userId)))
-      .limit(1)
-    if (!row[0]) throw new Error('Situação não encontrada')
+      .limit(1);
+    if (!row[0]) throw new Error('Situação não encontrada');
     const dup = await db
       .select({ id: situations.id })
       .from(situations)
-      .where(
-        and(eq(situations.userId, userId), eq(situations.name, p.name), ne(situations.id, id))
-      )
-      .limit(1)
-    if (dup.length) throw new Error('Nome de situação já existe')
+      .where(and(eq(situations.userId, userId), eq(situations.name, p.name), ne(situations.id, id)))
+      .limit(1);
+    if (dup.length) throw new Error('Nome de situação já existe');
 
     db.transaction((tx) => {
-      const now = new Date()
+      const now = new Date();
       tx.update(situations)
         .set({
           groupId: p.groupId,
@@ -182,18 +182,22 @@ export function registerSituationsIpc(): void {
           position: p.position,
           description: p.description ?? null,
           effectiveStack: p.effectiveStack,
-          updatedAt: now
+          updatedAt: now,
         })
         .where(eq(situations.id, id))
-        .run()
-      const oldActs = tx.select({ id: actions.id }).from(actions).where(eq(actions.situationId, id)).all()
-      const oldIds = oldActs.map((x) => x.id)
+        .run();
+      const oldActs = tx
+        .select({ id: actions.id })
+        .from(actions)
+        .where(eq(actions.situationId, id))
+        .all();
+      const oldIds = oldActs.map((x) => x.id);
       if (oldIds.length) {
-        tx.delete(rangeCells).where(inArray(rangeCells.actionId, oldIds)).run()
-        tx.delete(actions).where(eq(actions.situationId, id)).run()
+        tx.delete(rangeCells).where(inArray(rangeCells.actionId, oldIds)).run();
+        tx.delete(actions).where(eq(actions.situationId, id)).run();
       }
       for (let i = 0; i < p.actions.length; i++) {
-        const a = p.actions[i]!
+        const a = p.actions[i]!;
         const insertedAct = tx
           .insert(actions)
           .values({
@@ -202,58 +206,60 @@ export function registerSituationsIpc(): void {
             actionType: a.actionType,
             sizeBb: a.sizeBb ?? null,
             colorHex: a.colorHex,
-            sortOrder: a.sortOrder ?? i
+            sortOrder: a.sortOrder ?? i,
           })
           .returning({ id: actions.id })
-          .all()
-        const aid = insertedAct[0]?.id
-        if (!aid) throw new Error('Falha ao criar ação')
-        const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey)
+          .all();
+        const aid = insertedAct[0]?.id;
+        if (!aid) throw new Error('Falha ao criar ação');
+        const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
         for (const c of cells) {
-          tx.insert(rangeCells).values({
-            actionId: aid,
-            rowIndex: c.rowIndex,
-            colIndex: c.colIndex,
-            frequency: c.frequency
-          }).run()
+          tx.insert(rangeCells)
+            .values({
+              actionId: aid,
+              rowIndex: c.rowIndex,
+              colIndex: c.colIndex,
+              frequency: c.frequency,
+            })
+            .run();
         }
       }
-    })
-    return id
-  })
+    });
+    return id;
+  });
 
   ipcMain.handle('situations:delete', async (_e, id: number) => {
-    const userId = await requireUserId()
-    const db = getDb()
+    const userId = await requireUserId();
+    const db = getDb();
     const res = await db
       .update(situations)
       .set({ isActive: false, updatedAt: new Date() })
       .where(and(eq(situations.id, id), eq(situations.userId, userId)))
-      .returning({ id: situations.id })
-    if (!res.length) throw new Error('Situação não encontrada')
-  })
+      .returning({ id: situations.id });
+    if (!res.length) throw new Error('Situação não encontrada');
+  });
 
   ipcMain.handle('situations:duplicate', async (_e, id: number) => {
-    const userId = await requireUserId()
-    const db = getDb()
+    const userId = await requireUserId();
+    const db = getDb();
     const row = await db
       .select()
       .from(situations)
       .where(and(eq(situations.id, id), eq(situations.userId, userId)))
-      .limit(1)
-    const s = row[0]
-    if (!s) throw new Error('Situação não encontrada')
+      .limit(1);
+    const s = row[0];
+    if (!s) throw new Error('Situação não encontrada');
     const acts = await db
       .select()
       .from(actions)
       .where(eq(actions.situationId, id))
-      .orderBy(asc(actions.sortOrder))
-    const actionIds = acts.map((a) => a.id)
+      .orderBy(asc(actions.sortOrder));
+    const actionIds = acts.map((a) => a.id);
     const cells = actionIds.length
       ? await db.select().from(rangeCells).where(inArray(rangeCells.actionId, actionIds))
-      : []
-    let newName = `Cópia de ${s.name}`
-    let n = 2
+      : [];
+    let newName = `Cópia de ${s.name}`;
+    let n = 2;
     while (
       (
         await db
@@ -263,11 +269,11 @@ export function registerSituationsIpc(): void {
           .limit(1)
       ).length
     ) {
-      newName = `Cópia de ${s.name} (${n})`
-      n++
+      newName = `Cópia de ${s.name} (${n})`;
+      n++;
     }
     return db.transaction((tx) => {
-      const now = new Date()
+      const now = new Date();
       const insertedSit = tx
         .insert(situations)
         .values({
@@ -279,12 +285,12 @@ export function registerSituationsIpc(): void {
           effectiveStack: s.effectiveStack,
           isActive: true,
           createdAt: now,
-          updatedAt: now
+          updatedAt: now,
         })
         .returning({ id: situations.id })
-        .all()
-      const sid = insertedSit[0]?.id
-      if (!sid) throw new Error('Falha ao duplicar')
+        .all();
+      const sid = insertedSit[0]?.id;
+      if (!sid) throw new Error('Falha ao duplicar');
       for (const a of acts) {
         const insertedAct = tx
           .insert(actions)
@@ -294,23 +300,25 @@ export function registerSituationsIpc(): void {
             actionType: a.actionType,
             sizeBb: a.sizeBb,
             colorHex: a.colorHex,
-            sortOrder: a.sortOrder
+            sortOrder: a.sortOrder,
           })
           .returning({ id: actions.id })
-          .all()
-        const aid = insertedAct[0]?.id
-        if (!aid) throw new Error('Falha ao duplicar ação')
-        const forAction = cells.filter((c) => c.actionId === a.id)
+          .all();
+        const aid = insertedAct[0]?.id;
+        if (!aid) throw new Error('Falha ao duplicar ação');
+        const forAction = cells.filter((c) => c.actionId === a.id);
         for (const c of forAction) {
-          tx.insert(rangeCells).values({
-            actionId: aid,
-            rowIndex: c.rowIndex,
-            colIndex: c.colIndex,
-            frequency: c.frequency
-          }).run()
+          tx.insert(rangeCells)
+            .values({
+              actionId: aid,
+              rowIndex: c.rowIndex,
+              colIndex: c.colIndex,
+              frequency: c.frequency,
+            })
+            .run();
         }
       }
-      return sid
-    })
-  })
+      return sid;
+    });
+  });
 }

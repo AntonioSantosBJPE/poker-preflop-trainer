@@ -28,12 +28,12 @@ Sem esta capacidade, o treino não exercita troca rápida de contexto nem tomada
 
 ## Out of Scope
 
-| Item | Reason |
-|------|--------|
-| Suporte a 5+ mesas simultâneas | Fora do escopo inicial; complexidade de UX/performance aumenta bastante |
-| Configuração distinta por mesa no mesmo bloco | MVP exige configuração unificada para todas as mesas |
-| Sincronização online/multiplayer | Feature é local e single-user |
-| Reformulação completa do motor de treino | Objetivo é extensão de fluxo, não reescrita do core |
+| Item                                          | Reason                                                                  |
+| --------------------------------------------- | ----------------------------------------------------------------------- |
+| Suporte a 5+ mesas simultâneas                | Fora do escopo inicial; complexidade de UX/performance aumenta bastante |
+| Configuração distinta por mesa no mesmo bloco | MVP exige configuração unificada para todas as mesas                    |
+| Sincronização online/multiplayer              | Feature é local e single-user                                           |
+| Reformulação completa do motor de treino      | Objetivo é extensão de fluxo, não reescrita do core                     |
 
 ---
 
@@ -126,18 +126,18 @@ Esta feature é altamente sensível a regressões de fluxo e concorrência de es
 
 ### E2E (Playwright + Electron) — Cobertura obrigatória
 
-| Test ID | Critério coberto | Ficheiro sugerido |
-|---------|------------------|-------------------|
-| E2E-MT-01 | Menu exibe "Treino Simultâneo" e navegação funciona | `e2e/simultaneous-training/navigation.spec.ts` |
-| E2E-MT-02 | Fluxo atual de treino continua funcional após introdução do novo modo | `e2e/simultaneous-training/regression-single-flow.spec.ts` |
-| E2E-MT-03 | Seleção válida de 2/3/4 mesas inicia sessão com quantidade correta | `e2e/simultaneous-training/session-config.spec.ts` |
-| E2E-MT-04 | Tentativa de iniciar sem configuração válida bloqueia com erro claro | `e2e/simultaneous-training/session-config.spec.ts` |
-| E2E-MT-05 | Estados por mesa são isolados (ação numa mesa não afeta outra) | `e2e/simultaneous-training/isolated-state.spec.ts` |
-| E2E-MT-06 | Ordem arbitrária de respostas mantém progresso consistente por mesa | `e2e/simultaneous-training/isolated-state.spec.ts` |
-| E2E-MT-07 | Encerramento persiste sessão e resumo agregado com dados coerentes | `e2e/simultaneous-training/session-summary.spec.ts` |
-| E2E-MT-08 | Bypass com `tableCount` inválido (<2, >4) é rejeitado no main process | `e2e/simultaneous-training/backend-validation.spec.ts` |
-| E2E-MT-09 | Navegação com sessão ativa pede confirmação de abandono | `e2e/simultaneous-training/leave-guard.spec.ts` |
-| E2E-MT-10 | Fluxo completo: configurar 3 mesas → jogar → concluir → validar histórico/stats | `e2e/simultaneous-training/full-flow.spec.ts` |
+| Test ID   | Critério coberto                                                                | Ficheiro sugerido                                          |
+| --------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| E2E-MT-01 | Menu exibe "Treino Simultâneo" e navegação funciona                             | `e2e/simultaneous-training/navigation.spec.ts`             |
+| E2E-MT-02 | Fluxo atual de treino continua funcional após introdução do novo modo           | `e2e/simultaneous-training/regression-single-flow.spec.ts` |
+| E2E-MT-03 | Seleção válida de 2/3/4 mesas inicia sessão com quantidade correta              | `e2e/simultaneous-training/session-config.spec.ts`         |
+| E2E-MT-04 | Tentativa de iniciar sem configuração válida bloqueia com erro claro            | `e2e/simultaneous-training/session-config.spec.ts`         |
+| E2E-MT-05 | Estados por mesa são isolados (ação numa mesa não afeta outra)                  | `e2e/simultaneous-training/isolated-state.spec.ts`         |
+| E2E-MT-06 | Ordem arbitrária de respostas mantém progresso consistente por mesa             | `e2e/simultaneous-training/isolated-state.spec.ts`         |
+| E2E-MT-07 | Encerramento persiste sessão e resumo agregado com dados coerentes              | `e2e/simultaneous-training/session-summary.spec.ts`        |
+| E2E-MT-08 | Bypass com `tableCount` inválido (<2, >4) é rejeitado no main process           | `e2e/simultaneous-training/backend-validation.spec.ts`     |
+| E2E-MT-09 | Navegação com sessão ativa pede confirmação de abandono                         | `e2e/simultaneous-training/leave-guard.spec.ts`            |
+| E2E-MT-10 | Fluxo completo: configurar 3 mesas → jogar → concluir → validar histórico/stats | `e2e/simultaneous-training/full-flow.spec.ts`              |
 
 **Regras para os E2E desta feature:**
 
@@ -148,33 +148,33 @@ Esta feature é altamente sensível a regressões de fluxo e concorrência de es
 
 ### Unit/Integration (suporte ao E2E)
 
-| Camada | O que validar | Prioridade |
-|--------|---------------|------------|
-| Shared domain (tipos/contratos) | Limites de `tableCount` e shape da sessão simultânea | P1 |
-| Main IPC handlers | Validação de payload, criação de sessão multi-mesa, erros formatados | P1 |
-| Engine/serviços de treino | Isolamento de estado por mesa e agregação de resultados | P1 |
-| Renderer state | Atualizações por mesa sem vazamento entre painéis | P2 |
+| Camada                          | O que validar                                                        | Prioridade |
+| ------------------------------- | -------------------------------------------------------------------- | ---------- |
+| Shared domain (tipos/contratos) | Limites de `tableCount` e shape da sessão simultânea                 | P1         |
+| Main IPC handlers               | Validação de payload, criação de sessão multi-mesa, erros formatados | P1         |
+| Engine/serviços de treino       | Isolamento de estado por mesa e agregação de resultados              | P1         |
+| Renderer state                  | Atualizações por mesa sem vazamento entre painéis                    | P2         |
 
 ---
 
 ## Requirement Traceability
 
-| Requirement ID | Descrição | Status |
-|----------------|-----------|--------|
-| SMT-01 | Nova entrada de menu para "Treino Simultâneo" | Done |
-| SMT-02 | Navegação para nova seção de configuração multi-mesa | Done |
-| SMT-03 | Manter fluxo de treino atual sem regressão funcional | Done |
-| SMT-04 | Permitir apenas 2, 3 ou 4 mesas na configuração | Done |
-| SMT-05 | Aplicar configuração única a todas as mesas da sessão | Done |
-| SMT-06 | Bloquear início quando configuração não é válida | Done |
-| SMT-07 | Criar sessão simultânea com N mesas ativas (N ∈ {2,3,4}) | Done |
-| SMT-08 | Garantir isolamento de estado por mesa durante execução | Done |
-| SMT-09 | Consolidar resultados do bloco sem perda de eventos | Done |
-| SMT-10 | Persistir sessão simultânea e exibir resumo agregado | Done |
-| SMT-11 | Rejeitar payload inválido de contagem de mesas no main process | Done |
-| SMT-12 | Exigir confirmação ao abandonar sessão ativa | Done |
-| SMT-13 | Cobertura E2E obrigatória do fluxo completo multi-mesa | Done |
-| SMT-14 | Cobertura E2E de regressão do fluxo single-table | Done |
+| Requirement ID | Descrição                                                      | Status |
+| -------------- | -------------------------------------------------------------- | ------ |
+| SMT-01         | Nova entrada de menu para "Treino Simultâneo"                  | Done   |
+| SMT-02         | Navegação para nova seção de configuração multi-mesa           | Done   |
+| SMT-03         | Manter fluxo de treino atual sem regressão funcional           | Done   |
+| SMT-04         | Permitir apenas 2, 3 ou 4 mesas na configuração                | Done   |
+| SMT-05         | Aplicar configuração única a todas as mesas da sessão          | Done   |
+| SMT-06         | Bloquear início quando configuração não é válida               | Done   |
+| SMT-07         | Criar sessão simultânea com N mesas ativas (N ∈ {2,3,4})       | Done   |
+| SMT-08         | Garantir isolamento de estado por mesa durante execução        | Done   |
+| SMT-09         | Consolidar resultados do bloco sem perda de eventos            | Done   |
+| SMT-10         | Persistir sessão simultânea e exibir resumo agregado           | Done   |
+| SMT-11         | Rejeitar payload inválido de contagem de mesas no main process | Done   |
+| SMT-12         | Exigir confirmação ao abandonar sessão ativa                   | Done   |
+| SMT-13         | Cobertura E2E obrigatória do fluxo completo multi-mesa         | Done   |
+| SMT-14         | Cobertura E2E de regressão do fluxo single-table               | Done   |
 
 ---
 

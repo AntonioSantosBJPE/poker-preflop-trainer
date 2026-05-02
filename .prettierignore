@@ -1,0 +1,10 @@
+node_modules
+out
+dist
+coverage
+test-results
+playwright-report
+pnpm-lock.yaml
+src/renderer/public/assets
+.agents
+.codex

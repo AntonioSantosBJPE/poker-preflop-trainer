@@ -56,20 +56,20 @@ Abre a aplicação em modo desenvolvimento (hot reload no renderer).
 
 ### Scripts úteis
 
-| Comando                  | Descrição                                                              |
-| ------------------------ | ---------------------------------------------------------------------- |
-| `pnpm dev`               | Desenvolvimento                                                        |
-| `pnpm dev:gpu-safe`      | Desenvolvimento com `--disable-gpu` (Linux com falhas de GPU)        |
-| `pnpm build`             | Build de produção + empacotamento (`electron-builder`)                 |
-| `pnpm preview`           | Pré-visualização do build                                              |
-| `pnpm test`              | Suíte completa local: unitários (Vitest) + build + E2E (Playwright)    |
-| `pnpm test:unit`         | Apenas testes unitários (Vitest); também usado no CI                   |
-| `pnpm test:unit:watch`   | Vitest em modo watch                                                   |
-| `pnpm test:e2e`          | Só E2E (Playwright + Electron); exige `out/main/index.js` (`build:app`) |
-| `pnpm test:e2e:ci`       | `build:app` + E2E (sem Vitest; útil quando só queres validar E2E)      |
-| `pnpm build:app`         | Só compila main/preload/renderer e copia migrações (sem .exe)          |
-| `pnpm typecheck`         | Verificação TypeScript (main + renderer)                               |
-| `pnpm db:generate`       | Gera migrações Drizzle a partir do schema                              |
+| Comando                | Descrição                                                               |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `pnpm dev`             | Desenvolvimento                                                         |
+| `pnpm dev:gpu-safe`    | Desenvolvimento com `--disable-gpu` (Linux com falhas de GPU)           |
+| `pnpm build`           | Build de produção + empacotamento (`electron-builder`)                  |
+| `pnpm preview`         | Pré-visualização do build                                               |
+| `pnpm test`            | Suíte completa local: unitários (Vitest) + build + E2E (Playwright)     |
+| `pnpm test:unit`       | Apenas testes unitários (Vitest); também usado no CI                    |
+| `pnpm test:unit:watch` | Vitest em modo watch                                                    |
+| `pnpm test:e2e`        | Só E2E (Playwright + Electron); exige `out/main/index.js` (`build:app`) |
+| `pnpm test:e2e:ci`     | `build:app` + E2E (sem Vitest; útil quando só queres validar E2E)       |
+| `pnpm build:app`       | Só compila main/preload/renderer e copia migrações (sem .exe)           |
+| `pnpm typecheck`       | Verificação TypeScript (main + renderer)                                |
+| `pnpm db:generate`     | Gera migrações Drizzle a partir do schema                               |
 
 ### Testes E2E (Playwright)
 

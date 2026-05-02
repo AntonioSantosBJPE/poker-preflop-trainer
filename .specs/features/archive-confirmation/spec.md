@@ -24,11 +24,11 @@ Atualmente o arquivamento pode ser executado diretamente a partir da UI, o que a
 
 ## Out of Scope
 
-| Item | Reason |
-|------|--------|
-| Implementar “desarquivar” (undo) | Fora do pedido atual |
-| Alterar regras de soft-delete no backend | O objetivo é confirmar antes da ação, não mudar o modelo de persistência |
-| Redesign completo de componentes de modal | Apenas o fluxo de confirmação necessário |
+| Item                                      | Reason                                                                   |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| Implementar “desarquivar” (undo)          | Fora do pedido atual                                                     |
+| Alterar regras de soft-delete no backend  | O objetivo é confirmar antes da ação, não mudar o modelo de persistência |
+| Redesign completo de componentes de modal | Apenas o fluxo de confirmação necessário                                 |
 
 ---
 
@@ -74,15 +74,15 @@ Atualmente o arquivamento pode ser executado diretamente a partir da UI, o que a
 
 ## Requirement Traceability
 
-| Requirement ID | Descrição | Status |
-|----------------|-----------|--------|
-| ARC-01 | Abrir diálogo de confirmação no arquivamento individual | Done |
-| ARC-02 | Executar arquivamento individual apenas com confirmação explícita | Done |
-| ARC-03 | Cancelar/fechar diálogo não altera dados no arquivamento individual | Done |
-| ARC-04 | Abrir diálogo de confirmação no arquivamento em lote/grupo | Done |
-| ARC-05 | Executar arquivamento em lote/grupo apenas com confirmação explícita | Done |
-| ARC-06 | Cancelar/fechar diálogo não altera dados no arquivamento em lote/grupo | Done |
-| ARC-07 | Proteger contra submissão duplicada da mesma ação de arquivamento | Done |
+| Requirement ID | Descrição                                                              | Status |
+| -------------- | ---------------------------------------------------------------------- | ------ |
+| ARC-01         | Abrir diálogo de confirmação no arquivamento individual                | Done   |
+| ARC-02         | Executar arquivamento individual apenas com confirmação explícita      | Done   |
+| ARC-03         | Cancelar/fechar diálogo não altera dados no arquivamento individual    | Done   |
+| ARC-04         | Abrir diálogo de confirmação no arquivamento em lote/grupo             | Done   |
+| ARC-05         | Executar arquivamento em lote/grupo apenas com confirmação explícita   | Done   |
+| ARC-06         | Cancelar/fechar diálogo não altera dados no arquivamento em lote/grupo | Done   |
+| ARC-07         | Proteger contra submissão duplicada da mesma ação de arquivamento      | Done   |
 
 ---
 

@@ -1,19 +1,19 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../stores/auth'
-import { useThemeStore } from '../stores/theme'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../stores/auth';
+import { useThemeStore } from '../stores/theme';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   [
     'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
     isActive
       ? 'bg-muted text-primary shadow-sm'
-      : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
-  ].join(' ')
+      : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
+  ].join(' ');
 
 function ThemeToggle(): React.ReactElement {
-  const theme = useThemeStore((s) => s.theme)
-  const toggleTheme = useThemeStore((s) => s.toggleTheme)
-  const isDark = theme === 'dark'
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
+  const isDark = theme === 'dark';
   return (
     <button
       type="button"
@@ -37,16 +37,16 @@ function ThemeToggle(): React.ReactElement {
         </>
       )}
     </button>
-  )
+  );
 }
 
 export function AppLayout(): React.ReactElement {
-  const user = useAuthStore((s) => s.user)
-  const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
   async function logout(): Promise<void> {
-    await window.api.auth.logout()
-    useAuthStore.getState().setUser(null)
-    navigate('/login')
+    await window.api.auth.logout();
+    useAuthStore.getState().setUser(null);
+    navigate('/login');
   }
 
   return (
@@ -101,5 +101,5 @@ export function AppLayout(): React.ReactElement {
         </div>
       </main>
     </div>
-  )
+  );
 }

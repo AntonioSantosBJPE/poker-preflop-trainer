@@ -19,20 +19,20 @@
 
 ## Execution Status
 
-| Task | Status | Notes |
-|------|--------|-------|
-| T-01 | Done | Colunas de contexto adicionadas ao schema |
-| T-02 | Done | Migration `0003_famous_omega_sentinel.sql` + snapshot gerados |
-| T-03 | Done | Tipos compartilhados e contrato `window.api.stats.*` tipados |
-| T-04 | Done | Parser `parseStatsFilters` + testes unitarios |
-| T-05 | Done | Helper `trainingSessionContext` + testes unitarios |
-| T-06 | Done | `training:startSession` persiste contexto `single` |
-| T-07 | Done | `simultaneous-training:startSession` transacional com `sessionBlockId` comum |
-| T-08 | Done | `stats:*` usa parser e aplica filtros por tipo/mesas |
-| T-09 | Done | `StatsPage` com filtros de tipo e quantidade de mesas |
-| T-10 | Done | Cobertura E2E validada com sucesso |
-| T-11 | Done | Segmentacao por 2/3/4 mesas validada com sucesso |
-| T-12 | Done | Gates finais passaram: `pnpm test` |
+| Task | Status | Notes                                                                        |
+| ---- | ------ | ---------------------------------------------------------------------------- |
+| T-01 | Done   | Colunas de contexto adicionadas ao schema                                    |
+| T-02 | Done   | Migration `0003_famous_omega_sentinel.sql` + snapshot gerados                |
+| T-03 | Done   | Tipos compartilhados e contrato `window.api.stats.*` tipados                 |
+| T-04 | Done   | Parser `parseStatsFilters` + testes unitarios                                |
+| T-05 | Done   | Helper `trainingSessionContext` + testes unitarios                           |
+| T-06 | Done   | `training:startSession` persiste contexto `single`                           |
+| T-07 | Done   | `simultaneous-training:startSession` transacional com `sessionBlockId` comum |
+| T-08 | Done   | `stats:*` usa parser e aplica filtros por tipo/mesas                         |
+| T-09 | Done   | `StatsPage` com filtros de tipo e quantidade de mesas                        |
+| T-10 | Done   | Cobertura E2E validada com sucesso                                           |
+| T-11 | Done   | Segmentacao por 2/3/4 mesas validada com sucesso                             |
+| T-12 | Done   | Gates finais passaram: `pnpm test`                                           |
 
 ---
 
@@ -66,6 +66,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Adicionar as colunas persistidas de contexto em `training_sessions` e tipar o schema Drizzle correspondente.
 
 **Onde:**
+
 - `src/main/db/schema.ts`
 
 **Design ref:** `design.md` -> Data Models, Implementation Notes / Schema and Migration
@@ -77,6 +78,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Padrao atual do `schema.ts` e naming existente de `training_sessions`.
 
 **Done when:**
+
 - `trainingSessions` inclui `sessionType`, `sessionBlockId` e `simultaneousTableCount`
 - os tipos Drizzle do schema compilam sem erro
 - nenhum default novo classifica dados legados automaticamente
@@ -91,6 +93,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Gerar a migration Drizzle para as novas colunas de contexto em `training_sessions`.
 
 **Onde:**
+
 - `src/main/db/migrations/`
 - `src/main/db/migrations/meta/`
 
@@ -103,6 +106,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Workflow atual de migrations do repo.
 
 **Done when:**
+
 - existe migration adicionando `session_type`, `session_block_id` e `simultaneous_table_count`
 - snapshots Drizzle ficam coerentes com o novo schema
 - a migration nao tenta preencher dados legados por heuristica
@@ -117,6 +121,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Expandir os tipos compartilhados para suportar tipo de sessao e filtro por quantidade de mesas, e refletir isso no contrato tipado do renderer.
 
 **Onde:**
+
 - `src/shared/ipc/types.ts`
 - `src/renderer/src/env.d.ts`
 
@@ -129,6 +134,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Estrutura atual de `StatsFilters` e tipagem de `window.api`.
 
 **Done when:**
+
 - `StatsFilters` aceita `sessionType` e `simultaneousTableCount`
 - existe tipo compartilhado para os valores persistidos de contexto
 - `window.api.stats.*` aceita filtros tipados coerentes com `StatsFilters`
@@ -143,6 +149,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Criar um parser dedicado para filtros de stats com validacao de combinacoes invalidas.
 
 **Onde:**
+
 - `src/shared/forms/statsSchemas.ts`
 - `src/shared/forms/statsSchemas.test.ts`
 
@@ -155,6 +162,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Padrao de `parse*` usado em `src/shared/forms/trainingSchemas.ts`
 
 **Done when:**
+
 - `parseStatsFilters(raw)` rejeita `sessionType` invalido
 - `parseStatsFilters(raw)` rejeita `simultaneousTableCount` fora de `2|3|4`
 - `parseStatsFilters(raw)` rejeita `simultaneousTableCount` sem `sessionType = 'simultaneous'`
@@ -170,6 +178,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Centralizar a construcao dos valores persistidos de contexto para sessoes single e simultaneous.
 
 **Onde:**
+
 - `src/main/services/trainingSessionContext.ts`
 - `src/main/services/trainingSessionContext.test.ts`
 
@@ -182,6 +191,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Tipos compartilhados e `node:crypto` para geracao de `sessionBlockId`
 
 **Done when:**
+
 - o helper gera contexto `single` com `simultaneousTableCount = null`
 - o helper gera contexto `simultaneous` com `sessionBlockId` comum e contagem valida
 - os testes unitarios cobrem ambos os modos e invariantes principais
@@ -196,6 +206,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Atualizar `training:startSession` para persistir contexto `single` em toda nova sessao individual.
 
 **Onde:**
+
 - `src/main/ipc/training.ts`
 - `src/main/ipc/training.test.ts`
 
@@ -208,6 +219,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Fluxo atual de `training:startSession`
 
 **Done when:**
+
 - `training:startSession` persiste `sessionType = 'single'`
 - a sessao individual grava `sessionBlockId` proprio
 - `simultaneousTableCount` nao recebe valor artificial
@@ -223,6 +235,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Atualizar `simultaneous-training:startSession` para usar transacao e persistir contexto compartilhado entre as mesas do mesmo arranque.
 
 **Onde:**
+
 - `src/main/ipc/simultaneousTraining.ts`
 - `src/main/ipc/simultaneousTraining.test.ts`
 
@@ -235,6 +248,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Validacao atual de `parseSimultaneousTrainingStart`
 
 **Done when:**
+
 - todas as linhas do mesmo treino simultaneo compartilham o mesmo `sessionBlockId`
 - todas persistem `sessionType = 'simultaneous'`
 - todas persistem `simultaneousTableCount` coerente com `tableCount`
@@ -251,6 +265,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Aplicar os novos filtros em todos os handlers `stats:*` e manter a visao nao filtrada compativel com dados legados.
 
 **Onde:**
+
 - `src/main/ipc/stats.ts`
 - `src/main/ipc/stats.test.ts`
 
@@ -263,6 +278,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** `sessionWhereClause` e a estrutura atual dos handlers `stats:*`
 
 **Done when:**
+
 - todos os handlers `stats:*` usam `parseStatsFilters`
 - `sessionType` filtra apenas sessoes explicitamente classificadas
 - `simultaneousTableCount` filtra apenas sessoes `simultaneous` com contagem valida
@@ -279,6 +295,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Adicionar controles de UI para tipo de sessao e quantidade de mesas, compondo-os com o filtro por grupo ja existente.
 
 **Onde:**
+
 - `src/renderer/src/pages/StatsPage.tsx`
 
 **Design ref:** `design.md` -> Components / Stats Filter UI, Renderer
@@ -290,6 +307,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Estado local atual de `StatsPage` e ciclo de refetch existente
 
 **Done when:**
+
 - existe seletor para `todos`, `individual` e `simultaneo`
 - existe seletor para `2`, `3` e `4` mesas habilitado apenas em `simultaneo`
 - mudar o tipo para `single` ou `all` limpa `simultaneousTableCount`
@@ -305,6 +323,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Atualizar ou criar specs E2E para provar que stats sem filtro continuam funcionando e que o filtro por tipo separa treino individual de simultaneo.
 
 **Onde:**
+
 - `e2e/stats.spec.ts`
 - `e2e/situation-groups/stats-filter.spec.ts`
 
@@ -317,6 +336,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Helpers atuais de auth, training e simultaneous-training
 
 **Done when:**
+
 - existe cobertura para stats nao filtradas continuarem exibindo dados
 - existe cobertura para `tipo de sessao = individual`
 - existe cobertura para `tipo de sessao = simultaneo`
@@ -332,6 +352,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Garantir via E2E que a segmentacao por `2|3|4` mesas funciona e que combinacoes invalidas nao contaminam o fluxo atual.
 
 **Onde:**
+
 - `e2e/simultaneous-training/full-flow.spec.ts`
 - `e2e/simultaneous-training/session-config.spec.ts`
 - novo spec dedicado em `e2e/simultaneous-training/stats-segmentation.spec.ts` se necessario
@@ -345,6 +366,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Fixtures de treino simultaneo ja existentes
 
 **Done when:**
+
 - existe cobertura para filtros de `2`, `3` e `4` mesas
 - existe cobertura para ausencia de resultados cruzados entre contagens diferentes
 - existe cobertura para combinacao invalida de filtros ser bloqueada ou normalizada de forma deterministica
@@ -359,6 +381,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **O que:** Atualizar status da spec conforme a implementacao e executar os gates finais da feature.
 
 **Onde:**
+
 - `.specs/features/training-session-context/spec.md`
 - `.specs/features/training-session-context/tasks.md`
 
@@ -371,6 +394,7 @@ Depois de `T-01`, `T-03` e `T-04`:
 **Reuses:** Padrao de fechamento usado nas outras features do repo
 
 **Done when:**
+
 - os requisitos TSC-01..TSC-13 estao atualizados com status coerente
 - `tasks.md` reflete o estado final da execucao
 - gates finais da feature passam sem falhas
@@ -410,51 +434,51 @@ Bloco 3
 
 ### Check 1 - Task Granularity
 
-| Task | Atomicidade validada | Resultado |
-|------|----------------------|-----------|
-| T-01 | Um deliverable de schema | PASS |
-| T-02 | Um deliverable de migration | PASS |
-| T-03 | Um deliverable de contrato compartilhado | PASS |
-| T-04 | Um deliverable de parser/validacao | PASS |
-| T-05 | Um deliverable de helper de contexto | PASS |
-| T-06 | Um deliverable no fluxo single | PASS |
-| T-07 | Um deliverable no fluxo simultaneous | PASS |
-| T-08 | Um deliverable de filtragem backend | PASS |
-| T-09 | Um deliverable de UI de filtros | PASS |
-| T-10 | Um deliverable E2E para filtro por tipo | PASS |
-| T-11 | Um deliverable E2E para filtro por contagem | PASS |
-| T-12 | Um deliverable de fechamento/gates | PASS |
+| Task | Atomicidade validada                        | Resultado |
+| ---- | ------------------------------------------- | --------- |
+| T-01 | Um deliverable de schema                    | PASS      |
+| T-02 | Um deliverable de migration                 | PASS      |
+| T-03 | Um deliverable de contrato compartilhado    | PASS      |
+| T-04 | Um deliverable de parser/validacao          | PASS      |
+| T-05 | Um deliverable de helper de contexto        | PASS      |
+| T-06 | Um deliverable no fluxo single              | PASS      |
+| T-07 | Um deliverable no fluxo simultaneous        | PASS      |
+| T-08 | Um deliverable de filtragem backend         | PASS      |
+| T-09 | Um deliverable de UI de filtros             | PASS      |
+| T-10 | Um deliverable E2E para filtro por tipo     | PASS      |
+| T-11 | Um deliverable E2E para filtro por contagem | PASS      |
+| T-12 | Um deliverable de fechamento/gates          | PASS      |
 
 ### Check 2 - Diagram-Definition Cross-Check
 
-| Task | Depends on definido | Dependencia no mapa | Resultado |
-|------|---------------------|---------------------|-----------|
-| T-01 | - | raiz | PASS |
-| T-02 | T-01 | T-01 -> T-02 | PASS |
-| T-03 | - | raiz | PASS |
-| T-04 | T-03 | T-03 -> T-04 | PASS |
-| T-05 | T-01, T-03 | pre-condicoes do Bloco 1 | PASS |
-| T-06 | T-02, T-04, T-05 | ramo paralelo apos T-05 | PASS |
-| T-07 | T-02, T-04, T-05 | ramo paralelo apos T-05 | PASS |
-| T-08 | T-01, T-03, T-04 | inicio do Bloco 2 | PASS |
-| T-09 | T-03, T-08 | T-08 -> T-09 | PASS |
-| T-10 | T-06, T-07, T-08, T-09 | ramo paralelo do Bloco 3 | PASS |
-| T-11 | T-07, T-08, T-09 | ramo paralelo do Bloco 3 | PASS |
-| T-12 | T-10, T-11 | fechamento final | PASS |
+| Task | Depends on definido    | Dependencia no mapa      | Resultado |
+| ---- | ---------------------- | ------------------------ | --------- |
+| T-01 | -                      | raiz                     | PASS      |
+| T-02 | T-01                   | T-01 -> T-02             | PASS      |
+| T-03 | -                      | raiz                     | PASS      |
+| T-04 | T-03                   | T-03 -> T-04             | PASS      |
+| T-05 | T-01, T-03             | pre-condicoes do Bloco 1 | PASS      |
+| T-06 | T-02, T-04, T-05       | ramo paralelo apos T-05  | PASS      |
+| T-07 | T-02, T-04, T-05       | ramo paralelo apos T-05  | PASS      |
+| T-08 | T-01, T-03, T-04       | inicio do Bloco 2        | PASS      |
+| T-09 | T-03, T-08             | T-08 -> T-09             | PASS      |
+| T-10 | T-06, T-07, T-08, T-09 | ramo paralelo do Bloco 3 | PASS      |
+| T-11 | T-07, T-08, T-09       | ramo paralelo do Bloco 3 | PASS      |
+| T-12 | T-10, T-11             | fechamento final         | PASS      |
 
 ### Check 3 - Test Co-location Validation
 
-| Task | Camada alterada | Teste requerido | Planeado | Resultado |
-|------|------------------|-----------------|----------|-----------|
-| T-01 | schema | none | typecheck | PASS |
-| T-02 | migration | none | typecheck | PASS |
-| T-03 | shared contracts | none | typecheck | PASS |
-| T-04 | shared parser | unit | `statsSchemas.test.ts` | PASS |
-| T-05 | service/helper main | unit | `trainingSessionContext.test.ts` | PASS |
-| T-06 | IPC training | unit | `training.test.ts` | PASS |
-| T-07 | IPC simultaneous training | unit | `simultaneousTraining.test.ts` | PASS |
-| T-08 | IPC stats | unit | `stats.test.ts` | PASS |
-| T-09 | renderer stats filters | e2e | co-validado por T-10/T-11 | PASS |
-| T-10 | fluxo stats por tipo | e2e | specs atualizados | PASS |
-| T-11 | fluxo stats por contagem | e2e | specs atualizados/novos | PASS |
-| T-12 | fechamento da feature | full | `pnpm test` | PASS |
+| Task | Camada alterada           | Teste requerido | Planeado                         | Resultado |
+| ---- | ------------------------- | --------------- | -------------------------------- | --------- |
+| T-01 | schema                    | none            | typecheck                        | PASS      |
+| T-02 | migration                 | none            | typecheck                        | PASS      |
+| T-03 | shared contracts          | none            | typecheck                        | PASS      |
+| T-04 | shared parser             | unit            | `statsSchemas.test.ts`           | PASS      |
+| T-05 | service/helper main       | unit            | `trainingSessionContext.test.ts` | PASS      |
+| T-06 | IPC training              | unit            | `training.test.ts`               | PASS      |
+| T-07 | IPC simultaneous training | unit            | `simultaneousTraining.test.ts`   | PASS      |
+| T-08 | IPC stats                 | unit            | `stats.test.ts`                  | PASS      |
+| T-09 | renderer stats filters    | e2e             | co-validado por T-10/T-11        | PASS      |
+| T-10 | fluxo stats por tipo      | e2e             | specs atualizados                | PASS      |
+| T-11 | fluxo stats por contagem  | e2e             | specs atualizados/novos          | PASS      |
+| T-12 | fechamento da feature     | full            | `pnpm test`                      | PASS      |

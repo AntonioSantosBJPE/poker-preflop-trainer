@@ -1,40 +1,45 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import type { FeedbackMode } from '../env'
-import { PlayingCard } from '../components/PlayingCard'
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import type { FeedbackMode } from '../env';
+import { PlayingCard } from '../components/PlayingCard';
 
-type Card = { rank: string; suit: string }
-type Act = { id: number; name: string; colorHex: string }
-type HandData = { situationId: number; card1: Card; card2: Card; actions: Act[] }
-type FeedbackData = { ok: boolean; ms: number }
+type Card = { rank: string; suit: string };
+type Act = { id: number; name: string; colorHex: string };
+type HandData = { situationId: number; card1: Card; card2: Card; actions: Act[] };
+type FeedbackData = { ok: boolean; ms: number };
 
 type TableState = {
-  sessionId: number
-  hand: HandData | null
-  situationName: string
-  feedback: FeedbackData | null
-  handsPlayed: number
-  finished: boolean
-  deadlineMs: number | null
-}
+  sessionId: number;
+  hand: HandData | null;
+  situationName: string;
+  feedback: FeedbackData | null;
+  handsPlayed: number;
+  finished: boolean;
+  deadlineMs: number | null;
+};
 
 export function SimultaneousTrainingSessionPage(): React.ReactElement {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const location = useLocation() as {
-    state?: { sessionIds: number[]; totalHands: number; timerSeconds: number; feedbackMode: FeedbackMode }
-  }
+    state?: {
+      sessionIds: number[];
+      totalHands: number;
+      timerSeconds: number;
+      feedbackMode: FeedbackMode;
+    };
+  };
 
-  const sessionIds = location.state?.sessionIds ?? []
-  const totalHands = location.state?.totalHands ?? 0
-  const timerSeconds = location.state?.timerSeconds ?? 0
-  const feedbackMode = location.state?.feedbackMode ?? 'IMMEDIATE'
-  const [tables, setTables] = useState<TableState[]>([])
-  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const sessionIds = location.state?.sessionIds ?? [];
+  const totalHands = location.state?.totalHands ?? 0;
+  const timerSeconds = location.state?.timerSeconds ?? 0;
+  const feedbackMode = location.state?.feedbackMode ?? 'IMMEDIATE';
+  const [tables, setTables] = useState<TableState[]>([]);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   useEffect(() => {
     if (!sessionIds.length || !totalHands) {
-      navigate('/training/simultaneous', { replace: true })
-      return
+      navigate('/training/simultaneous', { replace: true });
+      return;
     }
     setTables(
       sessionIds.map((sessionId) => ({
@@ -44,14 +49,14 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
         feedback: null,
         handsPlayed: 0,
         finished: false,
-        deadlineMs: null
-      }))
-    )
-  }, [navigate, sessionIds, totalHands])
+        deadlineMs: null,
+      })),
+    );
+  }, [navigate, sessionIds, totalHands]);
 
   async function dealNext(sessionId: number): Promise<void> {
-    const h = (await window.api.training.dealHand(sessionId)) as HandData
-    const detail = (await window.api.situations.get(h.situationId)) as { name: string }
+    const h = (await window.api.training.dealHand(sessionId)) as HandData;
+    const detail = (await window.api.situations.get(h.situationId)) as { name: string };
     setTables((current) =>
       current.map((table) =>
         table.sessionId === sessionId
@@ -60,95 +65,111 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
               hand: h,
               situationName: detail.name,
               feedback: null,
-              deadlineMs: timerSeconds > 0 ? Date.now() + timerSeconds * 1000 : null
+              deadlineMs: timerSeconds > 0 ? Date.now() + timerSeconds * 1000 : null,
             }
-          : table
-      )
-    )
+          : table,
+      ),
+    );
   }
 
   useEffect(() => {
-    if (!tables.length) return
+    if (!tables.length) return;
     for (const table of tables) {
       if (!table.hand && !table.finished) {
-        void dealNext(table.sessionId)
+        void dealNext(table.sessionId);
       }
     }
-  }, [tables])
+  }, [tables]);
 
   useEffect(() => {
-    if (!tables.length || timerSeconds <= 0) return
+    if (!tables.length || timerSeconds <= 0) return;
     const timer = setInterval(() => {
-      setTables((current) => [...current])
-      const now = Date.now()
+      setTables((current) => [...current]);
+      const now = Date.now();
       for (const table of tables) {
-        if (!table.finished && !table.feedback && table.deadlineMs !== null && table.deadlineMs <= now) {
-          void submit(table.sessionId, null, true)
+        if (
+          !table.finished &&
+          !table.feedback &&
+          table.deadlineMs !== null &&
+          table.deadlineMs <= now
+        ) {
+          void submit(table.sessionId, null, true);
         }
       }
-    }, 200)
-    return () => clearInterval(timer)
-  }, [tables, timerSeconds]) // eslint-disable-line react-hooks/exhaustive-deps
+    }, 200);
+    return () => clearInterval(timer);
+  }, [tables, timerSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isCompleted = useMemo(() => tables.length > 0 && tables.every((t) => t.finished), [tables])
+  const isCompleted = useMemo(() => tables.length > 0 && tables.every((t) => t.finished), [tables]);
 
   useEffect(() => {
-    if (!isCompleted) return
-    navigate('/training/simultaneous/summary', { state: { sessionIds } })
-  }, [isCompleted, navigate, sessionIds])
+    if (!isCompleted) return;
+    navigate('/training/simultaneous/summary', { state: { sessionIds } });
+  }, [isCompleted, navigate, sessionIds]);
 
-  async function submit(sessionId: number, chosenActionId: number | null, timedOut: boolean): Promise<void> {
-    const table = tables.find((t) => t.sessionId === sessionId)
-    if (!table || table.finished || table.feedback) return
-    const res = await window.api.training.submitAnswer({ sessionId, chosenActionId, timedOut })
+  async function submit(
+    sessionId: number,
+    chosenActionId: number | null,
+    timedOut: boolean,
+  ): Promise<void> {
+    const table = tables.find((t) => t.sessionId === sessionId);
+    if (!table || table.finished || table.feedback) return;
+    const res = await window.api.training.submitAnswer({ sessionId, chosenActionId, timedOut });
 
     if (feedbackMode === 'IMMEDIATE') {
       setTables((current) =>
         current.map((item) =>
           item.sessionId === sessionId
             ? { ...item, feedback: { ok: res.isCorrect, ms: res.responseMs }, deadlineMs: null }
-            : item
-        )
-      )
-      return
+            : item,
+        ),
+      );
+      return;
     }
 
-    await advance(sessionId)
+    await advance(sessionId);
   }
 
   async function advance(sessionId: number): Promise<void> {
-    const table = tables.find((t) => t.sessionId === sessionId)
-    if (!table || table.finished) return
-    const nextHandsPlayed = table.handsPlayed + 1
+    const table = tables.find((t) => t.sessionId === sessionId);
+    if (!table || table.finished) return;
+    const nextHandsPlayed = table.handsPlayed + 1;
     if (nextHandsPlayed >= totalHands) {
-      await window.api.training.finishSession(sessionId)
+      await window.api.training.finishSession(sessionId);
       setTables((current) =>
         current.map((item) =>
           item.sessionId === sessionId
-            ? { ...item, finished: true, handsPlayed: nextHandsPlayed, hand: null, feedback: null, deadlineMs: null }
-            : item
-        )
-      )
-      return
+            ? {
+                ...item,
+                finished: true,
+                handsPlayed: nextHandsPlayed,
+                hand: null,
+                feedback: null,
+                deadlineMs: null,
+              }
+            : item,
+        ),
+      );
+      return;
     }
 
     setTables((current) =>
       current.map((item) =>
         item.sessionId === sessionId
           ? { ...item, handsPlayed: nextHandsPlayed, feedback: null, deadlineMs: null }
-          : item
-      )
-    )
-    await dealNext(sessionId)
+          : item,
+      ),
+    );
+    await dealNext(sessionId);
   }
 
   async function abandonAll(): Promise<void> {
-    await Promise.all(sessionIds.map((sessionId) => window.api.training.finishSession(sessionId)))
-    navigate('/training/simultaneous', { replace: true })
+    await Promise.all(sessionIds.map((sessionId) => window.api.training.finishSession(sessionId)));
+    navigate('/training/simultaneous', { replace: true });
   }
 
   if (!tables.length) {
-    return <p className="text-muted-foreground">Carregando sessão simultânea…</p>
+    return <p className="text-muted-foreground">Carregando sessão simultânea…</p>;
   }
 
   return (
@@ -183,7 +204,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
                 type="button"
                 className="pt-btn-secondary"
                 onClick={() => {
-                  setShowLeaveConfirm(false)
+                  setShowLeaveConfirm(false);
                 }}
               >
                 Continuar treinando
@@ -212,11 +233,14 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
                 <p className="text-sm text-muted-foreground">
                   {table.handsPlayed}/{totalHands}
                 </p>
-                {timerSeconds > 0 && !table.finished && table.deadlineMs !== null && !table.feedback && (
-                  <p className="font-mono text-xs text-primary">
-                    {Math.max(0, Math.ceil((table.deadlineMs - Date.now()) / 1000))}s
-                  </p>
-                )}
+                {timerSeconds > 0 &&
+                  !table.finished &&
+                  table.deadlineMs !== null &&
+                  !table.feedback && (
+                    <p className="font-mono text-xs text-primary">
+                      {Math.max(0, Math.ceil((table.deadlineMs - Date.now()) / 1000))}s
+                    </p>
+                  )}
               </div>
             </div>
             {table.finished && <p className="text-sm text-primary">Concluída</p>}
@@ -261,5 +285,5 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
         ))}
       </div>
     </div>
-  )
+  );
 }

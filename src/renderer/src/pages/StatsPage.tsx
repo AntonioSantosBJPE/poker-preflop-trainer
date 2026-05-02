@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import type {
   GroupSummaryDto,
   SimultaneousTableCount,
@@ -6,8 +6,8 @@ import type {
   StatsFilters,
   StatsOverviewDto,
   StatsTimelinePointDto,
-  StatsWorstHandRowDto
-} from '@shared/ipc/types'
+  StatsWorstHandRowDto,
+} from '@shared/ipc/types';
 import {
   CartesianGrid,
   Line,
@@ -15,56 +15,58 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
-} from 'recharts'
-import { useChartPalette } from '../hooks/useChartPalette'
+  YAxis,
+} from 'recharts';
+import { useChartPalette } from '../hooks/useChartPalette';
 
 export function StatsPage(): React.ReactElement {
-  const chart = useChartPalette()
-  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
-  const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
-  const [sessionType, setSessionType] = useState<'all' | 'single' | 'simultaneous'>('all')
-  const [simultaneousTableCount, setSimultaneousTableCount] = useState<'' | `${SimultaneousTableCount}`>('')
+  const chart = useChartPalette();
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
+  const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
+  const [sessionType, setSessionType] = useState<'all' | 'single' | 'simultaneous'>('all');
+  const [simultaneousTableCount, setSimultaneousTableCount] = useState<
+    '' | `${SimultaneousTableCount}`
+  >('');
   const [overview, setOverview] = useState<StatsOverviewDto>({
     sessions: 0,
     hands: 0,
     accuracy: 0,
-    avgResponseMs: 0
-  })
-  const [timeline, setTimeline] = useState<StatsTimelinePointDto[]>([])
-  const [bySit, setBySit] = useState<StatsBySituationRowDto[]>([])
-  const [worst, setWorst] = useState<StatsWorstHandRowDto[]>([])
+    avgResponseMs: 0,
+  });
+  const [timeline, setTimeline] = useState<StatsTimelinePointDto[]>([]);
+  const [bySit, setBySit] = useState<StatsBySituationRowDto[]>([]);
+  const [worst, setWorst] = useState<StatsWorstHandRowDto[]>([]);
 
   useEffect(() => {
     void (async () => {
-      const list = (await window.api.groups.list()) as GroupSummaryDto[]
-      setGroups(list)
-    })()
-  }, [])
+      const list = (await window.api.groups.list()) as GroupSummaryDto[];
+      setGroups(list);
+    })();
+  }, []);
 
   useEffect(() => {
-    if (sessionType === 'simultaneous') return
-    setSimultaneousTableCount('')
-  }, [sessionType])
+    if (sessionType === 'simultaneous') return;
+    setSimultaneousTableCount('');
+  }, [sessionType]);
 
   useEffect(() => {
     void (async () => {
-      const filters: StatsFilters = {}
-      if (activeGroupId !== null) filters.groupId = activeGroupId
-      if (sessionType !== 'all') filters.sessionType = sessionType
+      const filters: StatsFilters = {};
+      if (activeGroupId !== null) filters.groupId = activeGroupId;
+      if (sessionType !== 'all') filters.sessionType = sessionType;
       if (sessionType === 'simultaneous' && simultaneousTableCount) {
-        filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount
+        filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount;
       }
-      const ov = await window.api.stats.overview(filters)
-      setOverview(ov)
-      const tl = await window.api.stats.timeline(filters)
-      setTimeline(tl)
-      const bs = await window.api.stats.bySituation(filters)
-      setBySit(bs)
-      const w = await window.api.stats.worstHands(filters, 15)
-      setWorst(w)
-    })()
-  }, [activeGroupId, sessionType, simultaneousTableCount])
+      const ov = await window.api.stats.overview(filters);
+      setOverview(ov);
+      const tl = await window.api.stats.timeline(filters);
+      setTimeline(tl);
+      const bs = await window.api.stats.bySituation(filters);
+      setBySit(bs);
+      const w = await window.api.stats.worstHands(filters, 15);
+      setWorst(w);
+    })();
+  }, [activeGroupId, sessionType, simultaneousTableCount]);
 
   return (
     <div className="space-y-8">
@@ -83,7 +85,7 @@ export function StatsPage(): React.ReactElement {
             'whitespace-nowrap rounded-t-lg px-4 py-2 text-sm font-medium transition-colors',
             activeGroupId === null
               ? 'border-b-2 border-primary text-primary'
-              : 'text-muted-foreground hover:text-foreground'
+              : 'text-muted-foreground hover:text-foreground',
           ].join(' ')}
           data-testid="stats-tab-all"
         >
@@ -100,7 +102,7 @@ export function StatsPage(): React.ReactElement {
               'whitespace-nowrap rounded-t-lg px-4 py-2 text-sm font-medium transition-colors',
               activeGroupId === g.id
                 ? 'border-b-2 border-primary text-primary'
-                : 'text-muted-foreground hover:text-foreground'
+                : 'text-muted-foreground hover:text-foreground',
             ].join(' ')}
             data-testid={`stats-tab-group-${g.id}`}
           >
@@ -132,7 +134,9 @@ export function StatsPage(): React.ReactElement {
             data-testid="stats-simultaneous-count-filter"
             className="rounded-lg border border-border bg-background px-3 py-2 disabled:cursor-not-allowed disabled:opacity-60"
             value={simultaneousTableCount}
-            onChange={(event) => setSimultaneousTableCount(event.currentTarget.value as '' | '2' | '3' | '4')}
+            onChange={(event) =>
+              setSimultaneousTableCount(event.currentTarget.value as '' | '2' | '3' | '4')
+            }
             disabled={sessionType !== 'simultaneous'}
           >
             <option value="">Todas</option>
@@ -145,11 +149,15 @@ export function StatsPage(): React.ReactElement {
       <div className="grid gap-4 md:grid-cols-4 md:items-stretch">
         <div className="pt-card p-4">
           <p className="text-sm text-muted-foreground">Sessões</p>
-          <p className="font-display text-2xl font-bold tabular-nums text-primary">{overview.sessions}</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-primary">
+            {overview.sessions}
+          </p>
         </div>
         <div className="pt-card p-4">
           <p className="text-sm text-muted-foreground">Mãos</p>
-          <p className="font-display text-2xl font-bold tabular-nums text-primary">{overview.hands}</p>
+          <p className="font-display text-2xl font-bold tabular-nums text-primary">
+            {overview.hands}
+          </p>
         </div>
         <div className="pt-card p-4">
           <p className="text-sm text-muted-foreground">Acerto geral</p>
@@ -178,8 +186,22 @@ export function StatsPage(): React.ReactElement {
             />
             <YAxis yAxisId="b" orientation="right" tick={{ fill: chart.tick, fontSize: 11 }} />
             <Tooltip />
-            <Line yAxisId="a" type="monotone" dataKey="accuracy" stroke={chart.primary} dot={false} name="Acerto" />
-            <Line yAxisId="b" type="monotone" dataKey="avgTimeMs" stroke={chart.secondary} dot={false} name="Tempo ms" />
+            <Line
+              yAxisId="a"
+              type="monotone"
+              dataKey="accuracy"
+              stroke={chart.primary}
+              dot={false}
+              name="Acerto"
+            />
+            <Line
+              yAxisId="b"
+              type="monotone"
+              dataKey="avgTimeMs"
+              stroke={chart.secondary}
+              dot={false}
+              name="Tempo ms"
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -223,9 +245,11 @@ export function StatsPage(): React.ReactElement {
               <span className="tabular-nums text-primary">{w.count} erros</span>
             </li>
           ))}
-          {!worst.length && <li className="p-4 text-sm text-muted-foreground">Sem erros registrados.</li>}
+          {!worst.length && (
+            <li className="p-4 text-sm text-muted-foreground">Sem erros registrados.</li>
+          )}
         </ul>
       </div>
     </div>
-  )
+  );
 }

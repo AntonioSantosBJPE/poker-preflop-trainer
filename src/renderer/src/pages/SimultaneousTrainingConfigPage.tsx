@@ -1,21 +1,21 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   simultaneousTrainingStartSchema,
   type SimultaneousTrainingStartFormInput,
-  type SimultaneousTrainingStartInput
-} from '@shared/forms/trainingSchemas'
-import type { GroupSummaryDto } from '@shared/ipc/types'
+  type SimultaneousTrainingStartInput,
+} from '@shared/forms/trainingSchemas';
+import type { GroupSummaryDto } from '@shared/ipc/types';
 
-type Sit = { id: number; name: string }
+type Sit = { id: number; name: string };
 
 export function SimultaneousTrainingConfigPage(): React.ReactElement {
-  const navigate = useNavigate()
-  const [groups, setGroups] = useState<GroupSummaryDto[]>([])
-  const [step, setStep] = useState<1 | 2>(1)
-  const [sits, setSits] = useState<Sit[]>([])
+  const navigate = useNavigate();
+  const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [sits, setSits] = useState<Sit[]>([]);
 
   const {
     register,
@@ -23,7 +23,7 @@ export function SimultaneousTrainingConfigPage(): React.ReactElement {
     setValue,
     watch,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm<SimultaneousTrainingStartFormInput, unknown, SimultaneousTrainingStartInput>({
     resolver: zodResolver(simultaneousTrainingStartSchema),
     defaultValues: {
@@ -32,53 +32,53 @@ export function SimultaneousTrainingConfigPage(): React.ReactElement {
       situationIds: [],
       totalHands: 25,
       timerSeconds: 0,
-      feedbackMode: 'IMMEDIATE'
+      feedbackMode: 'IMMEDIATE',
     },
-    mode: 'onSubmit'
-  })
+    mode: 'onSubmit',
+  });
 
-  const situationIds = watch('situationIds')
+  const situationIds = watch('situationIds');
 
   useEffect(() => {
     void (async () => {
-      const list = (await window.api.groups.list()) as GroupSummaryDto[]
-      setGroups(list)
-    })()
-  }, [])
+      const list = (await window.api.groups.list()) as GroupSummaryDto[];
+      setGroups(list);
+    })();
+  }, []);
 
   async function handleSelectGroup(group: GroupSummaryDto): Promise<void> {
-    setValue('groupId', group.id, { shouldValidate: false })
-    const list = (await window.api.situations.list({ groupId: group.id })) as Sit[]
-    setSits(list)
-    setStep(2)
+    setValue('groupId', group.id, { shouldValidate: false });
+    const list = (await window.api.situations.list({ groupId: group.id })) as Sit[];
+    setSits(list);
+    setStep(2);
   }
 
   function handleBack(): void {
-    setStep(1)
-    setValue('situationIds', [], { shouldValidate: false, shouldDirty: true })
+    setStep(1);
+    setValue('situationIds', [], { shouldValidate: false, shouldDirty: true });
   }
 
   function toggleSituation(id: number): void {
-    const cur = getValues('situationIds')
-    const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]
-    setValue('situationIds', next, { shouldValidate: true, shouldDirty: true })
+    const cur = getValues('situationIds');
+    const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
+    setValue('situationIds', next, { shouldValidate: true, shouldDirty: true });
   }
 
   function selectAllSituations(): void {
-    const allIds = sits.map((s) => s.id)
-    setValue('situationIds', allIds, { shouldValidate: true, shouldDirty: true })
+    const allIds = sits.map((s) => s.id);
+    setValue('situationIds', allIds, { shouldValidate: true, shouldDirty: true });
   }
 
   async function onValid(data: SimultaneousTrainingStartInput): Promise<void> {
-    const { sessionIds } = await window.api.simultaneousTraining.startSession(data)
+    const { sessionIds } = await window.api.simultaneousTraining.startSession(data);
     navigate('/training/simultaneous/session', {
       state: {
         sessionIds,
         totalHands: data.totalHands,
         timerSeconds: data.timerSeconds,
-        feedbackMode: data.feedbackMode
-      }
-    })
+        feedbackMode: data.feedbackMode,
+      },
+    });
   }
 
   if (step === 1) {
@@ -109,7 +109,7 @@ export function SimultaneousTrainingConfigPage(): React.ReactElement {
           )}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -168,7 +168,9 @@ export function SimultaneousTrainingConfigPage(): React.ReactElement {
                 <span>{s.name}</span>
               </label>
             ))}
-            {!sits.length && <p className="p-4 text-sm text-muted-foreground">Cadastre situações antes.</p>}
+            {!sits.length && (
+              <p className="p-4 text-sm text-muted-foreground">Cadastre situações antes.</p>
+            )}
           </div>
           {errors.situationIds && (
             <p className="mt-2 text-sm text-destructive" role="alert">
@@ -214,10 +216,14 @@ export function SimultaneousTrainingConfigPage(): React.ReactElement {
             <option value="END_OF_SESSION">Ao final</option>
           </select>
         </label>
-        <button type="submit" disabled={!situationIds.length} className="pt-btn-primary w-full py-3">
+        <button
+          type="submit"
+          disabled={!situationIds.length}
+          className="pt-btn-primary w-full py-3"
+        >
           Iniciar treino simultâneo
         </button>
       </form>
     </div>
-  )
+  );
 }

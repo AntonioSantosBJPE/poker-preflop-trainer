@@ -1,4 +1,4 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig } from '@playwright/test';
 
 /**
  * Testes E2E lançam o binário Electron com `out/main/index.js`.
@@ -10,11 +10,11 @@ import { defineConfig } from "@playwright/test";
  * Em CI mantém-se workers: 1 por ausência de display dedicado por worker.
  */
 export default defineConfig({
-  testDir: "e2e",
+  testDir: 'e2e',
   fullyParallel: true,
   workers: process.env.CI ? 1 : 2,
   timeout: 120_000,
   expect: { timeout: 35_000 },
   forbidOnly: !!process.env.CI,
-  reporter: process.env.CI ? [["github"], ["list"]] : [["list"]],
+  reporter: process.env.CI ? [['github'], ['list']] : [['list']],
 });

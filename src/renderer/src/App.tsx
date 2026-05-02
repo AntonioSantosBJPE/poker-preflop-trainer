@@ -1,41 +1,41 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AppLayout } from './components/Layout'
-import { DashboardPage } from './pages/DashboardPage'
-import { GroupDetailPage } from './pages/GroupDetailPage'
-import { GroupsPage } from './pages/GroupsPage'
-import { LoginPage } from './pages/LoginPage'
-import { SituationEditPage } from './pages/SituationEditPage'
-import { SituationsPage } from './pages/SituationsPage'
-import { StatsPage } from './pages/StatsPage'
-import { SimultaneousTrainingConfigPage } from './pages/SimultaneousTrainingConfigPage'
-import { SimultaneousTrainingSessionPage } from './pages/SimultaneousTrainingSessionPage'
-import { SimultaneousTrainingSummaryPage } from './pages/SimultaneousTrainingSummaryPage'
-import { TrainingConfigPage } from './pages/TrainingConfigPage'
-import { TrainingResultPage } from './pages/TrainingResultPage'
-import { TrainingSessionPage } from './pages/TrainingSessionPage'
-import { useAuthStore } from './stores/auth'
+import { useEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { AppLayout } from './components/Layout';
+import { DashboardPage } from './pages/DashboardPage';
+import { GroupDetailPage } from './pages/GroupDetailPage';
+import { GroupsPage } from './pages/GroupsPage';
+import { LoginPage } from './pages/LoginPage';
+import { SituationEditPage } from './pages/SituationEditPage';
+import { SituationsPage } from './pages/SituationsPage';
+import { StatsPage } from './pages/StatsPage';
+import { SimultaneousTrainingConfigPage } from './pages/SimultaneousTrainingConfigPage';
+import { SimultaneousTrainingSessionPage } from './pages/SimultaneousTrainingSessionPage';
+import { SimultaneousTrainingSummaryPage } from './pages/SimultaneousTrainingSummaryPage';
+import { TrainingConfigPage } from './pages/TrainingConfigPage';
+import { TrainingResultPage } from './pages/TrainingResultPage';
+import { TrainingSessionPage } from './pages/TrainingSessionPage';
+import { useAuthStore } from './stores/auth';
 
 function Protected({ children }: { children: React.ReactNode }): React.ReactElement {
-  const user = useAuthStore((s) => s.user)
-  const ready = useAuthStore((s) => s.ready)
+  const user = useAuthStore((s) => s.user);
+  const ready = useAuthStore((s) => s.ready);
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-muted-foreground">Carregando…</p>
       </div>
-    )
+    );
   }
   if (!user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" replace />;
   }
-  return <>{children}</>
+  return <>{children}</>;
 }
 
 export function App(): React.ReactElement {
   useEffect(() => {
-    void useAuthStore.getState().refresh()
-  }, [])
+    void useAuthStore.getState().refresh();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -56,8 +56,14 @@ export function App(): React.ReactElement {
           <Route path="situations/:id" element={<SituationEditPage />} />
           <Route path="training" element={<TrainingConfigPage />} />
           <Route path="training/simultaneous" element={<SimultaneousTrainingConfigPage />} />
-          <Route path="training/simultaneous/session" element={<SimultaneousTrainingSessionPage />} />
-          <Route path="training/simultaneous/summary" element={<SimultaneousTrainingSummaryPage />} />
+          <Route
+            path="training/simultaneous/session"
+            element={<SimultaneousTrainingSessionPage />}
+          />
+          <Route
+            path="training/simultaneous/summary"
+            element={<SimultaneousTrainingSummaryPage />}
+          />
           <Route path="training/:sessionId" element={<TrainingSessionPage />} />
           <Route path="training/:sessionId/result" element={<TrainingResultPage />} />
           <Route path="stats" element={<StatsPage />} />
@@ -65,5 +71,5 @@ export function App(): React.ReactElement {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

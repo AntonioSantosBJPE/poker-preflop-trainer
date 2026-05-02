@@ -25,12 +25,12 @@ Com isso, as consultas de estatisticas nao conseguem distinguir com precisao ses
 
 ## Out of Scope
 
-| Item | Reason |
-|------|--------|
-| Redesign completo da pagina de estatisticas | O pedido atual e segmentacao analitica, nao reformulacao visual ampla |
-| Drill-down historico por bloco simultaneo em pagina propria | O identificador comum deve ser persistido agora, mas exploracao dedicada de blocos nao faz parte deste escopo |
-| Suporte a quantidades de mesas fora de `2`, `3` e `4` | O treino simultaneo atual so suporta essas opcoes |
-| Reconstituicao perfeita de blocos simultaneos antigos sem metadados | Os dados atuais nao possuem sinal suficiente para inferencia confiavel |
+| Item                                                                | Reason                                                                                                        |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Redesign completo da pagina de estatisticas                         | O pedido atual e segmentacao analitica, nao reformulacao visual ampla                                         |
+| Drill-down historico por bloco simultaneo em pagina propria         | O identificador comum deve ser persistido agora, mas exploracao dedicada de blocos nao faz parte deste escopo |
+| Suporte a quantidades de mesas fora de `2`, `3` e `4`               | O treino simultaneo atual so suporta essas opcoes                                                             |
+| Reconstituicao perfeita de blocos simultaneos antigos sem metadados | Os dados atuais nao possuem sinal suficiente para inferencia confiavel                                        |
 
 ---
 
@@ -120,21 +120,21 @@ Com isso, as consultas de estatisticas nao conseguem distinguir com precisao ses
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Descricao | Status |
-|----------------|-------|-----------|--------|
-| TSC-01 | P1 | Persistir `sessionType = individual` em sessoes de treino individual | Implemented |
-| TSC-02 | P1 | Persistir `simultaneousTableCount` nulo ou ausente para sessoes individuais | Implemented |
-| TSC-03 | P1 | Persistir `sessionType = simultaneo` em todas as linhas criadas por treino simultaneo | Implemented |
-| TSC-04 | P1 | Persistir identificador de bloco comum para todas as mesas do mesmo treino simultaneo | Implemented |
-| TSC-05 | P1 | Persistir `simultaneousTableCount` igual ao numero de mesas do bloco | Implemented |
-| TSC-06 | P1 | Filtrar estatisticas por `tipo de sessao` | Implemented |
-| TSC-07 | P1 | Combinar filtro de tipo com filtros existentes sem quebrar o fluxo atual | Implemented |
-| TSC-08 | P1 | Validar valores invalidos de filtro de tipo no backend | Implemented |
-| TSC-09 | P1 | Filtrar estatisticas por quantidade de mesas simultaneas `2`, `3` ou `4` | Implemented |
-| TSC-10 | P1 | Validar valores invalidos de `simultaneousTableCount` no backend | Implemented |
-| TSC-11 | P2 | Preservar estatisticas nao filtradas com dados legados sem erro | Implemented |
-| TSC-12 | P2 | Tratar dados legados sem classificacao heuristica silenciosa em filtros segmentados | Implemented |
-| TSC-13 | P2 | Evitar persistencia parcial inconsistente ao criar bloco simultaneo | Implemented |
+| Requirement ID | Story | Descricao                                                                             | Status      |
+| -------------- | ----- | ------------------------------------------------------------------------------------- | ----------- |
+| TSC-01         | P1    | Persistir `sessionType = individual` em sessoes de treino individual                  | Implemented |
+| TSC-02         | P1    | Persistir `simultaneousTableCount` nulo ou ausente para sessoes individuais           | Implemented |
+| TSC-03         | P1    | Persistir `sessionType = simultaneo` em todas as linhas criadas por treino simultaneo | Implemented |
+| TSC-04         | P1    | Persistir identificador de bloco comum para todas as mesas do mesmo treino simultaneo | Implemented |
+| TSC-05         | P1    | Persistir `simultaneousTableCount` igual ao numero de mesas do bloco                  | Implemented |
+| TSC-06         | P1    | Filtrar estatisticas por `tipo de sessao`                                             | Implemented |
+| TSC-07         | P1    | Combinar filtro de tipo com filtros existentes sem quebrar o fluxo atual              | Implemented |
+| TSC-08         | P1    | Validar valores invalidos de filtro de tipo no backend                                | Implemented |
+| TSC-09         | P1    | Filtrar estatisticas por quantidade de mesas simultaneas `2`, `3` ou `4`              | Implemented |
+| TSC-10         | P1    | Validar valores invalidos de `simultaneousTableCount` no backend                      | Implemented |
+| TSC-11         | P2    | Preservar estatisticas nao filtradas com dados legados sem erro                       | Implemented |
+| TSC-12         | P2    | Tratar dados legados sem classificacao heuristica silenciosa em filtros segmentados   | Implemented |
+| TSC-13         | P2    | Evitar persistencia parcial inconsistente ao criar bloco simultaneo                   | Implemented |
 
 **Coverage:** 13 requisitos totais, 13 mapeados no spec, 0 nao mapeados.
 

@@ -1,10 +1,10 @@
-import { defineConfig } from 'drizzle-kit'
+import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   schema: './src/main/db/schema.ts',
   out: './src/main/db/migrations',
   dialect: 'sqlite',
   dbCredentials: {
-    url: './preflop_trainer.db'
-  }
-})
+    url: './preflop_trainer.db',
+  },
+});
