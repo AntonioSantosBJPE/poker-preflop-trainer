@@ -273,7 +273,7 @@ describe('registerStatsIpc', () => {
 
       const select = vi.fn();
       let handsCall = 0;
-      select.mockImplementation((() => {
+      select.mockImplementation(() => {
         const idx = select.mock.calls.length;
         if (idx === 1) {
           return { from: timelineFrom };
@@ -283,7 +283,7 @@ describe('registerStatsIpc', () => {
           return { from: vi.fn(() => ({ where: handsWhere1 })) };
         }
         return { from: vi.fn(() => ({ where: handsWhere2 })) };
-      }) as typeof select.mockImplementation);
+      });
 
       vi.mocked(getDb).mockReturnValue({ select } as unknown as ReturnType<typeof getDb>);
       const handler = getHandler('stats:timeline');

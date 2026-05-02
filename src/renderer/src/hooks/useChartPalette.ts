@@ -1,4 +1,5 @@
-import { useThemeStore } from '../stores/theme';
+import { DEFAULT_USER_PREFERENCES } from '@shared/constants';
+import { usePreferencesStore } from '../stores/preferences';
 
 /** Cores hex para Recharts alinhadas à paleta Felt/âmbar (evita slate/emerald soltos). */
 export function useChartPalette(): {
@@ -7,7 +8,7 @@ export function useChartPalette(): {
   primary: string;
   secondary: string;
 } {
-  const theme = useThemeStore((s) => s.theme);
+  const theme = usePreferencesStore((s) => s.raw?.theme ?? DEFAULT_USER_PREFERENCES.theme);
   const dark = theme === 'dark';
   return dark
     ? {

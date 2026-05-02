@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { createAuthFormSchema, type AuthFormFields } from '@shared/forms/authSchemas';
-import { FormField } from '@/components/forms';
+import { FormField, PasswordField } from '@/components/forms';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -24,7 +24,7 @@ function ipcErrorMessage(err: unknown): string {
 export function LoginPage(): React.ReactElement {
   const [tab, setTab] = useState<AuthTab>('login');
   const navigate = useNavigate();
-  const setUser = useAuthStore((s) => s.setUser);
+  const applySessionSnapshot = useAuthStore((s) => s.applySessionSnapshot);
 
   const resolver = useMemo(() => zodResolver(createAuthFormSchema(tab)), [tab]);
 
@@ -60,7 +60,7 @@ export function LoginPage(): React.ReactElement {
         await window.api.auth.register(values.name!.trim(), values.email, values.password);
       }
       const res = await window.api.auth.login(values.email, values.password);
-      setUser(res.user);
+      applySessionSnapshot({ user: res.user, preferences: res.preferences });
       navigate('/');
     } catch (err) {
       setError('root', { message: ipcErrorMessage(err) });
@@ -134,10 +134,9 @@ export function LoginPage(): React.ReactElement {
               register={register('email')}
               error={errors.email?.message}
             />
-            <FormField
+            <PasswordField
               id="auth-password"
               label="Senha"
-              type="password"
               register={register('password')}
               error={errors.password?.message}
             />

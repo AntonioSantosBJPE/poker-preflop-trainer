@@ -234,7 +234,7 @@ describe('parseSituationPayload', () => {
   it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
     const spy = vi.spyOn(situationPayloadSchema, 'safeParse').mockReturnValueOnce({
       success: false,
-      error: new z.ZodError([]),
+      error: new z.ZodError([]) as never,
     });
     expect(() => parseSituationPayload(minimalValid)).toThrow('Dados inválidos');
     spy.mockRestore();

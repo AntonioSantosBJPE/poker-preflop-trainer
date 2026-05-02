@@ -88,7 +88,7 @@ describe('parseTrainingStartSession', () => {
   it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
     const spy = vi.spyOn(trainingStartFormSchema, 'safeParse').mockReturnValueOnce({
       success: false,
-      error: new z.ZodError([]),
+      error: new z.ZodError([]) as never,
     });
     expect(() => parseTrainingStartSession({})).toThrow('Dados inválidos');
     spy.mockRestore();
@@ -117,7 +117,7 @@ describe('parseSimultaneousTrainingStart', () => {
   it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
     const spy = vi.spyOn(simultaneousTrainingStartSchema, 'safeParse').mockReturnValueOnce({
       success: false,
-      error: new z.ZodError([]),
+      error: new z.ZodError([]) as never,
     });
     expect(() => parseSimultaneousTrainingStart({ ...validTrainingBase, tableCount: 2 })).toThrow(
       'Dados inválidos',

@@ -37,7 +37,7 @@ describe('parseGroupCreate', () => {
   it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
     const spy = vi.spyOn(groupCreateSchema, 'safeParse').mockReturnValueOnce({
       success: false,
-      error: new z.ZodError([]),
+      error: new z.ZodError([]) as never,
     });
     expect(() => parseGroupCreate({ name: 'x' })).toThrow('Dados inválidos');
     spy.mockRestore();
@@ -72,7 +72,7 @@ describe('parseGroupRename', () => {
   it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
     const spy = vi.spyOn(groupRenameSchema, 'safeParse').mockReturnValueOnce({
       success: false,
-      error: new z.ZodError([]),
+      error: new z.ZodError([]) as never,
     });
     expect(() => parseGroupRename({ id: 1, name: 'x' })).toThrow('Dados inválidos');
     spy.mockRestore();
@@ -99,7 +99,7 @@ describe('parseGroupArchive', () => {
   it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
     const spy = vi.spyOn(groupArchiveSchema, 'safeParse').mockReturnValueOnce({
       success: false,
-      error: new z.ZodError([]),
+      error: new z.ZodError([]) as never,
     });
     expect(() => parseGroupArchive({ id: 1 })).toThrow('Dados inválidos');
     spy.mockRestore();

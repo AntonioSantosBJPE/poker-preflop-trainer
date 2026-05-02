@@ -1,15 +1,62 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type { AuthSessionDto, UserPreferencesDto, UserPreferencesPatchDto } from '@shared/ipc/types';
+
+type AuthLoginResult = {
+  token: string;
+  user: AuthSessionDto['user'];
+  preferences?: Partial<UserPreferencesDto> | null;
+};
+
+const EMPTY_PREFERENCES: UserPreferencesDto = {
+  theme: null,
+  defaultTrainingTotalHands: null,
+  defaultTrainingTimerSeconds: null,
+  defaultTrainingFeedbackMode: null,
+  defaultSimultaneousTableCount: null,
+};
+
+function normalizePreferences(
+  raw: Partial<UserPreferencesDto> | null | undefined,
+): UserPreferencesDto {
+  return {
+    ...EMPTY_PREFERENCES,
+    ...(raw ?? {}),
+  };
+}
 
 const api = {
   auth: {
     register: (name: string, email: string, password: string) =>
       ipcRenderer.invoke('auth:register', name, email, password),
-    login: (email: string, password: string) => ipcRenderer.invoke('auth:login', email, password),
+    login: async (email: string, password: string) => {
+      const result = (await ipcRenderer.invoke('auth:login', email, password)) as AuthLoginResult;
+      return {
+        token: result.token,
+        user: result.user,
+        preferences: normalizePreferences(result.preferences),
+      };
+    },
     logout: () => ipcRenderer.invoke('auth:logout'),
-    me: () =>
-      ipcRenderer.invoke('auth:me') as Promise<{
-        user: { id: number; name: string; email: string };
-      } | null>,
+    me: async () => {
+      const result = (await ipcRenderer.invoke('auth:me')) as
+        | {
+            user: AuthSessionDto['user'];
+            preferences?: Partial<UserPreferencesDto> | null;
+          }
+        | null;
+      if (!result) return null;
+      return {
+        user: result.user,
+        preferences: normalizePreferences(result.preferences),
+      } satisfies AuthSessionDto;
+    },
+  },
+  profile: {
+    updateName: (name: string) => ipcRenderer.invoke('profile:updateName', { name }),
+    changePassword: (currentPassword: string, newPassword: string) =>
+      ipcRenderer.invoke('profile:changePassword', { currentPassword, newPassword }),
+    updatePreferences: (payload: UserPreferencesPatchDto) =>
+      ipcRenderer.invoke('profile:updatePreferences', payload),
   },
   groups: {
     list: () => ipcRenderer.invoke('groups:list'),

@@ -1,6 +1,27 @@
-import type { ActionType, FeedbackMode, Position, RankChar, SuitChar } from '../constants';
+import type { ActionType, FeedbackMode, Position, RankChar, SuitChar, ThemeMode } from '../constants';
 
 export type UserDto = { id: number; name: string; email: string };
+
+export type UserPreferencesDto = {
+  theme: ThemeMode | null;
+  defaultTrainingTotalHands: number | null;
+  defaultTrainingTimerSeconds: number | null;
+  defaultTrainingFeedbackMode: FeedbackMode | null;
+  defaultSimultaneousTableCount: SimultaneousTableCount | null;
+};
+
+export type UserPreferencesPatchDto = {
+  theme?: ThemeMode | null;
+  defaultTrainingTotalHands?: number | null;
+  defaultTrainingTimerSeconds?: number | null;
+  defaultTrainingFeedbackMode?: FeedbackMode | null;
+  defaultSimultaneousTableCount?: SimultaneousTableCount | null;
+};
+
+export type AuthSessionDto = {
+  user: UserDto;
+  preferences: UserPreferencesDto;
+};
 
 export type GroupSummaryDto = {
   id: number;

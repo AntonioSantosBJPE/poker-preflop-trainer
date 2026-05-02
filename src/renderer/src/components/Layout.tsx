@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { DEFAULT_USER_PREFERENCES, type ThemeMode } from '@shared/constants';
 import { AppSidebar } from '@/components/app';
 import { useAuthStore } from '../stores/auth';
-import { useThemeStore } from '../stores/theme';
+import { usePreferencesStore } from '../stores/preferences';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   [
@@ -13,12 +14,33 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
 
 export function AppLayout(): React.ReactElement {
   const user = useAuthStore((s) => s.user);
-  const theme = useThemeStore((s) => s.theme);
-  const toggleTheme = useThemeStore((s) => s.toggleTheme);
+  const applySessionSnapshot = useAuthStore((s) => s.applySessionSnapshot);
+  const clearSession = useAuthStore((s) => s.clearSession);
+  const persistedTheme = usePreferencesStore((s) => s.raw?.theme);
+  const setThemeLocally = usePreferencesStore((s) => s.setThemeLocally);
   const navigate = useNavigate();
+
+  const theme = persistedTheme ?? DEFAULT_USER_PREFERENCES.theme;
+  const toggleTheme = () => {
+    if (!user) return;
+
+    const previous = theme;
+    const next: ThemeMode = theme === 'dark' ? 'light' : 'dark';
+    setThemeLocally(next);
+
+    void window.api.profile
+      .updatePreferences({ theme: next })
+      .then((snapshot) => {
+        applySessionSnapshot(snapshot);
+      })
+      .catch(() => {
+        setThemeLocally(previous);
+      });
+  };
+
   async function logout(): Promise<void> {
     await window.api.auth.logout();
-    useAuthStore.getState().setUser(null);
+    clearSession();
     navigate('/login');
   }
 
@@ -47,6 +69,9 @@ export function AppLayout(): React.ReactElement {
         </NavLink>
         <NavLink to="/stats" className={navLinkClass}>
           Estatísticas
+        </NavLink>
+        <NavLink to="/profile" className={navLinkClass}>
+          Perfil
         </NavLink>
       </AppSidebar>
       <main className="min-h-0 flex-1 overflow-y-auto">

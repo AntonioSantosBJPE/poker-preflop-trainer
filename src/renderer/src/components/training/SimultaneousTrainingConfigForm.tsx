@@ -9,6 +9,7 @@ import {
   type SimultaneousTrainingStartInput,
   type TrainingStartFormValues,
 } from '@shared/forms/trainingSchemas';
+import { DEFAULT_USER_PREFERENCES } from '@shared/constants';
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { PageHeader } from '@/components/app/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { FormSelectField } from '@/components/forms/FormSelectField';
 import { GroupSelectionStep } from '@/components/training/GroupSelectionStep';
 import { SituationChecklist } from '@/components/training/SituationChecklist';
 import { SessionSettingsForm } from '@/components/training/SessionSettingsForm';
+import { usePreferencesStore } from '@/stores/preferences';
 
 type Sit = { id: number; name: string };
 
@@ -30,6 +32,18 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
   const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
   const [step, setStep] = useState<1 | 2>(1);
   const [sits, setSits] = useState<Sit[]>([]);
+  const rawPreferences = usePreferencesStore((s) => s.raw);
+  const preferencesReady = usePreferencesStore((s) => s.ready);
+
+  const preferredTableCount =
+    rawPreferences?.defaultSimultaneousTableCount ??
+    DEFAULT_USER_PREFERENCES.defaultSimultaneousTableCount;
+  const preferredTotalHands =
+    rawPreferences?.defaultTrainingTotalHands ?? DEFAULT_USER_PREFERENCES.defaultTrainingTotalHands;
+  const preferredTimerSeconds =
+    rawPreferences?.defaultTrainingTimerSeconds ?? DEFAULT_USER_PREFERENCES.defaultTrainingTimerSeconds;
+  const preferredFeedbackMode =
+    rawPreferences?.defaultTrainingFeedbackMode ?? DEFAULT_USER_PREFERENCES.defaultTrainingFeedbackMode;
 
   const {
     register,
@@ -38,16 +52,16 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
     setValue,
     watch,
     getValues,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<SimultaneousTrainingStartFormInput, unknown, SimultaneousTrainingStartInput>({
     resolver: zodResolver(simultaneousTrainingStartSchema),
     defaultValues: {
-      tableCount: 2,
+      tableCount: preferredTableCount,
       groupId: 1,
       situationIds: [],
-      totalHands: 25,
-      timerSeconds: 0,
-      feedbackMode: 'IMMEDIATE',
+      totalHands: preferredTotalHands,
+      timerSeconds: preferredTimerSeconds,
+      feedbackMode: preferredFeedbackMode,
     },
     mode: 'onSubmit',
   });
@@ -60,6 +74,39 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
       setGroups(list);
     })();
   }, []);
+
+  useEffect(() => {
+    if (!preferencesReady) return;
+    if (!dirtyFields.tableCount) {
+      setValue('tableCount', preferredTableCount, { shouldDirty: false, shouldValidate: false });
+    }
+    if (!dirtyFields.totalHands) {
+      setValue('totalHands', preferredTotalHands, { shouldDirty: false, shouldValidate: false });
+    }
+    if (!dirtyFields.timerSeconds) {
+      setValue('timerSeconds', preferredTimerSeconds, {
+        shouldDirty: false,
+        shouldValidate: false,
+      });
+    }
+    if (!dirtyFields.feedbackMode) {
+      setValue('feedbackMode', preferredFeedbackMode, {
+        shouldDirty: false,
+        shouldValidate: false,
+      });
+    }
+  }, [
+    dirtyFields.feedbackMode,
+    dirtyFields.tableCount,
+    dirtyFields.timerSeconds,
+    dirtyFields.totalHands,
+    preferencesReady,
+    preferredFeedbackMode,
+    preferredTableCount,
+    preferredTimerSeconds,
+    preferredTotalHands,
+    setValue,
+  ]);
 
   async function handleSelectGroup(group: GroupSummaryDto): Promise<void> {
     setValue('groupId', group.id, { shouldValidate: false });

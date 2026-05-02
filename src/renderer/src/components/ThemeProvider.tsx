@@ -1,14 +1,19 @@
 import { useEffect } from 'react';
-import { useThemeStore } from '../stores/theme';
+import { getEffectivePreferences, usePreferencesStore } from '../stores/preferences';
 
-/** Sincroniza classe `dark` após hidratação do Zustand persist (além do script inline em index.html). */
+/** Sincroniza a classe `dark` a partir das preferências efetivas da conta autenticada. */
 export function ThemeProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   useEffect(() => {
-    const t = useThemeStore.getState().theme;
-    document.documentElement.classList.toggle('dark', t === 'dark');
-    const unsub = useThemeStore.persist.onFinishHydration(() => {
-      const mode = useThemeStore.getState().theme;
+    const apply = () => {
+      const mode = getEffectivePreferences().theme;
       document.documentElement.classList.toggle('dark', mode === 'dark');
+    };
+    apply();
+
+    const unsub = usePreferencesStore.subscribe((state, prevState) => {
+      if (state.raw !== prevState.raw || state.ready !== prevState.ready) {
+        apply();
+      }
     });
     return unsub;
   }, []);

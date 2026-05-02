@@ -12,6 +12,28 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   };
 }
 
+// Radix Select depends on pointer-capture APIs not implemented by jsdom.
+if (typeof Element !== 'undefined') {
+  const proto = Element.prototype as {
+    hasPointerCapture?: (pointerId: number) => boolean;
+    setPointerCapture?: (pointerId: number) => void;
+    releasePointerCapture?: (pointerId: number) => void;
+    scrollIntoView?: (options?: boolean | ScrollIntoViewOptions) => void;
+  };
+  if (!proto.hasPointerCapture) {
+    proto.hasPointerCapture = () => false;
+  }
+  if (!proto.setPointerCapture) {
+    proto.setPointerCapture = () => undefined;
+  }
+  if (!proto.releasePointerCapture) {
+    proto.releasePointerCapture = () => undefined;
+  }
+  if (!proto.scrollIntoView) {
+    proto.scrollIntoView = () => undefined;
+  }
+}
+
 function createWindowApiMock(): Window['api'] {
   return {
     auth: {
@@ -19,6 +41,11 @@ function createWindowApiMock(): Window['api'] {
       login: vi.fn(),
       logout: vi.fn().mockResolvedValue(undefined),
       me: vi.fn().mockResolvedValue(null),
+    },
+    profile: {
+      updateName: vi.fn(),
+      changePassword: vi.fn(),
+      updatePreferences: vi.fn(),
     },
     groups: {
       list: vi.fn().mockResolvedValue([]),

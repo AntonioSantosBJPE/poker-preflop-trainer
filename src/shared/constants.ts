@@ -16,6 +16,17 @@ export type ActionType = (typeof ACTION_TYPES)[number];
 export const FEEDBACK_MODES = ['IMMEDIATE', 'END_OF_SESSION'] as const;
 export type FeedbackMode = (typeof FEEDBACK_MODES)[number];
 
+export const THEME_MODES = ['light', 'dark'] as const;
+export type ThemeMode = (typeof THEME_MODES)[number];
+
+export const DEFAULT_USER_PREFERENCES = {
+  theme: 'dark' as ThemeMode,
+  defaultTrainingTotalHands: 25,
+  defaultTrainingTimerSeconds: 0,
+  defaultTrainingFeedbackMode: 'IMMEDIATE' as FeedbackMode,
+  defaultSimultaneousTableCount: 2 as const,
+};
+
 export const RANK_CHARS = [
   'A',
   'K',

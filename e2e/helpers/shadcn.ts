@@ -14,8 +14,8 @@ export async function selectShadcnOption(
   labelText: string,
   optionLabel: string,
 ): Promise<void> {
-  // Click the trigger button associated with the label
-  await page.getByLabel(labelText).click();
+  // Click the select trigger (combobox) associated with the label
+  await page.getByRole('combobox', { name: labelText, exact: true }).click();
   // Click the option in the dropdown list
   await page.getByRole('option', { name: optionLabel, exact: true }).click();
 }
