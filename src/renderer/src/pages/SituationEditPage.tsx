@@ -2,15 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ACTION_TYPES, POSITIONS } from '@shared/constants';
 import {
   situationEditorFormSchema,
   situationPayloadSchema,
   type SituationEditorFormValues,
 } from '@shared/forms/situationSchemas';
 import { countCombosForCell } from '@shared/poker/grid';
-import { RangeGrid13, type RangeCellEdit } from '../components/grid/RangeGrid13';
+import type { RangeCellEdit } from '../components/grid/RangeGrid13';
 import type { GroupSummaryDto } from '@shared/ipc/types';
+import { RangeEditorPanel, SituationActionsEditor, SituationForm } from '@/components/situations';
 
 function uid(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -263,217 +263,26 @@ export function SituationEditPage(): React.ReactElement {
           {errors.root.message}
         </p>
       )}
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="block md:col-span-2" htmlFor="situation-name">
-          <span className="pt-label">Nome</span>
-          <input
-            id="situation-name"
-            className="pt-input"
-            aria-invalid={errors.name ? true : undefined}
-            {...register('name')}
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-destructive" role="alert">
-              {errors.name.message}
-            </p>
-          )}
-        </label>
-        <label className="block" htmlFor="situation-group">
-          <span className="pt-label">Grupo</span>
-          <select
-            id="situation-group"
-            className="pt-input"
-            data-testid="situation-group-select"
-            aria-invalid={errors.groupId ? true : undefined}
-            {...register('groupId', {
-              setValueAs: (v) => {
-                if (v === '' || v === undefined || v === null) return 0;
-                const n = Number(v);
-                return Number.isNaN(n) ? 0 : n;
-              },
-            })}
-          >
-            <option value="">Selecione um grupo…</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-          {errors.groupId && (
-            <p
-              className="mt-1 text-sm text-destructive"
-              role="alert"
-              data-testid="situation-group-error"
-            >
-              {errors.groupId.message}
-            </p>
-          )}
-        </label>
-        <label className="block" htmlFor="situation-position">
-          <span className="pt-label">Posição</span>
-          <select id="situation-position" className="pt-input" {...register('position')}>
-            {POSITIONS.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block" htmlFor="situation-stack">
-          <span className="pt-label">Stack efetivo (BB)</span>
-          <input
-            id="situation-stack"
-            type="number"
-            min={10}
-            max={500}
-            className="pt-input"
-            aria-invalid={errors.effectiveStack ? true : undefined}
-            {...register('effectiveStack', { valueAsNumber: true })}
-          />
-          {errors.effectiveStack && (
-            <p className="mt-1 text-sm text-destructive" role="alert">
-              {errors.effectiveStack.message}
-            </p>
-          )}
-        </label>
-        <label className="block md:col-span-2" htmlFor="situation-description">
-          <span className="pt-label">Descrição</span>
-          <textarea
-            id="situation-description"
-            className="pt-input min-h-18"
-            {...register('description')}
-          />
-        </label>
-      </div>
+      <SituationForm register={register} errors={errors} groups={groups} />
 
-      <div
-        className="space-y-3 rounded-xl border border-border bg-card p-4"
-        data-testid="situation-actions-panel"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-baseline gap-3">
-            <h2 className="font-display text-lg font-semibold text-foreground">Ações</h2>
-            <span className="text-xs tabular-nums text-muted-foreground">
-              Range total: {((totalCombos / 1326) * 100).toFixed(1)}%
-            </span>
-          </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              className="text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => setCells([])}
-            >
-              Limpar tudo
-            </button>
-            <button
-              type="button"
-              className="text-sm font-medium text-primary hover:underline"
-              onClick={addAction}
-            >
-              + Adicionar
-            </button>
-          </div>
-        </div>
-        {errors.actions && typeof errors.actions === 'object' && 'message' in errors.actions && (
-          <p className="text-sm text-destructive" role="alert">
-            {(errors.actions as { message?: string }).message}
-          </p>
-        )}
-        <div className="space-y-2">
-          {fields.map((field, index) => {
-            const clientKey = getValues(`actions.${index}.clientKey`);
-            const isActive = clientKey === activeActionKey;
-            const combos = actionCombos.get(clientKey) ?? 0;
-            const pct = ((combos / 1326) * 100).toFixed(1);
-            return (
-              <div
-                key={field.id}
-                data-testid="situation-action-row"
-                className={[
-                  'flex flex-wrap items-center gap-2 rounded-lg p-2 transition-colors',
-                  isActive
-                    ? 'border-2 border-primary/40 bg-muted'
-                    : 'border border-border bg-muted/40',
-                ].join(' ')}
-              >
-                <input
-                  className="pt-input mt-0 min-w-30 flex-1 py-1 text-sm"
-                  aria-invalid={errors.actions?.[index]?.name ? true : undefined}
-                  {...register(`actions.${index}.name`)}
-                />
-                <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-                <select
-                  className="pt-input mt-0 w-auto py-1 text-sm"
-                  {...register(`actions.${index}.actionType`)}
-                >
-                  {ACTION_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  step="0.1"
-                  placeholder="BB"
-                  className="pt-input mt-0 w-24 py-1 text-sm"
-                  aria-invalid={errors.actions?.[index]?.sizeBb ? true : undefined}
-                  {...register(`actions.${index}.sizeBb`, {
-                    setValueAs: (v) => {
-                      if (v === '' || v === undefined || v === null) return null;
-                      const n = Number(v);
-                      return Number.isNaN(n) ? null : n;
-                    },
-                  })}
-                />
-                <input
-                  type="color"
-                  className="h-8 w-10 border-0 bg-transparent"
-                  {...register(`actions.${index}.colorHex`)}
-                />
-                <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">
-                  {pct}%
-                </span>
-                <button
-                  type="button"
-                  className="text-xs font-medium text-primary hover:underline"
-                  onClick={() => setActiveActionKey(clientKey)}
-                >
-                  Pintar
-                </button>
-                <button
-                  type="button"
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                  onClick={() =>
-                    setCells((prev) => prev.filter((c) => c.actionClientKey !== clientKey))
-                  }
-                >
-                  Limpar
-                </button>
-                <button
-                  type="button"
-                  className="text-xs text-destructive hover:underline"
-                  onClick={() => removeAt(index)}
-                >
-                  Remover
-                </button>
-                {(errors.actions?.[index]?.name ||
-                  errors.actions?.[index]?.actionType ||
-                  errors.actions?.[index]?.sizeBb) && (
-                  <p className="w-full text-xs text-destructive" role="alert">
-                    {errors.actions?.[index]?.name?.message ??
-                      errors.actions?.[index]?.actionType?.message ??
-                      errors.actions?.[index]?.sizeBb?.message}
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <SituationActionsEditor
+        fields={fields}
+        register={register}
+        getValues={getValues}
+        errors={errors}
+        activeActionKey={activeActionKey}
+        actionCombos={actionCombos}
+        totalCombos={totalCombos}
+        onSetActiveAction={setActiveActionKey}
+        onClearAll={() => setCells([])}
+        onAddAction={addAction}
+        onClearAction={(clientKey) =>
+          setCells((prev) => prev.filter((cell) => cell.actionClientKey !== clientKey))
+        }
+        onRemoveAt={removeAt}
+      />
 
-      <RangeGrid13
+      <RangeEditorPanel
         actions={gridActions}
         activeActionKey={activeActionKey}
         cells={cells}

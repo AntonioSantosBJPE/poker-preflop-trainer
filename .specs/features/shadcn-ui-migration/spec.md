@@ -245,9 +245,9 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 | T-05 | Done | 2026-05-02 |
 | T-06 | Done | 2026-05-02 |
 | T-07 | Done | 2026-05-02 |
-| T-08 | Pending | - |
-| T-09 | Pending | - |
-| T-10 | Pending | - |
+| T-08 | Done | 2026-05-02 |
+| T-09 | Done | 2026-05-02 |
+| T-10 | Done | 2026-05-02 |
 | T-11 | Pending | - |
 | T-12 | Pending | - |
 | T-13 | Pending | - |

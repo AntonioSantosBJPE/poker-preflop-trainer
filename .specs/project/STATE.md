@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-01 (situation-range-editor concluída; situation-groups concluída)
+**Última actualização:** 2026-05-02 (shadcn-ui-migration bloco 2 concluído com suíte completa verde)
 
 ## Decisões
 
@@ -13,6 +13,8 @@
 | D-05 | [situation-groups] UI de treino: escolher grupo primeiro, depois situações do grupo | Evita mistura cross-group naturalmente; fluxo claro                                                 | 2026-05-01 |
 | D-06 | [situation-groups] Stats filtradas por tabs horizontais por grupo                   | Acesso rápido; adequado para < 10 grupos                                                            | 2026-05-01 |
 | D-07 | [situation-groups] Migração limpa DB (sem preservação de dados antigos)             | Sistema em desenvolvimento; sem dados de produção a preservar                                       | 2026-05-01 |
+| D-08 | [shadcn-ui-migration] Confirmacoes destrutivas migradas de `confirm()/alert()` para `AlertDialog` | Acessibilidade, consistência visual e previsibilidade de testes E2E                                | 2026-05-02 |
+| D-09 | [shadcn-ui-migration] Encerramento de bloco exige gate completo `pnpm test`          | Evita regressões acumuladas entre blocos e mantém rastreabilidade de qualidade                      | 2026-05-02 |
 
 ## Features Concluídas
 
@@ -20,6 +22,7 @@
 | -------------------------------------- | ---------- | ------------------------------------------------------------------------------------ |
 | situation-groups (GRP-01..16)          | 2026-05-01 | 25 tasks, 65 unit tests, 8 E2E novos (38 total)                                      |
 | situation-range-editor (SRANGE-01..04) | 2026-05-01 | T1 fold implícito shared; T2 N/A (parse no main); T3 `RangeGrid13` min 36px + scroll |
+| shadcn-ui-migration (blocos 0, 1 e 2)  | 2026-05-02 | Fundação shadcn + CRUD/editor modularizados + gates E2E e `pnpm test` verdes         |
 
 ## Blockers Activos
 
