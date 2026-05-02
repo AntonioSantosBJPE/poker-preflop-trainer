@@ -140,6 +140,9 @@ export function registerTrainingIpc(): void {
       .from(actions)
       .where(eq(actions.situationId, situationId))
       .orderBy(asc(actions.sortOrder));
+    if (!acts.length) {
+      throw new Error('Situação sem acções definidas');
+    }
     const foldAct = acts.find((a) => a.actionType === 'FOLD');
     const pending: PendingHand = {
       situationId,

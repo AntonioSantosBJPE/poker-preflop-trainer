@@ -1,5 +1,13 @@
-import { describe, expect, it } from 'vitest';
-import { parseGroupArchive, parseGroupCreate, parseGroupRename } from './groupSchemas';
+import { describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
+import {
+  groupArchiveSchema,
+  groupCreateSchema,
+  groupRenameSchema,
+  parseGroupArchive,
+  parseGroupCreate,
+  parseGroupRename,
+} from './groupSchemas';
 
 describe('parseGroupCreate', () => {
   it('aceita nome válido', () => {
@@ -24,6 +32,15 @@ describe('parseGroupCreate', () => {
 
   it('rejeita payload sem nome', () => {
     expect(() => parseGroupCreate({})).toThrow();
+  });
+
+  it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
+    const spy = vi.spyOn(groupCreateSchema, 'safeParse').mockReturnValueOnce({
+      success: false,
+      error: new z.ZodError([]),
+    });
+    expect(() => parseGroupCreate({ name: 'x' })).toThrow('Dados inválidos');
+    spy.mockRestore();
   });
 });
 
@@ -51,6 +68,15 @@ describe('parseGroupRename', () => {
   it('rejeita payload incompleto', () => {
     expect(() => parseGroupRename({ id: 1 })).toThrow();
   });
+
+  it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
+    const spy = vi.spyOn(groupRenameSchema, 'safeParse').mockReturnValueOnce({
+      success: false,
+      error: new z.ZodError([]),
+    });
+    expect(() => parseGroupRename({ id: 1, name: 'x' })).toThrow('Dados inválidos');
+    spy.mockRestore();
+  });
 });
 
 describe('parseGroupArchive', () => {
@@ -68,5 +94,14 @@ describe('parseGroupArchive', () => {
 
   it('rejeita payload sem id', () => {
     expect(() => parseGroupArchive({})).toThrow();
+  });
+
+  it('usa mensagem genérica quando o primeiro issue não tem mensagem', () => {
+    const spy = vi.spyOn(groupArchiveSchema, 'safeParse').mockReturnValueOnce({
+      success: false,
+      error: new z.ZodError([]),
+    });
+    expect(() => parseGroupArchive({ id: 1 })).toThrow('Dados inválidos');
+    spy.mockRestore();
   });
 });

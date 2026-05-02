@@ -35,8 +35,11 @@ describe('registerSimultaneousTrainingIpc', () => {
     return call[1] as (...args: unknown[]) => Promise<unknown>;
   }
 
-  function createDbMock(sessionIds: Array<number | null>) {
-    const selectWhere = vi.fn().mockResolvedValue([{ id: 10, groupId: 1 }]);
+  function createDbMock(
+    sessionIds: Array<number | null>,
+    sitDetails: { id: number; groupId: number }[] = [{ id: 10, groupId: 1 }],
+  ) {
+    const selectWhere = vi.fn().mockResolvedValue(sitDetails);
     const selectFrom = vi.fn(() => ({ where: selectWhere }));
     const select = vi.fn(() => ({ from: selectFrom }));
 
@@ -119,5 +122,68 @@ describe('registerSimultaneousTrainingIpc', () => {
         },
       ),
     ).rejects.toThrow('Falha ao iniciar sessão simultânea');
+  });
+
+  it('rejeita quando o DB devolve menos situações do que as pedidas (inativa ou outro user)', async () => {
+    const { db } = createDbMock([201, 202], [{ id: 10, groupId: 1 }]);
+    vi.mocked(getDb).mockReturnValue(db as unknown as ReturnType<typeof getDb>);
+    const handler = getHandler('simultaneous-training:startSession');
+
+    await expect(
+      handler(
+        {},
+        {
+          tableCount: 2,
+          groupId: 1,
+          situationIds: [10, 11],
+          totalHands: 10,
+          timerSeconds: 0,
+          feedbackMode: 'IMMEDIATE',
+        },
+      ),
+    ).rejects.toThrow('Situação inválida ou inativa');
+  });
+
+  it('rejeita quando as situações pertencem a grupos diferentes', async () => {
+    const { db } = createDbMock([201, 202], [
+      { id: 10, groupId: 1 },
+      { id: 11, groupId: 2 },
+    ]);
+    vi.mocked(getDb).mockReturnValue(db as unknown as ReturnType<typeof getDb>);
+    const handler = getHandler('simultaneous-training:startSession');
+
+    await expect(
+      handler(
+        {},
+        {
+          tableCount: 2,
+          groupId: 1,
+          situationIds: [10, 11],
+          totalHands: 10,
+          timerSeconds: 0,
+          feedbackMode: 'IMMEDIATE',
+        },
+      ),
+    ).rejects.toThrow('Todas as situações devem pertencer ao mesmo grupo');
+  });
+
+  it('rejeita quando groupId do pedido não coincide com o grupo das situações', async () => {
+    const { db } = createDbMock([201, 202], [{ id: 10, groupId: 2 }]);
+    vi.mocked(getDb).mockReturnValue(db as unknown as ReturnType<typeof getDb>);
+    const handler = getHandler('simultaneous-training:startSession');
+
+    await expect(
+      handler(
+        {},
+        {
+          tableCount: 2,
+          groupId: 1,
+          situationIds: [10],
+          totalHands: 10,
+          timerSeconds: 0,
+          feedbackMode: 'IMMEDIATE',
+        },
+      ),
+    ).rejects.toThrow('groupId não corresponde ao grupo das situações selecionadas');
   });
 });

@@ -16,3 +16,4 @@ preflop_trainer.db
 playwright-report/
 test-results/
 blob-report/
+coverage/

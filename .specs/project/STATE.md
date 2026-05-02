@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-02 (shadcn-ui-migration bloco 4 concluído — feature fechada com suíte completa verde)
+**Última actualização:** 2026-05-02 (test-coverage-improvement P2 concluído — 248 unit tests, stmts 94%, branches 86%, funcs 93%, lines 96%; pnpm test 57 E2E verdes)
 
 ## Decisões
 
@@ -15,6 +15,12 @@
 | D-07 | [situation-groups] Migração limpa DB (sem preservação de dados antigos)                           | Sistema em desenvolvimento; sem dados de produção a preservar                                       | 2026-05-01 |
 | D-08 | [shadcn-ui-migration] Confirmacoes destrutivas migradas de `confirm()/alert()` para `AlertDialog` | Acessibilidade, consistência visual e previsibilidade de testes E2E                                 | 2026-05-02 |
 | D-09 | [shadcn-ui-migration] Encerramento de bloco exige gate completo `pnpm test`                       | Evita regressões acumuladas entre blocos e mantém rastreabilidade de qualidade                      | 2026-05-02 |
+| D-10 | [test-coverage] Thresholds P1: statements ≥80%, branches ≥75%, functions ≥85%, lines ≥80%        | Alinhado com padrões de mercado (Google Testing Blog, Atlassian, Jest/Vitest docs) para apps críticas | 2026-05-02 |
+| D-11 | [test-coverage] Excluir ui/ shadcn, bootstrap, register.ts e db/client.ts do coverage             | Código gerado e bootstrap não representam lógica de domínio testável                                | 2026-05-02 |
+
+## Features em Progresso
+
+Nenhuma.
 
 ## Features Concluídas
 
@@ -23,6 +29,7 @@
 | situation-groups (GRP-01..16)          | 2026-05-01 | 25 tasks, 65 unit tests, 8 E2E novos (38 total)                                      |
 | situation-range-editor (SRANGE-01..04) | 2026-05-01 | T1 fold implícito shared; T2 N/A (parse no main); T3 `RangeGrid13` min 36px + scroll |
 | shadcn-ui-migration (blocos 0, 1, 2, 3 e 4) | 2026-05-02 | Fundação shadcn + CRUD/editor modularizados + treino/simultâneo + stats + remoção .pt-* + gates E2E e `pnpm test` verdes |
+| test-coverage-improvement (T01–T11 + P2) | 2026-05-02 | 129 novos testes (119→248); stmts 65%→94%, branches 56%→86%, funcs 74%→93%, lines 67%→96%; thresholds vitest activos; 2 specs E2E novas; pnpm test 57 E2E ✅ |
 
 ## Blockers Activos
 
