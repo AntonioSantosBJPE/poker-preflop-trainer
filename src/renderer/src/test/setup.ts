@@ -2,6 +2,16 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 
+// ResizeObserver is not available in jsdom — mock it for components that use it
+// (e.g. Radix UI ScrollArea)
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 function createWindowApiMock(): Window['api'] {
   return {
     auth: {

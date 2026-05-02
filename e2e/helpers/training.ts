@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect } from '../fixtures';
+import { selectShadcnOption } from './shadcn';
 
 export async function openTrainingConfig(page: Page): Promise<void> {
   await page.getByRole('link', { name: 'Treino', exact: true }).click();
@@ -31,7 +32,7 @@ export async function setFeedbackMode(
   mode: 'IMMEDIATE' | 'END_OF_SESSION',
 ): Promise<void> {
   const label = mode === 'IMMEDIATE' ? 'Imediato' : 'Ao final';
-  await page.getByLabel('Feedback').selectOption({ label });
+  await selectShadcnOption(page, 'Feedback', label);
 }
 
 export async function startTrainingSession(page: Page): Promise<void> {

@@ -8,6 +8,13 @@ import {
 } from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
+import { selectShadcnOption } from '../helpers/shadcn';
+
+const TABLE_COUNT_LABELS: Record<'2' | '3' | '4', string> = {
+  '2': '2 mesas',
+  '3': '3 mesas',
+  '4': '4 mesas',
+};
 
 async function openAndStartSimultaneousTraining(params: {
   appPage: Page;
@@ -22,7 +29,7 @@ async function openAndStartSimultaneousTraining(params: {
   await appPage.getByRole('button', { name: groupName }).click();
   await expect(appPage.getByTestId('sim-training-step-2')).toBeVisible();
   await appPage.getByRole('checkbox', { name: situationName, exact: true }).check();
-  await appPage.getByLabel('Mesas simultâneas').selectOption({ value: tableCount });
+  await selectShadcnOption(appPage, 'Mesas simultâneas', TABLE_COUNT_LABELS[tableCount]);
   await appPage.getByLabel('Número de mãos por mesa').fill(String(totalHands));
   await appPage.getByRole('button', { name: 'Iniciar treino simultâneo' }).click();
   await expect(appPage.getByRole('heading', { name: 'Treino simultâneo' })).toBeVisible();

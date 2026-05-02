@@ -23,14 +23,14 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ## Out of Scope
 
-| Feature | Reason |
-| --- | --- |
-| Reescrever regras de negocio do poker, avaliacao ou IPC | A feature e de arquitetura de UI e manutencao do renderer |
-| Migrar React Router, Zustand, Electron IPC ou schema de DB sem necessidade direta | Mudancas estruturais fora do objetivo principal aumentam risco |
-| Redesenho visual completo do produto | A prioridade e consolidar sistema de componentes com paridade comportamental |
-| Substituir Recharts por outra biblioteca | Estatisticas podem continuar em Recharts, envolvidas por componentes compartilhados |
-| Refatorar `RangeGrid13` para outro modelo de dominio | O grid pode ganhar casca/composicao nova, mas invariantes de dominio permanecem |
-| Introduzir Storybook ou catalogo visual nesta iteracao | Pode ser avaliado depois da consolidacao da base compartilhada |
+| Feature                                                                           | Reason                                                                              |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Reescrever regras de negocio do poker, avaliacao ou IPC                           | A feature e de arquitetura de UI e manutencao do renderer                           |
+| Migrar React Router, Zustand, Electron IPC ou schema de DB sem necessidade direta | Mudancas estruturais fora do objetivo principal aumentam risco                      |
+| Redesenho visual completo do produto                                              | A prioridade e consolidar sistema de componentes com paridade comportamental        |
+| Substituir Recharts por outra biblioteca                                          | Estatisticas podem continuar em Recharts, envolvidas por componentes compartilhados |
+| Refatorar `RangeGrid13` para outro modelo de dominio                              | O grid pode ganhar casca/composicao nova, mas invariantes de dominio permanecem     |
+| Introduzir Storybook ou catalogo visual nesta iteracao                            | Pode ser avaliado depois da consolidacao da base compartilhada                      |
 
 ---
 
@@ -38,21 +38,21 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ### Inventario de paginas do renderer
 
-| Pagina | Ficheiro | Tamanho atual | Cobertura E2E atual | Lacuna principal |
-| --- | --- | ---: | --- | --- |
-| Login | `src/renderer/src/pages/LoginPage.tsx` | 186 linhas | `e2e/auth.spec.ts`, `e2e/smoke.spec.ts` | Sem testes unitarios; formulario e tabs embutidos |
-| Dashboard | `src/renderer/src/pages/DashboardPage.tsx` | 52 linhas | `e2e/dashboard.spec.ts`, `e2e/smoke.spec.ts` | Cards resumo e fallback sem componente compartilhado |
-| Grupos | `src/renderer/src/pages/GroupsPage.tsx` | 116 linhas | `e2e/situation-groups/crud-groups.spec.ts` | Create form inline; estado visual repetido |
-| Detalhe do grupo | `src/renderer/src/pages/GroupDetailPage.tsx` | 161 linhas | `e2e/situation-groups/full-flow.spec.ts`, `archive-cascade.spec.ts` | Tabela, empty state e confirmacao customizados |
-| Situacoes | `src/renderer/src/pages/SituationsPage.tsx` | 148 linhas | `e2e/situations.spec.ts`, `e2e/situation-groups/*.spec.ts` | Filtro, tabela e acoes repetem padroes do detalhe de grupo |
-| Editor de situacao | `src/renderer/src/pages/SituationEditPage.tsx` | 484 linhas | `e2e/situations.spec.ts`, `e2e/range-grid-improvements.spec.ts`, `e2e/situation-groups/situation-group-field.spec.ts` | Arquivo monolitico com baixa reutilizacao |
-| Config treino | `src/renderer/src/pages/TrainingConfigPage.tsx` | 221 linhas | `e2e/training.spec.ts`, `e2e/situation-groups/training-selection.spec.ts` | Wizard e seletores repetidos em treino simultaneo |
-| Sessao treino | `src/renderer/src/pages/TrainingSessionPage.tsx` | 274 linhas | `e2e/training.spec.ts` | Dialog e botoes de acao customizados |
-| Resultado treino | `src/renderer/src/pages/TrainingResultPage.tsx` | 91 linhas | `e2e/training.spec.ts`, `e2e/stats.spec.ts` | Stat cards e chart shell repetem Stats/Summary |
-| Config treino simultaneo | `src/renderer/src/pages/SimultaneousTrainingConfigPage.tsx` | 229 linhas | `e2e/simultaneous-training/session-config.spec.ts` | Duplicacao forte do treino normal |
-| Sessao treino simultaneo | `src/renderer/src/pages/SimultaneousTrainingSessionPage.tsx` | 289 linhas | `e2e/simultaneous-training/*.spec.ts` | Estado e layout por mesa fortemente acoplados |
-| Resumo treino simultaneo | `src/renderer/src/pages/SimultaneousTrainingSummaryPage.tsx` | 86 linhas | `e2e/simultaneous-training/full-flow.spec.ts` | Cards/resumo repetidos |
-| Estatisticas | `src/renderer/src/pages/StatsPage.tsx` | 255 linhas | `e2e/stats.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts`, `e2e/simultaneous-training/stats-segmentation.spec.ts` | Filtros, tabs, metric cards e tabela sem componentes compartilhados |
+| Pagina                   | Ficheiro                                                     | Tamanho atual | Cobertura E2E atual                                                                                                      | Lacuna principal                                                    |
+| ------------------------ | ------------------------------------------------------------ | ------------: | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| Login                    | `src/renderer/src/pages/LoginPage.tsx`                       |    186 linhas | `e2e/auth.spec.ts`, `e2e/smoke.spec.ts`                                                                                  | Sem testes unitarios; formulario e tabs embutidos                   |
+| Dashboard                | `src/renderer/src/pages/DashboardPage.tsx`                   |     52 linhas | `e2e/dashboard.spec.ts`, `e2e/smoke.spec.ts`                                                                             | Cards resumo e fallback sem componente compartilhado                |
+| Grupos                   | `src/renderer/src/pages/GroupsPage.tsx`                      |    116 linhas | `e2e/situation-groups/crud-groups.spec.ts`                                                                               | Create form inline; estado visual repetido                          |
+| Detalhe do grupo         | `src/renderer/src/pages/GroupDetailPage.tsx`                 |    161 linhas | `e2e/situation-groups/full-flow.spec.ts`, `archive-cascade.spec.ts`                                                      | Tabela, empty state e confirmacao customizados                      |
+| Situacoes                | `src/renderer/src/pages/SituationsPage.tsx`                  |    148 linhas | `e2e/situations.spec.ts`, `e2e/situation-groups/*.spec.ts`                                                               | Filtro, tabela e acoes repetem padroes do detalhe de grupo          |
+| Editor de situacao       | `src/renderer/src/pages/SituationEditPage.tsx`               |    484 linhas | `e2e/situations.spec.ts`, `e2e/range-grid-improvements.spec.ts`, `e2e/situation-groups/situation-group-field.spec.ts`    | Arquivo monolitico com baixa reutilizacao                           |
+| Config treino            | `src/renderer/src/pages/TrainingConfigPage.tsx`              |    221 linhas | `e2e/training.spec.ts`, `e2e/situation-groups/training-selection.spec.ts`                                                | Wizard e seletores repetidos em treino simultaneo                   |
+| Sessao treino            | `src/renderer/src/pages/TrainingSessionPage.tsx`             |    274 linhas | `e2e/training.spec.ts`                                                                                                   | Dialog e botoes de acao customizados                                |
+| Resultado treino         | `src/renderer/src/pages/TrainingResultPage.tsx`              |     91 linhas | `e2e/training.spec.ts`, `e2e/stats.spec.ts`                                                                              | Stat cards e chart shell repetem Stats/Summary                      |
+| Config treino simultaneo | `src/renderer/src/pages/SimultaneousTrainingConfigPage.tsx`  |    229 linhas | `e2e/simultaneous-training/session-config.spec.ts`                                                                       | Duplicacao forte do treino normal                                   |
+| Sessao treino simultaneo | `src/renderer/src/pages/SimultaneousTrainingSessionPage.tsx` |    289 linhas | `e2e/simultaneous-training/*.spec.ts`                                                                                    | Estado e layout por mesa fortemente acoplados                       |
+| Resumo treino simultaneo | `src/renderer/src/pages/SimultaneousTrainingSummaryPage.tsx` |     86 linhas | `e2e/simultaneous-training/full-flow.spec.ts`                                                                            | Cards/resumo repetidos                                              |
+| Estatisticas             | `src/renderer/src/pages/StatsPage.tsx`                       |    255 linhas | `e2e/stats.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts`, `e2e/simultaneous-training/stats-segmentation.spec.ts` | Filtros, tabs, metric cards e tabela sem componentes compartilhados |
 
 ### Baseline de testes
 
@@ -173,17 +173,17 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ### Matriz de cobertura alvo por area
 
-| Area | E2E existente a preservar | Novos unitarios esperados |
-| --- | --- | --- |
-| App shell | `e2e/smoke.spec.ts`, `e2e/dashboard.spec.ts` | `AppLayout`, nav ativa, toggle de tema, CTA/logout |
-| Auth | `e2e/auth.spec.ts` | tabs/alternancia, validacao visual, submit error handling |
-| Groups | `e2e/situation-groups/crud-groups.spec.ts`, `archive-cascade.spec.ts` | `GroupsPage`, `GroupCard`, dialogs de rename/archive |
-| Situations list | `e2e/situations.spec.ts`, `e2e/situation-groups/full-flow.spec.ts` | filtros, empty state, acoes de linha |
-| Situation editor | `e2e/situations.spec.ts`, `e2e/range-grid-improvements.spec.ts`, `situation-group-field.spec.ts` | subcomponentes de formulario, lista de acoes, totais, integracao com grid mockado |
-| Training config | `e2e/training.spec.ts`, `e2e/situation-groups/training-selection.spec.ts` | wizard, group picker, checklist, feedback mode |
-| Training session/result | `e2e/training.spec.ts`, `e2e/stats.spec.ts` | header de sessao, leave dialog, feedback panel, summary cards |
-| Simultaneous training | `e2e/simultaneous-training/*.spec.ts` | config variant, table panel, summary cards, leave guard |
-| Stats | `e2e/stats.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts`, `e2e/simultaneous-training/stats-segmentation.spec.ts` | filter bar, stats cards, empty states, chart/table wrappers |
+| Area                    | E2E existente a preservar                                                                                                | Novos unitarios esperados                                                         |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| App shell               | `e2e/smoke.spec.ts`, `e2e/dashboard.spec.ts`                                                                             | `AppLayout`, nav ativa, toggle de tema, CTA/logout                                |
+| Auth                    | `e2e/auth.spec.ts`                                                                                                       | tabs/alternancia, validacao visual, submit error handling                         |
+| Groups                  | `e2e/situation-groups/crud-groups.spec.ts`, `archive-cascade.spec.ts`                                                    | `GroupsPage`, `GroupCard`, dialogs de rename/archive                              |
+| Situations list         | `e2e/situations.spec.ts`, `e2e/situation-groups/full-flow.spec.ts`                                                       | filtros, empty state, acoes de linha                                              |
+| Situation editor        | `e2e/situations.spec.ts`, `e2e/range-grid-improvements.spec.ts`, `situation-group-field.spec.ts`                         | subcomponentes de formulario, lista de acoes, totais, integracao com grid mockado |
+| Training config         | `e2e/training.spec.ts`, `e2e/situation-groups/training-selection.spec.ts`                                                | wizard, group picker, checklist, feedback mode                                    |
+| Training session/result | `e2e/training.spec.ts`, `e2e/stats.spec.ts`                                                                              | header de sessao, leave dialog, feedback panel, summary cards                     |
+| Simultaneous training   | `e2e/simultaneous-training/*.spec.ts`                                                                                    | config variant, table panel, summary cards, leave guard                           |
+| Stats                   | `e2e/stats.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts`, `e2e/simultaneous-training/stats-segmentation.spec.ts` | filter bar, stats cards, empty states, chart/table wrappers                       |
 
 ### Regras de cobertura desta feature
 
@@ -209,26 +209,26 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
-| --- | --- | --- | --- |
-| SHUI-01 | P1: inicializar `shadcn/ui` no renderer | Design | Pending |
-| SHUI-02 | P1: preservar tokens semanticos e identidade visual | Design | Pending |
-| SHUI-03 | P1: habilitar testes DOM no renderer | Design | Pending |
-| SHUI-04 | P1: estabelecer convencoes de pastas/imports para UI compartilhada | Design | Pending |
-| SHUI-05 | P1: criar compostos compartilhados para page header/cards/empty states | Design | Pending |
-| SHUI-06 | P1: substituir confirmacoes destrutivas por overlays acessiveis | Design | Pending |
-| SHUI-07 | P1: padronizar formularios com `shadcn/ui` | Design | Pending |
-| SHUI-08 | P1: migrar CRUD de grupos com paridade comportamental | Design | Pending |
-| SHUI-09 | P1: migrar listagem de situacoes com componentes compartilhados | Design | Pending |
-| SHUI-10 | P1: modularizar `SituationEditPage` em componentes menores | Design | Pending |
-| SHUI-11 | P1: migrar configuracao de treino em variantes explicitas | Design | Pending |
-| SHUI-12 | P1: migrar sessoes de treino e overlays associados | Design | Pending |
-| SHUI-13 | P1: migrar treino simultaneo em compostos reutilizaveis | Design | Pending |
-| SHUI-14 | P1: migrar resultados e estatisticas com metric cards/charts compartilhados | Design | Pending |
-| SHUI-15 | P1: adicionar cobertura unitaria aos componentes extraidos | Design | Pending |
-| SHUI-16 | P1: preservar e ampliar gates E2E durante a migracao | Design | Pending |
-| SHUI-17 | P2: evitar boolean prop proliferation e render props desnecessarias | Design | Pending |
-| SHUI-18 | P2: adotar compound components/providers locais quando houver estado compartilhado | Design | Pending |
+| Requirement ID | Story                                                                              | Phase  | Status  |
+| -------------- | ---------------------------------------------------------------------------------- | ------ | ------- |
+| SHUI-01        | P1: inicializar `shadcn/ui` no renderer                                            | Design | Pending |
+| SHUI-02        | P1: preservar tokens semanticos e identidade visual                                | Design | Pending |
+| SHUI-03        | P1: habilitar testes DOM no renderer                                               | Design | Pending |
+| SHUI-04        | P1: estabelecer convencoes de pastas/imports para UI compartilhada                 | Design | Pending |
+| SHUI-05        | P1: criar compostos compartilhados para page header/cards/empty states             | Design | Pending |
+| SHUI-06        | P1: substituir confirmacoes destrutivas por overlays acessiveis                    | Design | Pending |
+| SHUI-07        | P1: padronizar formularios com `shadcn/ui`                                         | Design | Pending |
+| SHUI-08        | P1: migrar CRUD de grupos com paridade comportamental                              | Design | Pending |
+| SHUI-09        | P1: migrar listagem de situacoes com componentes compartilhados                    | Design | Pending |
+| SHUI-10        | P1: modularizar `SituationEditPage` em componentes menores                         | Design | Pending |
+| SHUI-11        | P1: migrar configuracao de treino em variantes explicitas                          | Design | Pending |
+| SHUI-12        | P1: migrar sessoes de treino e overlays associados                                 | Design | Pending |
+| SHUI-13        | P1: migrar treino simultaneo em compostos reutilizaveis                            | Design | Pending |
+| SHUI-14        | P1: migrar resultados e estatisticas com metric cards/charts compartilhados        | Design | Pending |
+| SHUI-15        | P1: adicionar cobertura unitaria aos componentes extraidos                         | Design | Pending |
+| SHUI-16        | P1: preservar e ampliar gates E2E durante a migracao                               | Design | Pending |
+| SHUI-17        | P2: evitar boolean prop proliferation e render props desnecessarias                | Design | Pending |
+| SHUI-18        | P2: adotar compound components/providers locais quando houver estado compartilhado | Design | Pending |
 
 **Coverage:** 18 requisitos totais; 0 mapeados para implementacao ainda; 18 aguardando design/tasks.
 
@@ -236,24 +236,24 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ## Task Execution Tracking
 
-| Task | Status | Last update |
-| --- | --- | --- |
-| T-01 | Done | 2026-05-02 |
-| T-02 | Done | 2026-05-02 |
-| T-03 | Done | 2026-05-02 |
-| T-04 | Done | 2026-05-02 |
-| T-05 | Done | 2026-05-02 |
-| T-06 | Done | 2026-05-02 |
-| T-07 | Done | 2026-05-02 |
-| T-08 | Done | 2026-05-02 |
-| T-09 | Done | 2026-05-02 |
-| T-10 | Done | 2026-05-02 |
-| T-11 | Pending | - |
-| T-12 | Pending | - |
-| T-13 | Pending | - |
-| T-14 | Pending | - |
-| T-15 | Pending | - |
-| T-16 | Pending | - |
+| Task | Status  | Last update |
+| ---- | ------- | ----------- |
+| T-01 | Done    | 2026-05-02  |
+| T-02 | Done    | 2026-05-02  |
+| T-03 | Done    | 2026-05-02  |
+| T-04 | Done    | 2026-05-02  |
+| T-05 | Done    | 2026-05-02  |
+| T-06 | Done    | 2026-05-02  |
+| T-07 | Done    | 2026-05-02  |
+| T-08 | Done    | 2026-05-02  |
+| T-09 | Done    | 2026-05-02  |
+| T-10 | Done    | 2026-05-02  |
+| T-11 | Done    | 2026-05-02  |
+| T-12 | Done    | 2026-05-02  |
+| T-13 | Done    | 2026-05-02  |
+| T-14 | Pending | -           |
+| T-15 | Pending | -           |
+| T-16 | Pending | -           |
 
 ---
 

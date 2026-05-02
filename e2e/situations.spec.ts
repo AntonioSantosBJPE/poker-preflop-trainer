@@ -53,6 +53,8 @@ test.describe('Situações', () => {
     await copyRow.getByRole('button', { name: 'Arquivar' }).click();
     await appPage.getByRole('button', { name: 'Arquivar' }).click();
     await expect(appPage.getByRole('row').filter({ hasText: `Cópia de ${name}` })).toHaveCount(0);
-    await expect(appPage.getByText(name)).toBeVisible();
+    await expect(
+      appPage.getByRole('row').filter({ hasText: name }).filter({ hasNotText: 'Cópia de' }),
+    ).toBeVisible();
   });
 });

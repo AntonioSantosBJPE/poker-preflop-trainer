@@ -1,12 +1,17 @@
+import type { ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import type { Act } from '@/components/training/TrainingActionButtons';
+import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
+import { TrainingActionButtons } from '@/components/training/TrainingActionButtons';
+import { TrainingFeedbackPanel } from '@/components/training/TrainingFeedbackPanel';
+import { TrainingSessionHeader } from '@/components/training/TrainingSessionHeader';
+import { PlayingCard } from '@/components/PlayingCard';
 import type { FeedbackMode } from '../env';
-import { PlayingCard } from '../components/PlayingCard';
 
 type Card = { rank: string; suit: string };
-type Act = { id: number; name: string; colorHex: string };
 
-export function TrainingSessionPage(): React.ReactElement {
+export function TrainingSessionPage(): ReactElement {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const location = useLocation() as {
@@ -153,7 +158,7 @@ export function TrainingSessionPage(): React.ReactElement {
     if (remainingSec === 0) {
       void submit(null, true);
     }
-  }, [tick]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tick]);
 
   function openAbandonDialog(): void {
     if (deadlineRef.current !== null) {
@@ -182,55 +187,20 @@ export function TrainingSessionPage(): React.ReactElement {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
-        <span>
-          Mão {index + 1} / {totalHands}
-        </span>
-        <div className="flex items-center gap-4">
-          {remainingSec !== null && (
-            <span className="font-mono tabular-nums text-primary">{remainingSec}s</span>
-          )}
-          <button
-            type="button"
-            className="rounded-lg border border-border bg-muted px-3 py-1 text-sm text-foreground transition-colors hover:border-destructive hover:text-destructive"
-            onClick={() => openAbandonDialog()}
-          >
-            Abandonar
-          </button>
-        </div>
-      </div>
+      <TrainingSessionHeader
+        index={index}
+        totalHands={totalHands}
+        remainingSec={remainingSec}
+        onAbandon={() => openAbandonDialog()}
+      />
 
-      {showAbandonDialog && (
-        <div
-          role="alertdialog"
-          aria-modal="true"
-          aria-labelledby="abandon-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
-        >
-          <div className="mx-4 w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-6 shadow-xl">
-            <p id="abandon-title" className="font-display text-lg font-semibold text-foreground">
-              Abandonar sessão?
-            </p>
-            <p className="text-sm text-muted-foreground">O progresso desta sessão será perdido.</p>
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                className="pt-btn-secondary"
-                onClick={() => closeAbandonDialog()}
-              >
-                Continuar treinando
-              </button>
-              <button
-                type="button"
-                className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:brightness-110"
-                onClick={() => void finishSession()}
-              >
-                Confirmar abandono
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LeaveTrainingDialog
+        open={showAbandonDialog}
+        onOpenChange={(open) => {
+          if (!open) closeAbandonDialog();
+        }}
+        onConfirm={finishSession}
+      />
 
       <div className="space-y-2 rounded-xl border border-border bg-card p-6">
         <p className="text-sm text-muted-foreground">{situationName}</p>
@@ -240,35 +210,15 @@ export function TrainingSessionPage(): React.ReactElement {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        {hand.actions.map((a) => (
-          <button
-            key={a.id}
-            type="button"
-            style={{ borderColor: a.colorHex }}
-            className="min-w-[120px] rounded-lg border-2 bg-muted px-4 py-3 font-medium text-foreground"
-            disabled={Boolean(feedback)}
-            onClick={() => void submit(a.id, false)}
-          >
-            {a.name}
-          </button>
-        ))}
-      </div>
+      <TrainingActionButtons
+        actions={hand.actions}
+        disabled={Boolean(feedback)}
+        onAction={(id) => void submit(id, false)}
+      />
 
-      {feedback && feedbackMode === 'IMMEDIATE' && (
-        <div className="space-y-3 rounded-lg border border-border bg-card/90 p-4">
-          <p className={feedback.ok ? 'text-primary' : 'text-destructive'}>
-            {feedback.ok ? 'Correto' : 'Incorreto'} — {feedback.ms} ms
-          </p>
-          <button
-            type="button"
-            className="pt-btn-primary text-sm"
-            onClick={() => void onNextHand()}
-          >
-            Próxima mão
-          </button>
-        </div>
-      )}
+      {feedback && feedbackMode === 'IMMEDIATE' ? (
+        <TrainingFeedbackPanel feedback={feedback} onNextHand={() => void onNextHand()} />
+      ) : null}
     </div>
   );
 }

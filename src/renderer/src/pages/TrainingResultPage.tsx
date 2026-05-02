@@ -1,9 +1,13 @@
+import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { PageHeader } from '@/components/app/PageHeader';
+import { Button } from '@/components/ui/button';
+import { TrainingSummaryCards } from '@/components/training/TrainingSummaryCards';
 import { useChartPalette } from '../hooks/useChartPalette';
 
-export function TrainingResultPage(): React.ReactElement {
+export function TrainingResultPage(): ReactElement {
   const { sessionId } = useParams();
   const chart = useChartPalette();
   const [summary, setSummary] = useState<{
@@ -42,27 +46,12 @@ export function TrainingResultPage(): React.ReactElement {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="pt-page-title">Resultado da sessão</h1>
-      <div className="grid gap-4 text-center md:grid-cols-3 md:items-stretch">
-        <div className="pt-card p-4">
-          <p className="text-sm text-muted-foreground">Mãos</p>
-          <p className="font-display text-3xl font-bold tabular-nums text-primary">
-            {summary.totalHands}
-          </p>
-        </div>
-        <div className="pt-card p-4">
-          <p className="text-sm text-muted-foreground">Acertos</p>
-          <p className="font-display text-3xl font-bold tabular-nums text-primary">
-            {summary.correct}
-          </p>
-        </div>
-        <div className="pt-card p-4">
-          <p className="text-sm text-muted-foreground">Acerto</p>
-          <p className="font-display text-3xl font-bold tabular-nums text-primary">
-            {(summary.accuracy * 100).toFixed(1)}%
-          </p>
-        </div>
-      </div>
+      <PageHeader title="Resultado da sessão" />
+      <TrainingSummaryCards
+        totalHands={summary.totalHands}
+        correct={summary.correct}
+        accuracy={summary.accuracy}
+      />
       <div className="h-64 rounded-xl border border-border bg-card p-2">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={bySit}>
@@ -79,12 +68,12 @@ export function TrainingResultPage(): React.ReactElement {
         </ResponsiveContainer>
       </div>
       <div className="flex flex-wrap gap-3">
-        <Link to="/training" className="pt-btn-secondary">
-          Nova sessão
-        </Link>
-        <Link to="/stats" className="pt-btn-primary">
-          Ver estatísticas
-        </Link>
+        <Button variant="outline" asChild>
+          <Link to="/training">Nova sessão</Link>
+        </Button>
+        <Button variant="default" asChild>
+          <Link to="/stats">Ver estatísticas</Link>
+        </Button>
       </div>
     </div>
   );
