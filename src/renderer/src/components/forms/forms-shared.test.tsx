@@ -80,6 +80,13 @@ describe('forms shared components', () => {
       </>,
     );
 
+    await user.click(screen.getByRole('combobox', { name: /^Feedback$/ }));
+    const endOption = await screen.findByRole('option', { name: 'Final' });
+    expect(endOption).toHaveClass('text-popover-foreground');
+    expect(endOption.className).toContain('data-[highlighted]:bg-accent');
+    await user.click(endOption);
+    expect(onValueChange).toHaveBeenCalledWith('end');
+
     await user.click(screen.getByRole('radio', { name: /simultâneo/i }));
     expect(onToggle).toHaveBeenCalledWith('simultaneous');
     expect(screen.getByLabelText('Feedback')).toBeInTheDocument();
