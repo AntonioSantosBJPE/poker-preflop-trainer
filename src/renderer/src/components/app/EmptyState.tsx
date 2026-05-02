@@ -7,7 +7,12 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ title, description, action, className }: EmptyStateProps): React.ReactElement {
+export function EmptyState({
+  title,
+  description,
+  action,
+  className,
+}: EmptyStateProps): React.ReactElement {
   return (
     <div
       className={cn(

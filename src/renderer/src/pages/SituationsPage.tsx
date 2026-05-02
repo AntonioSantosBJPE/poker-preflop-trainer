@@ -92,7 +92,12 @@ export function SituationsPage(): React.ReactElement {
       cellClassName: 'text-right',
       cell: (row) => (
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/situations/${row.id}`)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/situations/${row.id}`)}
+          >
             Editar
           </Button>
           <Button
@@ -143,7 +148,11 @@ export function SituationsPage(): React.ReactElement {
               setSelectedGroupId(Number(value));
             }}
           >
-            <SelectTrigger id="situations-group-filter-input" data-testid="situations-group-filter" className="w-full">
+            <SelectTrigger
+              id="situations-group-filter-input"
+              data-testid="situations-group-filter"
+              className="w-full"
+            >
               <SelectValue placeholder="Todos os grupos" />
             </SelectTrigger>
             <SelectContent>

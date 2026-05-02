@@ -7,7 +7,9 @@ export interface FilterToolbarProps {
 
 export function FilterToolbar({ children, className }: FilterToolbarProps): React.ReactElement {
   return (
-    <div className={cn('flex flex-col gap-3 rounded-xl border border-border bg-card p-3', className)}>
+    <div
+      className={cn('flex flex-col gap-3 rounded-xl border border-border bg-card p-3', className)}
+    >
       {children}
     </div>
   );
@@ -18,6 +20,9 @@ export interface FilterToolbarRowProps {
   className?: string;
 }
 
-export function FilterToolbarRow({ children, className }: FilterToolbarRowProps): React.ReactElement {
+export function FilterToolbarRow({
+  children,
+  className,
+}: FilterToolbarRowProps): React.ReactElement {
   return <div className={cn('flex flex-wrap items-end gap-3', className)}>{children}</div>;
 }

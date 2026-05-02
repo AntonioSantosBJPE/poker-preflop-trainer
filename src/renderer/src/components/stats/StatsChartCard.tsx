@@ -21,7 +21,11 @@ export function StatsChartCard({
       {hasData ? (
         <div className="h-72">{children}</div>
       ) : (
-        <EmptyState title={emptyTitle} description={emptyDescription} className="border-0 bg-transparent" />
+        <EmptyState
+          title={emptyTitle}
+          description={emptyDescription}
+          className="border-0 bg-transparent"
+        />
       )}
     </SectionCard>
   );

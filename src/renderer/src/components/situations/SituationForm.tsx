@@ -9,7 +9,11 @@ export interface SituationFormProps {
   groups: GroupSummaryDto[];
 }
 
-export function SituationForm({ register, errors, groups }: SituationFormProps): React.ReactElement {
+export function SituationForm({
+  register,
+  errors,
+  groups,
+}: SituationFormProps): React.ReactElement {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <label className="block md:col-span-2" htmlFor="situation-name">
@@ -49,7 +53,11 @@ export function SituationForm({ register, errors, groups }: SituationFormProps):
           ))}
         </select>
         {errors.groupId && (
-          <p className="mt-1 text-sm text-destructive" role="alert" data-testid="situation-group-error">
+          <p
+            className="mt-1 text-sm text-destructive"
+            role="alert"
+            data-testid="situation-group-error"
+          >
             {errors.groupId.message}
           </p>
         )}

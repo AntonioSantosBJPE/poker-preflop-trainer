@@ -31,7 +31,10 @@ export function EntityTable<T>({
   tableTestId,
 }: EntityTableProps<T>): React.ReactElement {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card" data-testid={tableTestId}>
+    <div
+      className="overflow-hidden rounded-xl border border-border bg-card"
+      data-testid={tableTestId}
+    >
       <Table>
         <TableHeader>
           <TableRow className="bg-muted hover:bg-muted">

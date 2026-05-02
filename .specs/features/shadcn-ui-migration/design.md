@@ -262,21 +262,21 @@ Uso previsto:
 
 ## 5. Matriz Pagina -> Componentes alvo
 
-| Pagina | Componentes `shadcn/ui` principais | Compostos internos alvo |
-| --- | --- | --- |
-| `LoginPage` | `Card`, `Input`, `Button`, `Tabs` ou `ToggleGroup`, `Alert` | `AuthForm`, `AuthModeSwitcher` |
-| `DashboardPage` | `Card`, `Button`, `Separator` | `StatCard`, `PageHeader` |
-| `GroupsPage` | `Card`, `Dialog`, `AlertDialog`, `Button`, `Input`, `Empty` | `GroupCreateDialog`, `PageHeader` |
-| `GroupDetailPage` | `Table`, `Button`, `AlertDialog`, `Empty` | `EntityTable`, `SituationRowActions` |
-| `SituationsPage` | `Select`, `Table`, `Button`, `AlertDialog`, `Empty` | `SituationFilterBar`, `SituationsTable` |
-| `SituationEditPage` | `Card`, `Input`, `Textarea`, `Select`, `Button`, `Alert` | `SituationForm`, `SituationActionsEditor`, `RangeEditorPanel` |
-| `TrainingConfigPage` | `Card`, `Checkbox`, `Button`, `ScrollArea`, `ToggleGroup` | `GroupSelectionStep`, `SingleTrainingConfigForm` |
-| `TrainingSessionPage` | `Card`, `Button`, `AlertDialog`, `Badge` | `TrainingSessionHeader`, `TrainingActionButtons`, `TrainingFeedbackPanel` |
-| `TrainingResultPage` | `Card`, `Button` | `TrainingSummaryCards`, `TimelineChartCard` |
-| `SimultaneousTrainingConfigPage` | `Card`, `Checkbox`, `Button`, `ScrollArea`, `ToggleGroup` | `GroupSelectionStep`, `SimultaneousTrainingConfigForm` |
-| `SimultaneousTrainingSessionPage` | `Card`, `Button`, `AlertDialog`, `Badge` | `SimultaneousTablePanel`, `LeaveTrainingDialog` |
-| `SimultaneousTrainingSummaryPage` | `Card`, `Button` | `TrainingSummaryCards` |
-| `StatsPage` | `Tabs`, `Select`, `Card`, `Table`, `Empty`, `Separator` | `StatsFilterBar`, `StatsOverviewCards`, `BySituationTable`, `WorstHandsList` |
+| Pagina                            | Componentes `shadcn/ui` principais                          | Compostos internos alvo                                                      |
+| --------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `LoginPage`                       | `Card`, `Input`, `Button`, `Tabs` ou `ToggleGroup`, `Alert` | `AuthForm`, `AuthModeSwitcher`                                               |
+| `DashboardPage`                   | `Card`, `Button`, `Separator`                               | `StatCard`, `PageHeader`                                                     |
+| `GroupsPage`                      | `Card`, `Dialog`, `AlertDialog`, `Button`, `Input`, `Empty` | `GroupCreateDialog`, `PageHeader`                                            |
+| `GroupDetailPage`                 | `Table`, `Button`, `AlertDialog`, `Empty`                   | `EntityTable`, `SituationRowActions`                                         |
+| `SituationsPage`                  | `Select`, `Table`, `Button`, `AlertDialog`, `Empty`         | `SituationFilterBar`, `SituationsTable`                                      |
+| `SituationEditPage`               | `Card`, `Input`, `Textarea`, `Select`, `Button`, `Alert`    | `SituationForm`, `SituationActionsEditor`, `RangeEditorPanel`                |
+| `TrainingConfigPage`              | `Card`, `Checkbox`, `Button`, `ScrollArea`, `ToggleGroup`   | `GroupSelectionStep`, `SingleTrainingConfigForm`                             |
+| `TrainingSessionPage`             | `Card`, `Button`, `AlertDialog`, `Badge`                    | `TrainingSessionHeader`, `TrainingActionButtons`, `TrainingFeedbackPanel`    |
+| `TrainingResultPage`              | `Card`, `Button`                                            | `TrainingSummaryCards`, `TimelineChartCard`                                  |
+| `SimultaneousTrainingConfigPage`  | `Card`, `Checkbox`, `Button`, `ScrollArea`, `ToggleGroup`   | `GroupSelectionStep`, `SimultaneousTrainingConfigForm`                       |
+| `SimultaneousTrainingSessionPage` | `Card`, `Button`, `AlertDialog`, `Badge`                    | `SimultaneousTablePanel`, `LeaveTrainingDialog`                              |
+| `SimultaneousTrainingSummaryPage` | `Card`, `Button`                                            | `TrainingSummaryCards`                                                       |
+| `StatsPage`                       | `Tabs`, `Select`, `Card`, `Table`, `Empty`, `Separator`     | `StatsFilterBar`, `StatsOverviewCards`, `BySituationTable`, `WorstHandsList` |
 
 ---
 

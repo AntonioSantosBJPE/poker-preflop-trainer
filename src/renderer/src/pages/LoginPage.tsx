@@ -114,36 +114,40 @@ export function LoginPage(): React.ReactElement {
           </div>
         </CardHeader>
         <CardContent>
-          <form className="flex flex-col gap-4" onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
-          {tab === 'register' && (
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => void handleSubmit(onSubmit)(e)}
+            noValidate
+          >
+            {tab === 'register' && (
+              <FormField
+                id="auth-name"
+                label="Nome"
+                register={register('name')}
+                error={errors.name?.message}
+              />
+            )}
             <FormField
-              id="auth-name"
-              label="Nome"
-              register={register('name')}
-              error={errors.name?.message}
+              id="auth-email"
+              label="E-mail"
+              type="email"
+              register={register('email')}
+              error={errors.email?.message}
             />
-          )}
-          <FormField
-            id="auth-email"
-            label="E-mail"
-            type="email"
-            register={register('email')}
-            error={errors.email?.message}
-          />
-          <FormField
-            id="auth-password"
-            label="Senha"
-            type="password"
-            register={register('password')}
-            error={errors.password?.message}
-          />
-          {errors.root?.message && (
-            <p className="text-sm text-destructive" role="alert">
-              {errors.root.message}
-            </p>
-          )}
+            <FormField
+              id="auth-password"
+              label="Senha"
+              type="password"
+              register={register('password')}
+              error={errors.password?.message}
+            />
+            {errors.root?.message && (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.root.message}
+              </p>
+            )}
             <Button type="submit" className="w-full">
-            {tab === 'login' ? 'Entrar' : 'Cadastrar e entrar'}
+              {tab === 'login' ? 'Entrar' : 'Cadastrar e entrar'}
             </Button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">

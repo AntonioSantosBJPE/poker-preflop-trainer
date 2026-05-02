@@ -91,7 +91,12 @@ export function GroupDetailPage(): React.ReactElement {
       cellClassName: 'text-right',
       cell: (row) => (
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/situations/${row.id}`)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/situations/${row.id}`)}
+          >
             Editar
           </Button>
           <Button

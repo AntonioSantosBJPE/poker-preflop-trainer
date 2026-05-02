@@ -73,19 +73,10 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
               </p>
             ) : null}
             <div className="flex flex-wrap gap-2 pt-2">
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => void handleSaveRename()}
-              >
+              <Button type="button" size="sm" onClick={() => void handleSaveRename()}>
                 Salvar
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleCancelRename}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={handleCancelRename}>
                 Cancelar
               </Button>
             </div>

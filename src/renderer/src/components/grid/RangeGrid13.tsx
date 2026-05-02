@@ -45,7 +45,6 @@ export function RangeGrid13({
 
   const applyPaint = useCallback(
     (row: number, col: number, mode: 'add' | 'erase') => {
-      const key = `${row},${col}`;
       const others = cells.filter((c) => !(c.rowIndex === row && c.colIndex === col));
       if (mode === 'erase') {
         onChange(others);

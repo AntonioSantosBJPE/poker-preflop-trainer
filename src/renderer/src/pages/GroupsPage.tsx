@@ -81,17 +81,10 @@ export function GroupsPage(): React.ReactElement {
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              onClick={() => void handleCreate()}
-            >
+            <Button type="button" onClick={() => void handleCreate()}>
               Criar
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={cancelNewForm}
-            >
+            <Button type="button" variant="ghost" onClick={cancelNewForm}>
               Cancelar
             </Button>
           </div>

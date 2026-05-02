@@ -196,11 +196,7 @@ export function StatsPage(): React.ReactElement {
               tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
               tick={{ fill: chart.tick, fontSize: 11 }}
             />
-            <YAxis
-              yAxisId="time"
-              orientation="right"
-              tick={{ fill: chart.tick, fontSize: 11 }}
-            />
+            <YAxis yAxisId="time" orientation="right" tick={{ fill: chart.tick, fontSize: 11 }} />
             <Tooltip />
             <Line
               yAxisId="accuracy"

@@ -91,7 +91,10 @@ export function SituationActionsEditor({
                 {...register(`actions.${index}.name`)}
               />
               <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-              <select className="pt-input mt-0 w-auto py-1 text-sm" {...register(`actions.${index}.actionType`)}>
+              <select
+                className="pt-input mt-0 w-auto py-1 text-sm"
+                {...register(`actions.${index}.actionType`)}
+              >
                 {ACTION_TYPES.map((actionType) => (
                   <option key={actionType} value={actionType}>
                     {actionType}
@@ -117,7 +120,9 @@ export function SituationActionsEditor({
                 className="h-8 w-10 border-0 bg-transparent"
                 {...register(`actions.${index}.colorHex`)}
               />
-              <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">{percentage}%</span>
+              <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">
+                {percentage}%
+              </span>
               <button
                 type="button"
                 className="text-xs font-medium text-primary hover:underline"

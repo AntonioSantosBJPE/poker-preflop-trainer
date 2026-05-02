@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -34,7 +34,8 @@ function ToggleGroup({
   size,
   children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> & VariantProps<typeof toggleGroupVariants>) {
+}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
+  VariantProps<typeof toggleGroupVariants>) {
   return (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"

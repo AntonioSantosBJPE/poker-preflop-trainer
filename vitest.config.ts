@@ -6,12 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'node',
-    include: [
-      'src/**/*.test.ts',
-      'src/**/*.spec.ts',
-      'src/**/*.test.tsx',
-      'src/**/*.spec.tsx',
-    ],
+    include: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/**/*.test.tsx', 'src/**/*.spec.tsx'],
     setupFiles: ['src/renderer/src/test/setup.ts'],
   },
   resolve: {
