@@ -4,6 +4,7 @@ import { and, asc, eq, inArray, max, sql } from 'drizzle-orm'
 import { actions, rangeCells, sessionHands, situations, trainingSessions } from '../db/schema'
 import { getDb } from '../db/client'
 import { requireUserId } from '../services/session'
+import { buildSingleSessionContext } from '../services/trainingSessionContext'
 import { parseTrainingStartSession } from '@shared/forms/trainingSchemas'
 import { evaluateTrainingAnswer, handToGridCell } from '@shared/poker/grid'
 import type { RankChar, SuitChar } from '@shared/constants'
@@ -74,12 +75,16 @@ export function registerTrainingIpc(): void {
       if (detectedGroupId !== parsed.groupId) {
         throw new Error('groupId não corresponde ao grupo das situações selecionadas')
       }
+      const sessionContext = buildSingleSessionContext()
       const now = new Date()
       const inserted = await db
         .insert(trainingSessions)
         .values({
           userId,
           groupId: parsed.groupId,
+          sessionType: sessionContext.sessionType,
+          sessionBlockId: sessionContext.sessionBlockId,
+          simultaneousTableCount: sessionContext.simultaneousTableCount,
           startedAt: now,
           finishedAt: null,
           totalHands: parsed.totalHands,

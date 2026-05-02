@@ -42,7 +42,7 @@ test.describe('Treino — seleção por grupo', () => {
     await createSituationMinimal(appPage, sit2, group2)
 
     const errorThrown = await appPage.evaluate(
-      async ({ n1, n2 }) => {
+      async ({ n1, n2 }: { n1: string; n2: string }) => {
         try {
           const sits = await window.api.situations.list()
           const s1 = sits.find((s) => s.name === n1)

@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures'
+import type { Dialog } from '@playwright/test'
 import { registerAccount } from '../helpers/auth'
 import { uniqueGroupName, uniqueUserCredentials } from '../helpers/credentials'
 import { createGroup } from '../helpers/group'
@@ -24,7 +25,7 @@ test.describe('Grupos — CRUD', () => {
     await expect(appPage.getByText(groupName)).not.toBeVisible()
 
     const renamedCard = appPage.getByTestId('group-card').filter({ hasText: renamedName })
-    appPage.once('dialog', (dialog) => dialog.accept())
+    appPage.once('dialog', (dialog: Dialog) => dialog.accept())
     await renamedCard.getByTestId('group-archive-btn').click()
     await expect(appPage.getByText(renamedName)).not.toBeVisible()
   })

@@ -21,7 +21,12 @@
     "test:e2e": "playwright test",
     "test:e2e:ci": "pnpm build:app && playwright test",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "lint": "eslint .",
+    "lint:tests": "pnpm lint:tests:eslint && pnpm lint:tests:types",
+    "lint:tests:fix": "pnpm lint:tests:eslint --fix && pnpm lint:tests:types",
+    "lint:tests:eslint": "eslint --no-error-on-unmatched-pattern \"src/**/*.test.ts\" \"src/**/*.spec.ts\" \"e2e/**/*.ts\"",
+    "lint:tests:types": "tsc --noEmit -p tsconfig.e2e.json"
   },
   "dependencies": {
     "@fontsource/fraunces": "5.2.9",

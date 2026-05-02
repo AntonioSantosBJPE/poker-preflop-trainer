@@ -1,4 +1,12 @@
-import type { GroupSummaryDto, SituationSummaryDto } from '@shared/ipc/types'
+import type {
+  GroupSummaryDto,
+  SituationSummaryDto,
+  StatsBySituationRowDto,
+  StatsFilters,
+  StatsOverviewDto,
+  StatsTimelinePointDto,
+  StatsWorstHandRowDto
+} from '@shared/ipc/types'
 
 export type FeedbackMode = 'IMMEDIATE' | 'END_OF_SESSION'
 
@@ -61,10 +69,10 @@ export type Api = {
     }) => Promise<{ sessionIds: number[] }>
   }
   stats: {
-    overview: (filters?: unknown) => Promise<unknown>
-    bySituation: (filters?: unknown) => Promise<unknown>
-    timeline: (filters?: unknown) => Promise<unknown>
-    worstHands: (filters: unknown, limit: number) => Promise<unknown>
+    overview: (filters?: StatsFilters) => Promise<StatsOverviewDto>
+    bySituation: (filters?: StatsFilters) => Promise<StatsBySituationRowDto[]>
+    timeline: (filters?: StatsFilters) => Promise<StatsTimelinePointDto[]>
+    worstHands: (filters: StatsFilters | undefined, limit: number) => Promise<StatsWorstHandRowDto[]>
   }
 }
 

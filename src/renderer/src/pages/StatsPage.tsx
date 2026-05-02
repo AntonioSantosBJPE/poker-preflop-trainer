@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react'
-import type { GroupSummaryDto } from '@shared/ipc/types'
+import type {
+  GroupSummaryDto,
+  SimultaneousTableCount,
+  StatsBySituationRowDto,
+  StatsFilters,
+  StatsOverviewDto,
+  StatsTimelinePointDto,
+  StatsWorstHandRowDto
+} from '@shared/ipc/types'
 import {
   CartesianGrid,
   Line,
@@ -15,12 +23,17 @@ export function StatsPage(): React.ReactElement {
   const chart = useChartPalette()
   const [groups, setGroups] = useState<GroupSummaryDto[]>([])
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
-  const [overview, setOverview] = useState({ sessions: 0, hands: 0, accuracy: 0, avgResponseMs: 0 })
-  const [timeline, setTimeline] = useState<{ date: string; accuracy: number; avgTimeMs: number }[]>([])
-  const [bySit, setBySit] = useState<
-    { situationId: number; name: string; position: string; accuracy: number; avgResponseMs: number }[]
-  >([])
-  const [worst, setWorst] = useState<{ label: string; count: number }[]>([])
+  const [sessionType, setSessionType] = useState<'all' | 'single' | 'simultaneous'>('all')
+  const [simultaneousTableCount, setSimultaneousTableCount] = useState<'' | `${SimultaneousTableCount}`>('')
+  const [overview, setOverview] = useState<StatsOverviewDto>({
+    sessions: 0,
+    hands: 0,
+    accuracy: 0,
+    avgResponseMs: 0
+  })
+  const [timeline, setTimeline] = useState<StatsTimelinePointDto[]>([])
+  const [bySit, setBySit] = useState<StatsBySituationRowDto[]>([])
+  const [worst, setWorst] = useState<StatsWorstHandRowDto[]>([])
 
   useEffect(() => {
     void (async () => {
@@ -30,18 +43,28 @@ export function StatsPage(): React.ReactElement {
   }, [])
 
   useEffect(() => {
+    if (sessionType === 'simultaneous') return
+    setSimultaneousTableCount('')
+  }, [sessionType])
+
+  useEffect(() => {
     void (async () => {
-      const filters = activeGroupId !== null ? { groupId: activeGroupId } : {}
-      const ov = (await window.api.stats.overview(filters)) as typeof overview
+      const filters: StatsFilters = {}
+      if (activeGroupId !== null) filters.groupId = activeGroupId
+      if (sessionType !== 'all') filters.sessionType = sessionType
+      if (sessionType === 'simultaneous' && simultaneousTableCount) {
+        filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount
+      }
+      const ov = await window.api.stats.overview(filters)
       setOverview(ov)
-      const tl = (await window.api.stats.timeline(filters)) as typeof timeline
+      const tl = await window.api.stats.timeline(filters)
       setTimeline(tl)
-      const bs = (await window.api.stats.bySituation(filters)) as typeof bySit
+      const bs = await window.api.stats.bySituation(filters)
       setBySit(bs)
-      const w = (await window.api.stats.worstHands(filters, 15)) as typeof worst
+      const w = await window.api.stats.worstHands(filters, 15)
       setWorst(w)
     })()
-  }, [activeGroupId])
+  }, [activeGroupId, sessionType, simultaneousTableCount])
 
   return (
     <div className="space-y-8">
@@ -84,6 +107,40 @@ export function StatsPage(): React.ReactElement {
             {g.name}
           </button>
         ))}
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        <label className="flex flex-col gap-1 text-sm" htmlFor="stats-session-type">
+          <span className="text-muted-foreground">Tipo de sessão</span>
+          <select
+            id="stats-session-type"
+            data-testid="stats-session-type-filter"
+            className="rounded-lg border border-border bg-background px-3 py-2"
+            value={sessionType}
+            onChange={(event) =>
+              setSessionType(event.currentTarget.value as 'all' | 'single' | 'simultaneous')
+            }
+          >
+            <option value="all">Todos</option>
+            <option value="single">Individual</option>
+            <option value="simultaneous">Simultâneo</option>
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-sm" htmlFor="stats-table-count">
+          <span className="text-muted-foreground">Mesas simultâneas</span>
+          <select
+            id="stats-table-count"
+            data-testid="stats-simultaneous-count-filter"
+            className="rounded-lg border border-border bg-background px-3 py-2 disabled:cursor-not-allowed disabled:opacity-60"
+            value={simultaneousTableCount}
+            onChange={(event) => setSimultaneousTableCount(event.currentTarget.value as '' | '2' | '3' | '4')}
+            disabled={sessionType !== 'simultaneous'}
+          >
+            <option value="">Todas</option>
+            <option value="2">2 mesas</option>
+            <option value="3">3 mesas</option>
+            <option value="4">4 mesas</option>
+          </select>
+        </label>
       </div>
       <div className="grid gap-4 md:grid-cols-4 md:items-stretch">
         <div className="pt-card p-4">

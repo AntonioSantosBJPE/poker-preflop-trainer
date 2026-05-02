@@ -80,6 +80,9 @@ export const trainingSessions = sqliteTable('training_sessions', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   groupId: integer('group_id').references(() => situationGroups.id),
+  sessionType: text('session_type'),
+  sessionBlockId: text('session_block_id'),
+  simultaneousTableCount: integer('simultaneous_table_count'),
   startedAt: integer('started_at', { mode: 'timestamp' }).notNull(),
   finishedAt: integer('finished_at', { mode: 'timestamp' }),
   totalHands: integer('total_hands').notNull(),

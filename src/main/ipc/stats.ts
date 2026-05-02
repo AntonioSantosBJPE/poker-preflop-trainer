@@ -5,6 +5,7 @@ import { getDb } from '../db/client'
 import { requireUserId } from '../services/session'
 import type { Position } from '@shared/constants'
 import type { StatsFilters } from '@shared/ipc/types'
+import { parseStatsFilters } from '@shared/forms/statsSchemas'
 
 function sessionWhereClause(userId: number, filters?: StatsFilters) {
   const parts: ReturnType<typeof eq | typeof gte | typeof lte>[] = [eq(trainingSessions.userId, userId)]
@@ -17,11 +18,18 @@ function sessionWhereClause(userId: number, filters?: StatsFilters) {
   if (filters?.groupId !== undefined) {
     parts.push(eq(trainingSessions.groupId, filters.groupId))
   }
+  if (filters?.sessionType !== undefined) {
+    parts.push(eq(trainingSessions.sessionType, filters.sessionType))
+  }
+  if (filters?.simultaneousTableCount !== undefined) {
+    parts.push(eq(trainingSessions.simultaneousTableCount, filters.simultaneousTableCount))
+  }
   return and(...parts)
 }
 
 export function registerStatsIpc(): void {
-  ipcMain.handle('stats:overview', async (_e, filters?: StatsFilters) => {
+  ipcMain.handle('stats:overview', async (_e, rawFilters?: StatsFilters) => {
+    const filters = parseStatsFilters(rawFilters)
     const userId = await requireUserId()
     const db = getDb()
     const sessions = await db
@@ -50,7 +58,8 @@ export function registerStatsIpc(): void {
     }
   })
 
-  ipcMain.handle('stats:bySituation', async (_e, filters?: StatsFilters) => {
+  ipcMain.handle('stats:bySituation', async (_e, rawFilters?: StatsFilters) => {
+    const filters = parseStatsFilters(rawFilters)
     const userId = await requireUserId()
     const db = getDb()
     const sessions = await db
@@ -100,7 +109,8 @@ export function registerStatsIpc(): void {
     return out
   })
 
-  ipcMain.handle('stats:timeline', async (_e, filters?: StatsFilters) => {
+  ipcMain.handle('stats:timeline', async (_e, rawFilters?: StatsFilters) => {
+    const filters = parseStatsFilters(rawFilters)
     const userId = await requireUserId()
     const db = getDb()
     const sessions = await db
@@ -124,7 +134,8 @@ export function registerStatsIpc(): void {
     return out
   })
 
-  ipcMain.handle('stats:worstHands', async (_e, filters: StatsFilters | undefined, limit: number) => {
+  ipcMain.handle('stats:worstHands', async (_e, rawFilters: StatsFilters | undefined, limit: number) => {
+    const filters = parseStatsFilters(rawFilters)
     const userId = await requireUserId()
     const db = getDb()
     const sessions = await db

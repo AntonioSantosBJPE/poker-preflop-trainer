@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures'
+import type { Dialog } from '@playwright/test'
 import { registerAccount } from './helpers/auth'
 import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials'
 import { createGroup } from './helpers/group'
@@ -47,7 +48,7 @@ test.describe('Situações', () => {
 
     const copyRow = appPage.getByRole('row').filter({ hasText: `Cópia de ${name}` })
     await expect(copyRow).toBeVisible()
-    appPage.once('dialog', async (dialog) => {
+    appPage.once('dialog', async (dialog: Dialog) => {
       await dialog.accept()
     })
     await copyRow.getByRole('button', { name: 'Arquivar' }).click()

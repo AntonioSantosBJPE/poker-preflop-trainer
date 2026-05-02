@@ -50,6 +50,9 @@ export type SimultaneousTrainingStartResult = {
 
 export type CardDto = { rank: RankChar; suit: SuitChar }
 
+export type SessionType = 'single' | 'simultaneous'
+export type SimultaneousTableCount = 2 | 3 | 4
+
 export type DealHandResult = {
   situationId: number
   card1: CardDto
@@ -63,4 +66,34 @@ export type StatsFilters = {
   fromTs?: number
   toTs?: number
   positions?: Position[]
+  sessionType?: SessionType
+  simultaneousTableCount?: SimultaneousTableCount
+}
+
+export type StatsOverviewDto = {
+  sessions: number
+  hands: number
+  accuracy: number
+  avgResponseMs: number
+}
+
+export type StatsTimelinePointDto = {
+  date: string
+  accuracy: number
+  avgTimeMs: number
+}
+
+export type StatsBySituationRowDto = {
+  situationId: number
+  name: string
+  position: Position
+  accuracy: number
+  avgResponseMs: number
+}
+
+export type StatsWorstHandRowDto = {
+  label: string
+  count: number
+  situationId: number
+  chosenActionId: number | null
 }

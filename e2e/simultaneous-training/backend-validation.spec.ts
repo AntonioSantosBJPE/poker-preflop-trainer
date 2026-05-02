@@ -13,7 +13,7 @@ test.describe('Treino simultâneo — validação backend', () => {
     await createGroup(appPage, groupName)
     await createSituationMinimal(appPage, situationName, groupName)
 
-    const errors = await appPage.evaluate(async ({ groupName, situationName }) => {
+    const errors = await appPage.evaluate(async ({ groupName, situationName }: { groupName: string; situationName: string }) => {
       const groups = await window.api.groups.list()
       const group = groups.find((g) => g.name === groupName)
       if (!group) return ['missing group']

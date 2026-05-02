@@ -3,6 +3,7 @@ import { and, eq, inArray } from 'drizzle-orm'
 import { getDb } from '../db/client'
 import { situations, trainingSessions } from '../db/schema'
 import { requireUserId } from '../services/session'
+import { buildSimultaneousSessionContext } from '../services/trainingSessionContext'
 import { parseSimultaneousTrainingStart } from '@shared/forms/trainingSchemas'
 
 export function registerSimultaneousTrainingIpc(): void {
@@ -35,27 +36,34 @@ export function registerSimultaneousTrainingIpc(): void {
       throw new Error('groupId não corresponde ao grupo das situações selecionadas')
     }
 
-    const sessionIds: number[] = []
+    const sessionContext = buildSimultaneousSessionContext(parsed.tableCount)
     const now = new Date()
-    for (let i = 0; i < parsed.tableCount; i += 1) {
-      const inserted = await db
-        .insert(trainingSessions)
-        .values({
-          userId,
-          groupId: parsed.groupId,
-          startedAt: now,
-          finishedAt: null,
-          totalHands: parsed.totalHands,
-          timerSeconds: parsed.timerSeconds,
-          feedbackMode: parsed.feedbackMode,
-          situationIdsJson: JSON.stringify(parsed.situationIds)
-        })
-        .returning({ id: trainingSessions.id })
-        .all()
-      const sessionId = inserted[0]?.id
-      if (!sessionId) throw new Error('Falha ao iniciar sessão simultânea')
-      sessionIds.push(sessionId)
-    }
+    const sessionIds = db.transaction((tx) => {
+      const createdIds: number[] = []
+      for (let i = 0; i < parsed.tableCount; i += 1) {
+        const inserted = tx
+          .insert(trainingSessions)
+          .values({
+            userId,
+            groupId: parsed.groupId,
+            sessionType: sessionContext.sessionType,
+            sessionBlockId: sessionContext.sessionBlockId,
+            simultaneousTableCount: sessionContext.simultaneousTableCount,
+            startedAt: now,
+            finishedAt: null,
+            totalHands: parsed.totalHands,
+            timerSeconds: parsed.timerSeconds,
+            feedbackMode: parsed.feedbackMode,
+            situationIdsJson: JSON.stringify(parsed.situationIds)
+          })
+          .returning({ id: trainingSessions.id })
+          .all()
+        const sessionId = inserted[0]?.id
+        if (!sessionId) throw new Error('Falha ao iniciar sessão simultânea')
+        createdIds.push(sessionId)
+      }
+      return createdIds
+    })
 
     return { sessionIds }
   })
