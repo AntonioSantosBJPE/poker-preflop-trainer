@@ -2,6 +2,8 @@ import { ACTION_TYPES } from '@shared/constants';
 import type { FieldErrors, UseFormGetValues, UseFormRegister } from 'react-hook-form';
 import type { FieldArrayWithId } from 'react-hook-form';
 import type { SituationEditorFormValues } from '@shared/forms/situationSchemas';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 type SituationActionField = FieldArrayWithId<SituationEditorFormValues, 'actions', 'id'>;
 
@@ -54,13 +56,9 @@ export function SituationActionsEditor({
           >
             Limpar tudo
           </button>
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline"
-            onClick={onAddAction}
-          >
+          <Button type="button" variant="link" size="sm" className="px-0" onClick={onAddAction}>
             + Adicionar
-          </button>
+          </Button>
         </div>
       </div>
       {errors.actions && typeof errors.actions === 'object' && 'message' in errors.actions && (
@@ -85,14 +83,14 @@ export function SituationActionsEditor({
                   : 'border border-border bg-muted/40',
               ].join(' ')}
             >
-              <input
-                className="pt-input mt-0 min-w-30 flex-1 py-1 text-sm"
+              <Input
+                className="mt-0 min-w-30 flex-1 py-1 text-sm"
                 aria-invalid={errors.actions?.[index]?.name ? true : undefined}
                 {...register(`actions.${index}.name`)}
               />
               <input type="hidden" {...register(`actions.${index}.clientKey`)} />
               <select
-                className="pt-input mt-0 w-auto py-1 text-sm"
+                className="h-9 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 {...register(`actions.${index}.actionType`)}
               >
                 {ACTION_TYPES.map((actionType) => (
@@ -101,11 +99,11 @@ export function SituationActionsEditor({
                   </option>
                 ))}
               </select>
-              <input
+              <Input
                 type="number"
                 step="0.1"
                 placeholder="BB"
-                className="pt-input mt-0 w-24 py-1 text-sm"
+                className="mt-0 w-24 py-1 text-sm"
                 aria-invalid={errors.actions?.[index]?.sizeBb ? true : undefined}
                 {...register(`actions.${index}.sizeBb`, {
                   setValueAs: (value) => {

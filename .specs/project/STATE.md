@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-02 (shadcn-ui-migration bloco 2 concluído com suíte completa verde)
+**Última actualização:** 2026-05-02 (shadcn-ui-migration bloco 4 concluído — feature fechada com suíte completa verde)
 
 ## Decisões
 
@@ -22,7 +22,7 @@
 | -------------------------------------- | ---------- | ------------------------------------------------------------------------------------ |
 | situation-groups (GRP-01..16)          | 2026-05-01 | 25 tasks, 65 unit tests, 8 E2E novos (38 total)                                      |
 | situation-range-editor (SRANGE-01..04) | 2026-05-01 | T1 fold implícito shared; T2 N/A (parse no main); T3 `RangeGrid13` min 36px + scroll |
-| shadcn-ui-migration (blocos 0, 1 e 2)  | 2026-05-02 | Fundação shadcn + CRUD/editor modularizados + gates E2E e `pnpm test` verdes         |
+| shadcn-ui-migration (blocos 0, 1, 2, 3 e 4) | 2026-05-02 | Fundação shadcn + CRUD/editor modularizados + treino/simultâneo + stats + remoção .pt-* + gates E2E e `pnpm test` verdes |
 
 ## Blockers Activos
 

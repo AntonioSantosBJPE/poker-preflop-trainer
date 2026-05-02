@@ -1,6 +1,6 @@
 # Migracao para shadcn/ui e sistema de componentes compartilhados - Tasks
 
-**Status:** Draft  
+**Status:** Implemented  
 **Spec:** `spec.md`  
 **Design:** `design.md`  
 **Requisitos foco:** SHUI-01 a SHUI-18

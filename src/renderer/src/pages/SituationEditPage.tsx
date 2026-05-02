@@ -11,6 +11,7 @@ import { countCombosForCell } from '@shared/poker/grid';
 import type { RangeCellEdit } from '../components/grid/RangeGrid13';
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { RangeEditorPanel, SituationActionsEditor, SituationForm } from '@/components/situations';
+import { Button } from '@/components/ui/button';
 
 function uid(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -253,10 +254,10 @@ export function SituationEditPage(): React.ReactElement {
       noValidate
     >
       <div className="flex items-center justify-between gap-4">
-        <h1 className="pt-page-title">{isNew ? 'Nova situação' : 'Editar situação'}</h1>
-        <button type="submit" className="pt-btn-primary">
-          Salvar
-        </button>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          {isNew ? 'Nova situação' : 'Editar situação'}
+        </h1>
+        <Button type="submit">Salvar</Button>
       </div>
       {errors.root?.message && (
         <p className="text-sm text-destructive" role="alert">

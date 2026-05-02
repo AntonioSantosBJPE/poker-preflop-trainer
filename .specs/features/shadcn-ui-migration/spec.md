@@ -14,12 +14,12 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ## Goals
 
-- [ ] Inicializar `shadcn/ui` no renderer atual, preservando a identidade visual ja estabelecida em `src/renderer/src/index.css`.
-- [ ] Substituir gradualmente wrappers locais e markup repetido por componentes `shadcn/ui` e compostos internos reutilizaveis.
-- [ ] Reduzir a responsabilidade de renderizacao das paginas, movendo blocos visuais e interativos para componentes menores, coesos e testaveis.
-- [ ] Adotar padroes de composicao coerentes com `vercel-composition-patterns`, evitando proliferacao de boolean props e render APIs acopladas.
-- [ ] Garantir cobertura de testes por camada: manter E2E para fluxos completos e adicionar testes unitarios para cada componente/hook/provider extraido.
-- [ ] Executar a migracao pagina por pagina, sem regressao funcional em autenticacao, grupos, situacoes, treino, treino simultaneo e estatisticas.
+- [x] Inicializar `shadcn/ui` no renderer atual, preservando a identidade visual ja estabelecida em `src/renderer/src/index.css`.
+- [x] Substituir gradualmente wrappers locais e markup repetido por componentes `shadcn/ui` e compostos internos reutilizaveis.
+- [x] Reduzir a responsabilidade de renderizacao das paginas, movendo blocos visuais e interativos para componentes menores, coesos e testaveis.
+- [x] Adotar padroes de composicao coerentes com `vercel-composition-patterns`, evitando proliferacao de boolean props e render APIs acopladas.
+- [x] Garantir cobertura de testes por camada: manter E2E para fluxos completos e adicionar testes unitarios para cada componente/hook/provider extraido.
+- [x] Executar a migracao pagina por pagina, sem regressao funcional em autenticacao, grupos, situacoes, treino, treino simultaneo e estatisticas.
 
 ## Out of Scope
 
@@ -209,28 +209,28 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 
 ## Requirement Traceability
 
-| Requirement ID | Story                                                                              | Phase  | Status  |
-| -------------- | ---------------------------------------------------------------------------------- | ------ | ------- |
-| SHUI-01        | P1: inicializar `shadcn/ui` no renderer                                            | Design | Pending |
-| SHUI-02        | P1: preservar tokens semanticos e identidade visual                                | Design | Pending |
-| SHUI-03        | P1: habilitar testes DOM no renderer                                               | Design | Pending |
-| SHUI-04        | P1: estabelecer convencoes de pastas/imports para UI compartilhada                 | Design | Pending |
-| SHUI-05        | P1: criar compostos compartilhados para page header/cards/empty states             | Design | Pending |
-| SHUI-06        | P1: substituir confirmacoes destrutivas por overlays acessiveis                    | Design | Pending |
-| SHUI-07        | P1: padronizar formularios com `shadcn/ui`                                         | Design | Pending |
-| SHUI-08        | P1: migrar CRUD de grupos com paridade comportamental                              | Design | Pending |
-| SHUI-09        | P1: migrar listagem de situacoes com componentes compartilhados                    | Design | Pending |
-| SHUI-10        | P1: modularizar `SituationEditPage` em componentes menores                         | Design | Pending |
-| SHUI-11        | P1: migrar configuracao de treino em variantes explicitas                          | Design | Pending |
-| SHUI-12        | P1: migrar sessoes de treino e overlays associados                                 | Design | Pending |
-| SHUI-13        | P1: migrar treino simultaneo em compostos reutilizaveis                            | Design | Pending |
-| SHUI-14        | P1: migrar resultados e estatisticas com metric cards/charts compartilhados        | Design | Pending |
-| SHUI-15        | P1: adicionar cobertura unitaria aos componentes extraidos                         | Design | Pending |
-| SHUI-16        | P1: preservar e ampliar gates E2E durante a migracao                               | Design | Pending |
-| SHUI-17        | P2: evitar boolean prop proliferation e render props desnecessarias                | Design | Pending |
-| SHUI-18        | P2: adotar compound components/providers locais quando houver estado compartilhado | Design | Pending |
+| Requirement ID | Story                                                                              | Phase       | Status   |
+| -------------- | ---------------------------------------------------------------------------------- | ----------- | -------- |
+| SHUI-01        | P1: inicializar `shadcn/ui` no renderer                                            | Implemented | Verified |
+| SHUI-02        | P1: preservar tokens semanticos e identidade visual                                | Implemented | Verified |
+| SHUI-03        | P1: habilitar testes DOM no renderer                                               | Implemented | Verified |
+| SHUI-04        | P1: estabelecer convencoes de pastas/imports para UI compartilhada                 | Implemented | Verified |
+| SHUI-05        | P1: criar compostos compartilhados para page header/cards/empty states             | Implemented | Verified |
+| SHUI-06        | P1: substituir confirmacoes destrutivas por overlays acessiveis                    | Implemented | Verified |
+| SHUI-07        | P1: padronizar formularios com `shadcn/ui`                                         | Implemented | Verified |
+| SHUI-08        | P1: migrar CRUD de grupos com paridade comportamental                              | Implemented | Verified |
+| SHUI-09        | P1: migrar listagem de situacoes com componentes compartilhados                    | Implemented | Verified |
+| SHUI-10        | P1: modularizar `SituationEditPage` em componentes menores                         | Implemented | Verified |
+| SHUI-11        | P1: migrar configuracao de treino em variantes explicitas                          | Implemented | Verified |
+| SHUI-12        | P1: migrar sessoes de treino e overlays associados                                 | Implemented | Verified |
+| SHUI-13        | P1: migrar treino simultaneo em compostos reutilizaveis                            | Implemented | Verified |
+| SHUI-14        | P1: migrar resultados e estatisticas com metric cards/charts compartilhados        | Implemented | Verified |
+| SHUI-15        | P1: adicionar cobertura unitaria aos componentes extraidos                         | Implemented | Verified |
+| SHUI-16        | P1: preservar e ampliar gates E2E durante a migracao                               | Implemented | Verified |
+| SHUI-17        | P2: evitar boolean prop proliferation e render props desnecessarias                | Implemented | Verified |
+| SHUI-18        | P2: adotar compound components/providers locais quando houver estado compartilhado | Implemented | Verified |
 
-**Coverage:** 18 requisitos totais; 0 mapeados para implementacao ainda; 18 aguardando design/tasks.
+**Coverage:** 18 requisitos totais; 18 Verified; 0 pendentes.
 
 ---
 
@@ -251,17 +251,17 @@ O objetivo desta feature e migrar o frontend para uma base em `shadcn/ui`, intro
 | T-11 | Done    | 2026-05-02  |
 | T-12 | Done    | 2026-05-02  |
 | T-13 | Done    | 2026-05-02  |
-| T-14 | Pending | -           |
-| T-15 | Pending | -           |
-| T-16 | Pending | -           |
+| T-14 | Done    | 2026-05-02  |
+| T-15 | Done    | 2026-05-02  |
+| T-16 | Done    | 2026-05-02  |
 
 ---
 
 ## Success Criteria
 
-- [ ] O projeto passa a ter `components.json` e base `shadcn/ui` configurada no renderer.
-- [ ] O renderer deixa de depender exclusivamente de E2E para seguranca de UI, passando a ter cobertura unitaria para os componentes extraidos.
-- [ ] Nenhuma pagina principal permanece como monolito de renderizacao equivalente ao baseline atual sem um plano de decomposicao executado.
-- [ ] Fluxos cobertos hoje por Playwright continuam verdes durante e apos a migracao.
-- [ ] O sistema de componentes compartilhados reduz duplicacao entre `TrainingConfigPage`/`SimultaneousTrainingConfigPage`, `TrainingResultPage`/`SimultaneousTrainingSummaryPage`, `SituationsPage`/`GroupDetailPage`, e cards/tabelas/filtros de stats.
-- [ ] Novos componentes seguem uma linguagem de composicao explicita, sem regressao para APIs baseadas em modos booleanos acumulados.
+- [x] O projeto passa a ter `components.json` e base `shadcn/ui` configurada no renderer.
+- [x] O renderer deixa de depender exclusivamente de E2E para seguranca de UI, passando a ter cobertura unitaria para os componentes extraidos.
+- [x] Nenhuma pagina principal permanece como monolito de renderizacao equivalente ao baseline atual sem um plano de decomposicao executado.
+- [x] Fluxos cobertos hoje por Playwright continuam verdes durante e apos a migracao.
+- [x] O sistema de componentes compartilhados reduz duplicacao entre `TrainingConfigPage`/`SimultaneousTrainingConfigPage`, `TrainingResultPage`/`SimultaneousTrainingSummaryPage`, `SituationsPage`/`GroupDetailPage`, e cards/tabelas/filtros de stats.
+- [x] Novos componentes seguem uma linguagem de composicao explicita, sem regressao para APIs baseadas em modos booleanos acumulados.
