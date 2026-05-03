@@ -1,7 +1,8 @@
 # Git Hooks — Husky Tasks
 
 **Spec**: `.specs/features/git-hooks-husky/spec.md`
-**Status**: Approved
+**Status**: Done
+**Commit**: `8dd350e`
 
 ---
 

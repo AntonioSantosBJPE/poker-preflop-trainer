@@ -99,22 +99,22 @@ O repositório não possui proteção alguma em commits e pushes — código que
 
 ## Requirement Traceability
 
-| ID       | Story                                 | Phase | Status  |
-| -------- | ------------------------------------- | ----- | ------- |
-| HUSKY-01 | P1: Pre-commit full check             | Spec  | Pending |
-| HUSKY-02 | P1: Pre-push typecheck + test         | Spec  | Pending |
-| HUSKY-03 | P2: Post-merge auto install + rebuild | Spec  | Pending |
-| HUSKY-04 | P2: Commit-msg conventional commit    | Spec  | Pending |
-| HUSKY-05 | Install husky + hooks via postinstall | Spec  | Pending |
+| ID       | Story                                 | Phase       | Status   |
+| -------- | ------------------------------------- | ----------- | -------- |
+| HUSKY-01 | P1: Pre-commit full check             | Implemented | Verified |
+| HUSKY-02 | P1: Pre-push typecheck + test         | Implemented | Verified |
+| HUSKY-03 | P2: Post-merge auto install + rebuild | Implemented | Verified |
+| HUSKY-04 | P2: Commit-msg conventional commit    | Implemented | Verified |
+| HUSKY-05 | Install husky + hooks via postinstall | Implemented | Verified |
 
-**Coverage:** 5 total, 0 mapped to tasks, 5 unmapped ⚠️
+**Coverage:** 5 total, 5 mapped to tasks, 0 unmapped ✅
 
 ---
 
 ## Success Criteria
 
-- [ ] Desenvolvedor consegue clonar o repo, rodar `pnpm install`, e todos os hooks estão ativos automaticamente
-- [ ] Commit com qualquer erro de lint/type/format é bloqueado na hora
-- [ ] Push com teste falhando ou build quebrada é bloqueado
-- [ ] Pull com mudança de dependências instala/rebuilda automaticamente
-- [ ] Mensagens de commit fora do padrão conventional commit são rejeitadas
+- [x] Desenvolvedor consegue clonar o repo, rodar `pnpm install`, e todos os hooks estão ativos automaticamente (via postinstall)
+- [x] Commit com qualquer erro de lint/type/format é bloqueado na hora
+- [x] Push com teste falhando ou build quebrada é bloqueado
+- [x] Pull com mudança de dependências instala/rebuilda automaticamente
+- [x] Mensagens de commit fora do padrão conventional commit são rejeitadas
