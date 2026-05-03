@@ -140,6 +140,7 @@ describe('HistoryPage', () => {
 
     vi.mocked(window.api.training.listSessions)
       .mockResolvedValueOnce({ items: page1, total: 12, page: 1, pageSize: 10, totalPages: 2 })
+      .mockResolvedValueOnce({ items: page1, total: 12, page: 1, pageSize: 10, totalPages: 2 })
       .mockResolvedValueOnce({ items: page2, total: 12, page: 2, pageSize: 10, totalPages: 2 });
 
     renderHistory();
@@ -227,6 +228,116 @@ describe('HistoryPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('—')).toBeInTheDocument();
+    });
+  });
+
+  it('renders DatePeriodFilter inside FilterToolbar', () => {
+    vi.mocked(window.api.training.listSessions).mockReturnValue(new Promise(() => {}));
+
+    renderHistory();
+
+    expect(screen.getByTestId('date-period-filter')).toBeInTheDocument();
+  });
+
+  it('changing period calls listSessions with fromTs/toTs in filters', async () => {
+    const user = userEvent.setup();
+    vi.mocked(window.api.groups.list).mockResolvedValue([]);
+    vi.mocked(window.api.training.listSessions).mockResolvedValue({
+      items: [sampleSession],
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    });
+
+    renderHistory();
+
+    await waitFor(() => {
+      expect(screen.getByText('Meu Grupo')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('combobox', { name: /período/i }));
+    await user.click(screen.getByRole('option', { name: /Últimos 7 dias/i }));
+
+    await waitFor(() => {
+      expect(window.api.training.listSessions).toHaveBeenLastCalledWith(
+        expect.objectContaining({ fromTs: expect.any(Number), toTs: expect.any(Number) }),
+      );
+    });
+  });
+
+  it('changing period resets page to 1', async () => {
+    const user = userEvent.setup();
+    vi.mocked(window.api.groups.list).mockResolvedValue([]);
+    vi.mocked(window.api.training.listSessions).mockResolvedValue({
+      items: [sampleSession],
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    });
+
+    renderHistory('/history?page=2&fromTs=100&toTs=200');
+
+    await waitFor(() => {
+      expect(screen.getByText('Meu Grupo')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('combobox', { name: /período/i }));
+    await user.click(screen.getByRole('option', { name: /Últimos 30 dias/i }));
+
+    await waitFor(() => {
+      const calls = vi.mocked(window.api.training.listSessions).mock.calls;
+      const lastCall = calls[calls.length - 1][0];
+      expect(lastCall.page).toBe(1);
+      expect(lastCall.fromTs).toBeDefined();
+      expect(lastCall.toTs).toBeDefined();
+    });
+  });
+
+  it('adds fromTs/toTs to query params when period changes', async () => {
+    const user = userEvent.setup();
+    vi.mocked(window.api.groups.list).mockResolvedValue([]);
+    vi.mocked(window.api.training.listSessions).mockResolvedValue({
+      items: [sampleSession],
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    });
+
+    renderHistory('/history?page=2&fromTs=100&toTs=200');
+
+    await waitFor(() => {
+      expect(screen.getByText('Meu Grupo')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('combobox', { name: /período/i }));
+    await user.click(screen.getByRole('option', { name: /Últimos 7 dias/i }));
+
+    await waitFor(() => {
+      expect(window.api.training.listSessions).toHaveBeenLastCalledWith(
+        expect.objectContaining({ page: 1, fromTs: expect.any(Number), toTs: expect.any(Number) }),
+      );
+    });
+  });
+
+  it('loads with fromTs/toTs from URL as initial filter values', async () => {
+    vi.mocked(window.api.groups.list).mockResolvedValue([]);
+    vi.mocked(window.api.training.listSessions).mockResolvedValue({
+      items: [sampleSession],
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    });
+
+    renderHistory('/history?fromTs=1746057600&toTs=1746547200');
+
+    await waitFor(() => {
+      expect(window.api.training.listSessions).toHaveBeenCalledWith(
+        expect.objectContaining({ fromTs: 1746057600, toTs: 1746547200 }),
+      );
     });
   });
 });

@@ -260,6 +260,139 @@ describe('registerHistoryIpc', () => {
       const handler = getHandler('training:listSessions');
       await expect(handler({}, {})).rejects.toThrow('Não autenticado');
     });
+
+    it('filtra por fromTs', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 1700000000 })) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('filtra por toTs', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { toTs: 1800000000 })) as {
+        items: unknown[];
+        total: number;
+      };
+
+      expect(res.total).toBe(0);
+    });
+
+    it('filtra por fromTs e toTs', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 1700000000, toTs: 1800000000 })) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('fromTs=0 é válido (desde o início)', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 0 })) as { total: number };
+      expect(res.total).toBe(0);
+    });
+
+    it('filtros de data combinam com groupId', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 1700000000, groupId: 5 })) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('sem filtros de data mantém compatibilidade', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, {})) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('aceita página padrão quando não fornecida', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, {})) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+    });
   });
 
   describe('training:getSessionDetail', () => {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type {
   GroupSummaryDto,
@@ -7,6 +7,7 @@ import type {
 } from '@shared/ipc/types';
 import { formatDuration } from '@shared/utils/format';
 import {
+  DatePeriodFilter,
   EmptyState,
   EntityTable,
   FilterToolbar,
@@ -71,6 +72,10 @@ export function HistoryPage(): React.ReactElement {
       ? tableCountRaw
       : '__all__';
 
+  const fromTs = searchParams.get('fromTs') ? Number(searchParams.get('fromTs')) : undefined;
+  const toTs = searchParams.get('toTs') ? Number(searchParams.get('toTs')) : undefined;
+  const ignoreInitialFilter = useRef(fromTs !== undefined || toTs !== undefined);
+
   useEffect(() => {
     void (async () => {
       const list = await window.api.groups.list();
@@ -110,16 +115,20 @@ export function HistoryPage(): React.ReactElement {
       groupId?: number;
       sessionType?: 'single' | 'simultaneous';
       simultaneousTableCount?: SimultaneousTableCount;
+      fromTs?: number;
+      toTs?: number;
     } = { page };
     if (activeGroupId !== null) filters.groupId = activeGroupId;
     if (sessionType !== 'all') filters.sessionType = sessionType;
     if (tableCount !== '__all__')
       filters.simultaneousTableCount = Number(tableCount) as SimultaneousTableCount;
+    if (fromTs !== undefined) filters.fromTs = fromTs;
+    if (toTs !== undefined) filters.toTs = toTs;
     void window.api.training.listSessions(filters).then((res) => {
       setData(res);
       setLoading(false);
     });
-  }, [page, activeGroupId, sessionType, tableCount]);
+  }, [page, activeGroupId, sessionType, tableCount, fromTs, toTs]);
 
   const groupTabValue = activeGroupId === null ? 'all' : String(activeGroupId);
 
@@ -149,6 +158,21 @@ export function HistoryPage(): React.ReactElement {
   const handleTableCountChange = useCallback(
     (value: string) => {
       updateParams({ tableCount: value === '__all__' ? null : value, page: null });
+    },
+    [updateParams],
+  );
+
+  const handlePeriodChange = useCallback(
+    (filters: { fromTs?: number; toTs?: number }) => {
+      if (ignoreInitialFilter.current) {
+        ignoreInitialFilter.current = false;
+        return;
+      }
+      updateParams({
+        fromTs: filters.fromTs !== undefined ? String(filters.fromTs) : null,
+        toTs: filters.toTs !== undefined ? String(filters.toTs) : null,
+        page: null,
+      });
     },
     [updateParams],
   );
@@ -221,6 +245,10 @@ export function HistoryPage(): React.ReactElement {
             ))}
           </TabsList>
         </Tabs>
+
+        <div data-testid="date-period-filter">
+          <DatePeriodFilter onChange={handlePeriodChange} />
+        </div>
 
         <FilterToolbarRow>
           <div className="flex min-w-44 flex-col gap-1">

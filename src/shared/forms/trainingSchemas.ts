@@ -54,6 +54,8 @@ export const sessionHistoryFiltersSchema = z.object({
   groupId: z.number().int().positive().optional(),
   sessionType: z.enum(['single', 'simultaneous']).optional(),
   simultaneousTableCount: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  fromTs: z.number().int().nonnegative().optional(),
+  toTs: z.number().int().nonnegative().optional(),
 });
 
 export type SessionHistoryFiltersInput = z.infer<typeof sessionHistoryFiltersSchema>;

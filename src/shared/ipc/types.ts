@@ -204,6 +204,8 @@ export type SessionListResponse = {
 export type SessionHistoryFilters = {
   page?: number;
   groupId?: number;
+  fromTs?: number;
+  toTs?: number;
   sessionType?: SessionType;
   simultaneousTableCount?: SimultaneousTableCount;
 };

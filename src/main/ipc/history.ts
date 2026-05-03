@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 import type { ActionType, Position, RankChar, SuitChar } from '@shared/constants';
 import type { CardDto } from '@shared/ipc/types';
 import type {
@@ -31,8 +31,14 @@ export function registerHistoryIpc(): void {
     const userId = await requireUserId();
     const db = getDb();
 
-    const conditions: ReturnType<typeof eq>[] = [eq(trainingSessions.userId, userId)];
-    conditions.push(sql`${trainingSessions.finishedAt} IS NOT NULL` as ReturnType<typeof eq>);
+    const conditions: ReturnType<typeof eq | typeof gte | typeof lte>[] = [
+      eq(trainingSessions.userId, userId),
+    ];
+    conditions.push(
+      sql`${trainingSessions.finishedAt} IS NOT NULL` as ReturnType<
+        typeof eq | typeof gte | typeof lte
+      >,
+    );
     if (filters.groupId !== undefined) {
       conditions.push(eq(trainingSessions.groupId, filters.groupId));
     }
@@ -41,6 +47,12 @@ export function registerHistoryIpc(): void {
     }
     if (filters.simultaneousTableCount !== undefined) {
       conditions.push(eq(trainingSessions.simultaneousTableCount, filters.simultaneousTableCount));
+    }
+    if (filters.fromTs !== undefined) {
+      conditions.push(gte(trainingSessions.startedAt, new Date(filters.fromTs * 1000)));
+    }
+    if (filters.toTs !== undefined) {
+      conditions.push(lte(trainingSessions.startedAt, new Date(filters.toTs * 1000)));
     }
     const pageSize = 10;
     const page = filters.page;

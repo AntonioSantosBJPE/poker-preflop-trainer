@@ -5,6 +5,7 @@ import {
   parseTrainingStartSession,
   parseSimultaneousTrainingStart,
   simultaneousTrainingStartSchema,
+  sessionHistoryFiltersSchema,
 } from './trainingSchemas';
 
 const validTrainingBase = {
@@ -146,5 +147,46 @@ describe('simultaneousTrainingStartSchema', () => {
     const r = simultaneousTrainingStartSchema.safeParse({ ...validTrainingBase, tableCount: 5 });
     expect(r.success).toBe(false);
     if (!r.success) expect(r.error.issues[0]?.message).toBe('Máximo 4 mesas');
+  });
+});
+
+describe('sessionHistoryFiltersSchema', () => {
+  it('fromTs/toTs são opcionais — omitidos retornam undefined', () => {
+    const r = sessionHistoryFiltersSchema.safeParse({});
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.fromTs).toBeUndefined();
+      expect(r.data.toTs).toBeUndefined();
+    }
+  });
+
+  it('fromTs = 0 (epoch start) é válido', () => {
+    const r = sessionHistoryFiltersSchema.safeParse({ fromTs: 0 });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.fromTs).toBe(0);
+  });
+
+  it('fromTs negativo rejeita', () => {
+    const r = sessionHistoryFiltersSchema.safeParse({ fromTs: -1 });
+    expect(r.success).toBe(false);
+  });
+
+  it('toTs negativo rejeita', () => {
+    const r = sessionHistoryFiltersSchema.safeParse({ toTs: -1 });
+    expect(r.success).toBe(false);
+  });
+
+  it('Ambos fromTs + toTs juntos são válidos', () => {
+    const r = sessionHistoryFiltersSchema.safeParse({ fromTs: 100, toTs: 200 });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.fromTs).toBe(100);
+      expect(r.data.toTs).toBe(200);
+    }
+  });
+
+  it('Valores fracionados (ex: 1.5) rejeitam (int)', () => {
+    const r = sessionHistoryFiltersSchema.safeParse({ fromTs: 1.5 });
+    expect(r.success).toBe(false);
   });
 });

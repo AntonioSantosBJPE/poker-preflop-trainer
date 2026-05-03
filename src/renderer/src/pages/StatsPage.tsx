@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   GroupSummaryDto,
   SimultaneousTableCount,
@@ -18,6 +18,7 @@ import {
   YAxis,
 } from 'recharts';
 import {
+  DatePeriodFilter,
   EmptyState,
   EntityTable,
   FilterToolbar,
@@ -54,6 +55,13 @@ export function StatsPage(): React.ReactElement {
   const [timeline, setTimeline] = useState<StatsTimelinePointDto[]>([]);
   const [bySituation, setBySituation] = useState<StatsBySituationRowDto[]>([]);
   const [worstHands, setWorstHands] = useState<StatsWorstHandRowDto[]>([]);
+  const [fromTs, setFromTs] = useState<number | undefined>(undefined);
+  const [toTs, setToTs] = useState<number | undefined>(undefined);
+
+  const handleDatePeriodChange = useCallback((dateFilters: { fromTs?: number; toTs?: number }) => {
+    setFromTs(dateFilters.fromTs);
+    setToTs(dateFilters.toTs);
+  }, []);
 
   useEffect(() => {
     void (async () => {
@@ -75,12 +83,14 @@ export function StatsPage(): React.ReactElement {
       if (sessionType === 'simultaneous' && simultaneousTableCount !== '__all__') {
         filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount;
       }
+      if (fromTs !== undefined) filters.fromTs = fromTs;
+      if (toTs !== undefined) filters.toTs = toTs;
       setOverview(await window.api.stats.overview(filters));
       setTimeline(await window.api.stats.timeline(filters));
       setBySituation(await window.api.stats.bySituation(filters));
       setWorstHands(await window.api.stats.worstHands(filters, 15));
     })();
-  }, [activeGroupId, sessionType, simultaneousTableCount]);
+  }, [activeGroupId, sessionType, simultaneousTableCount, fromTs, toTs]);
 
   const groupTabValue = activeGroupId === null ? 'all' : String(activeGroupId);
 
@@ -146,6 +156,10 @@ export function StatsPage(): React.ReactElement {
             ))}
           </TabsList>
         </Tabs>
+
+        <div data-testid="stats-date-filter">
+          <DatePeriodFilter onChange={handleDatePeriodChange} />
+        </div>
 
         <FilterToolbarRow>
           <div className="flex min-w-52 flex-col gap-1">

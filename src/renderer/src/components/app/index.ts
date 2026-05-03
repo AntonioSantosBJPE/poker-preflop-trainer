@@ -1,5 +1,6 @@
 export * from '@/components/app/AppSidebar';
 export * from '@/components/app/ConfirmActionDialog';
+export * from '@/components/app/DatePeriodFilter';
 export * from '@/components/app/EmptyState';
 export * from '@/components/app/EntityTable';
 export * from '@/components/app/FilterToolbar';
