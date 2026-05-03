@@ -192,7 +192,7 @@ describe('Profile route and shell entry', () => {
     expect(window.api.profile.updatePreferences).toHaveBeenCalledWith({ theme: 'light' });
 
     await user.click(await screen.findByRole('link', { name: 'Perfil' }));
-    expect(await screen.findByRole('combobox', { name: 'Tema', exact: true })).toHaveTextContent(
+    expect(await screen.findByRole('combobox', { name: 'Tema' })).toHaveTextContent(
       'Claro',
     );
   });
