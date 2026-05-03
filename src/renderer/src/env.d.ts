@@ -1,16 +1,22 @@
 import type {
+  AuthSessionDto,
   GroupSummaryDto,
+  SessionDetailDto,
+  SessionHistoryFilters,
+  SessionListResponse,
   SituationSummaryDto,
   StatsBySituationRowDto,
   StatsFilters,
   StatsOverviewDto,
   StatsTimelinePointDto,
   StatsWorstHandRowDto,
+  UserPreferencesPatchDto,
 } from '@shared/ipc/types';
 
 export type FeedbackMode = 'IMMEDIATE' | 'END_OF_SESSION';
 
-export type ApiUser = { id: number; name: string; email: string };
+export type ApiUser = AuthSessionDto['user'];
+export type ApiUserPreferences = AuthSessionDto['preferences'];
 
 export type Api = {
   auth: {
@@ -19,9 +25,17 @@ export type Api = {
       email: string,
       password: string,
     ) => Promise<{ userId: number; name: string; email: string }>;
-    login: (email: string, password: string) => Promise<{ token: string; user: ApiUser }>;
+    login: (
+      email: string,
+      password: string,
+    ) => Promise<{ token: string; user: ApiUser; preferences: ApiUserPreferences }>;
     logout: () => Promise<void>;
-    me: () => Promise<{ user: ApiUser } | null>;
+    me: () => Promise<AuthSessionDto | null>;
+  };
+  profile: {
+    updateName: (name: string) => Promise<AuthSessionDto>;
+    changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+    updatePreferences: (payload: UserPreferencesPatchDto) => Promise<AuthSessionDto>;
   };
   groups: {
     list: () => Promise<GroupSummaryDto[]>;
@@ -61,6 +75,8 @@ export type Api = {
     }) => Promise<{ isCorrect: boolean; correctActions: number[]; responseMs: number }>;
     finishSession: (sessionId: number) => Promise<unknown>;
     getSessionResult: (sessionId: number) => Promise<unknown>;
+    listSessions: (filters: SessionHistoryFilters) => Promise<SessionListResponse>;
+    getSessionDetail: (sessionId: number) => Promise<SessionDetailDto>;
   };
   simultaneousTraining: {
     startSession: (config: {

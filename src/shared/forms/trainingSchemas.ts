@@ -48,3 +48,22 @@ export function parseSimultaneousTrainingStart(raw: unknown): SimultaneousTraini
   }
   return r.data;
 }
+
+export const sessionHistoryFiltersSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  groupId: z.number().int().positive().optional(),
+  sessionType: z.enum(['single', 'simultaneous']).optional(),
+  simultaneousTableCount: z
+    .union([z.literal(2), z.literal(3), z.literal(4)])
+    .optional(),
+});
+
+export type SessionHistoryFiltersInput = z.infer<typeof sessionHistoryFiltersSchema>;
+
+export function parseSessionHistoryFilters(raw: unknown): SessionHistoryFiltersInput {
+  const r = sessionHistoryFiltersSchema.safeParse(raw);
+  if (!r.success) {
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
+  }
+  return r.data;
+}

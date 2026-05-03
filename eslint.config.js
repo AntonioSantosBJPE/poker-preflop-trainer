@@ -2,7 +2,14 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['node_modules/**', 'out/**', 'test-results/**'],
+    ignores: [
+      'node_modules/**',
+      'out/**',
+      'test-results/**',
+      'coverage/**',
+      '.specs/**',
+      '.agents/**',
+    ],
   },
   ...tseslint.configs.recommended,
   {

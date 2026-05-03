@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PageHeader, StatCard } from '@/components/app';
+import { Button } from '@/components/ui/button';
 import { useAuthStore } from '../stores/auth';
 
 export function DashboardPage(): React.ReactElement {
@@ -22,31 +24,16 @@ export function DashboardPage(): React.ReactElement {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <h1 className="pt-page-title">Olá, {user?.name}</h1>
+    <div className="flex flex-col gap-8">
+      <PageHeader title={`Olá, ${user?.name ?? ''}`} />
       <div className="grid gap-4 md:grid-cols-3 md:items-stretch">
-        <div className="pt-card flex flex-col justify-between p-5">
-          <p className="text-sm text-muted-foreground">Situações ativas</p>
-          <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">
-            {counts.situations}
-          </p>
-        </div>
-        <div className="pt-card flex flex-col justify-between p-5">
-          <p className="text-sm text-muted-foreground">Sessões de treino</p>
-          <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">
-            {counts.sessions}
-          </p>
-        </div>
-        <div className="pt-card flex flex-col justify-between p-5">
-          <p className="text-sm text-muted-foreground">Acerto geral</p>
-          <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">
-            {(counts.accuracy * 100).toFixed(1)}%
-          </p>
-        </div>
+        <StatCard label="Situações ativas" value={counts.situations} />
+        <StatCard label="Sessões de treino" value={counts.sessions} />
+        <StatCard label="Acerto geral" value={`${(counts.accuracy * 100).toFixed(1)}%`} />
       </div>
-      <Link to="/training" className="pt-btn-primary inline-flex px-6 py-3 text-base">
-        Treinar agora
-      </Link>
+      <Button asChild size="lg" className="w-fit px-6 text-base">
+        <Link to="/training">Treinar agora</Link>
+      </Button>
     </div>
   );
 }

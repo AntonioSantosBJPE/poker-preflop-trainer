@@ -23,6 +23,10 @@
   --color-muted-foreground: rgb(var(--muted-foreground));
   --color-card: rgb(var(--card));
   --color-card-foreground: rgb(var(--card-foreground));
+  --color-popover: rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
   --color-chart-1: rgb(var(--chart-1));
   --color-chart-2: rgb(var(--chart-2));
   --color-felt-empty: rgb(var(--felt-empty));
@@ -34,8 +38,12 @@
     --foreground: 26 46 38;
     --card: 250 248 244;
     --card-foreground: 26 46 38;
+    --popover: 250 248 244;
+    --popover-foreground: 26 46 38;
     --muted: 235 230 220;
     --muted-foreground: 74 92 84;
+    --accent: 235 230 220;
+    --accent-foreground: 26 46 38;
     --border: 212 207 195;
     --input: 212 207 195;
     --primary: 139 105 20;
@@ -53,8 +61,12 @@
     --foreground: 232 240 236;
     --card: 20 41 32;
     --card-foreground: 232 240 236;
+    --popover: 20 41 32;
+    --popover-foreground: 232 240 236;
     --muted: 30 53 48;
     --muted-foreground: 156 184 174;
+    --accent: 30 53 48;
+    --accent-foreground: 232 240 236;
     --border: 42 74 62;
     --input: 42 74 62;
     --primary: 201 162 39;
@@ -81,40 +93,5 @@
   h2,
   h3 {
     font-family: Fraunces, Georgia, serif;
-  }
-}
-
-@layer components {
-  .pt-input {
-    @apply mt-1 w-full rounded-md border border-border bg-muted px-3 py-2 text-foreground shadow-sm transition-colors;
-    @apply placeholder:text-muted-foreground;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
-  }
-
-  .pt-input[aria-invalid='true'] {
-    @apply border-destructive;
-  }
-
-  .pt-btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors;
-    @apply hover:brightness-110 active:brightness-95;
-    @apply disabled:pointer-events-none disabled:opacity-40;
-  }
-
-  .pt-btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors;
-    @apply hover:bg-muted;
-  }
-
-  .pt-card {
-    @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
-  }
-
-  .pt-page-title {
-    @apply font-display text-2xl font-semibold tracking-tight text-foreground;
-  }
-
-  .pt-label {
-    @apply block text-sm text-muted-foreground;
   }
 }

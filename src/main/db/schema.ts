@@ -11,6 +11,28 @@ export const users = sqliteTable('users', {
     .default(sql`(unixepoch())`),
 });
 
+export const userPreferences = sqliteTable(
+  'user_preferences',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    theme: text('theme'),
+    defaultTrainingTotalHands: integer('default_training_total_hands'),
+    defaultTrainingTimerSeconds: integer('default_training_timer_seconds'),
+    defaultTrainingFeedbackMode: text('default_training_feedback_mode'),
+    defaultSimultaneousTableCount: integer('default_simultaneous_table_count'),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [uniqueIndex('uq_user_preferences_user_id').on(t.userId)],
+);
+
 export const situationGroups = sqliteTable(
   'situation_groups',
   {
@@ -109,10 +131,18 @@ export const sessionHands = sqliteTable('session_hands', {
   handIndex: integer('hand_index').notNull(),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   situations: many(situations),
   situationGroups: many(situationGroups),
   trainingSessions: many(trainingSessions),
+  preferences: one(userPreferences, {
+    fields: [users.id],
+    references: [userPreferences.userId],
+  }),
+}));
+
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+  user: one(users, { fields: [userPreferences.userId], references: [users.id] }),
 }));
 
 export const situationGroupsRelations = relations(situationGroups, ({ one, many }) => ({

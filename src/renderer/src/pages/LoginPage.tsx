@@ -3,6 +3,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { createAuthFormSchema, type AuthFormFields } from '@shared/forms/authSchemas';
+import { FormField, PasswordField } from '@/components/forms';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { useAuthStore } from '../stores/auth';
 
 type AuthTab = 'login' | 'register';
@@ -20,7 +24,7 @@ function ipcErrorMessage(err: unknown): string {
 export function LoginPage(): React.ReactElement {
   const [tab, setTab] = useState<AuthTab>('login');
   const navigate = useNavigate();
-  const setUser = useAuthStore((s) => s.setUser);
+  const applySessionSnapshot = useAuthStore((s) => s.applySessionSnapshot);
 
   const resolver = useMemo(() => zodResolver(createAuthFormSchema(tab)), [tab]);
 
@@ -56,7 +60,7 @@ export function LoginPage(): React.ReactElement {
         await window.api.auth.register(values.name!.trim(), values.email, values.password);
       }
       const res = await window.api.auth.login(values.email, values.password);
-      setUser(res.user);
+      applySessionSnapshot({ user: res.user, preferences: res.preferences });
       navigate('/');
     } catch (err) {
       setError('root', { message: ipcErrorMessage(err) });
@@ -72,115 +76,86 @@ export function LoginPage(): React.ReactElement {
           className="h-14 w-auto max-w-[280px] object-contain dark:brightness-[1.06]"
         />
       </div>
-      <div className="pt-card w-full max-w-md space-y-6 p-8 shadow-lg">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            Preflop Trainer
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Treino offline de ranges pré-flop NLHE 6-max.
-          </p>
-        </div>
-        <div className="mb-6 flex gap-2">
-          <button
-            type="button"
-            data-testid="auth-tab-login"
-            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-              tab === 'login'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
-            onClick={() => setTab('login')}
-          >
-            Entrar
-          </button>
-          <button
-            type="button"
-            data-testid="auth-tab-register"
-            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-              tab === 'register'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
-            onClick={() => setTab('register')}
-          >
-            Criar conta
-          </button>
-        </div>
-        <form className="space-y-4" onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
-          {tab === 'register' && (
-            <div>
-              <label htmlFor="auth-name" className="pt-label">
-                Nome
-              </label>
-              <input
-                id="auth-name"
-                autoComplete="name"
-                className="pt-input"
-                aria-invalid={errors.name ? true : undefined}
-                aria-describedby={errors.name ? 'auth-name-error' : undefined}
-                {...register('name')}
-              />
-              {errors.name && (
-                <p id="auth-name-error" className="mt-1 text-sm text-destructive" role="alert">
-                  {errors.name.message}
-                </p>
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col gap-1">
+            <h1 className="font-display text-2xl font-semibold leading-none">Preflop Trainer</h1>
+            <CardDescription>Treino offline de ranges pré-flop NLHE 6-max.</CardDescription>
+          </div>
+          <div className="grid grid-cols-2 gap-2" aria-label="Modo de autenticação">
+            <button
+              type="button"
+              data-testid="auth-tab-login"
+              aria-selected={tab === 'login'}
+              className={cn(
+                'rounded-md border px-3 py-2 text-sm font-medium transition-colors',
+                tab === 'login'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-muted text-muted-foreground hover:bg-muted/80',
               )}
-            </div>
-          )}
-          <div>
-            <label htmlFor="auth-email" className="pt-label">
-              E-mail
-            </label>
-            <input
+              onClick={() => setTab('login')}
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              data-testid="auth-tab-register"
+              aria-selected={tab === 'register'}
+              className={cn(
+                'rounded-md border px-3 py-2 text-sm font-medium transition-colors',
+                tab === 'register'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-muted text-muted-foreground hover:bg-muted/80',
+              )}
+              onClick={() => setTab('register')}
+            >
+              Criar conta
+            </button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => void handleSubmit(onSubmit)(e)}
+            noValidate
+          >
+            {tab === 'register' && (
+              <FormField
+                id="auth-name"
+                label="Nome"
+                register={register('name')}
+                error={errors.name?.message}
+              />
+            )}
+            <FormField
               id="auth-email"
+              label="E-mail"
               type="email"
-              autoComplete="email"
-              className="pt-input"
-              aria-invalid={errors.email ? true : undefined}
-              aria-describedby={errors.email ? 'auth-email-error' : undefined}
-              {...register('email')}
+              register={register('email')}
+              error={errors.email?.message}
             />
-            {errors.email && (
-              <p id="auth-email-error" className="mt-1 text-sm text-destructive" role="alert">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="auth-password" className="pt-label">
-              Senha
-            </label>
-            <input
+            <PasswordField
               id="auth-password"
-              type="password"
-              autoComplete={tab === 'register' ? 'new-password' : 'current-password'}
-              className="pt-input"
-              aria-invalid={errors.password ? true : undefined}
-              aria-describedby={errors.password ? 'auth-password-error' : undefined}
-              {...register('password')}
+              label="Senha"
+              register={register('password')}
+              error={errors.password?.message}
             />
-            {errors.password && (
-              <p id="auth-password-error" className="mt-1 text-sm text-destructive" role="alert">
-                {errors.password.message}
+            {errors.root?.message && (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.root.message}
               </p>
             )}
-          </div>
-          {errors.root?.message && (
-            <p className="text-sm text-destructive" role="alert">
-              {errors.root.message}
-            </p>
-          )}
-          <button type="submit" className="pt-btn-primary w-full py-2.5">
-            {tab === 'login' ? 'Entrar' : 'Cadastrar e entrar'}
-          </button>
-        </form>
-        <p className="text-center text-xs text-muted-foreground">
-          <Link to="/" className="text-primary hover:underline">
-            Voltar
-          </Link>
-        </p>
-      </div>
+            <Button type="submit" className="w-full">
+              {tab === 'login' ? 'Entrar' : 'Cadastrar e entrar'}
+            </Button>
+          </form>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            <Link to="/" className="text-primary hover:underline">
+              Voltar
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

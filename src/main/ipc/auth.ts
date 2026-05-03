@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { users } from '../db/schema';
 import { getDb } from '../db/client';
+import { buildAuthSessionSnapshot } from '../db/profile';
 import {
   clearToken,
   readToken,
@@ -52,9 +53,10 @@ export function registerAuthIpc(): void {
     if (!ok) throw new Error('Credenciais inválidas');
     const token = signUserToken(user.id, user.email);
     await saveToken(token);
+    const snapshot = await buildAuthSessionSnapshot(db, user.id);
     return {
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      ...snapshot,
     };
   });
 
@@ -68,13 +70,7 @@ export function registerAuthIpc(): void {
     try {
       const userId = await requireUserId();
       const db = getDb();
-      const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-      const user = rows[0];
-      if (!user) {
-        await clearToken();
-        return null;
-      }
-      return { user: { id: user.id, name: user.name, email: user.email } };
+      return await buildAuthSessionSnapshot(db, userId);
     } catch {
       await clearToken();
       return null;

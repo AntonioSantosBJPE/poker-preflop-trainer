@@ -1,6 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { GroupSummaryDto, SituationSummaryDto } from '@shared/ipc/types';
+import {
+  ConfirmActionDialog,
+  EmptyState,
+  EntityTable,
+  PageHeader,
+  type EntityTableColumn,
+} from '@/components/app';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type Row = Pick<SituationSummaryDto, 'id' | 'name' | 'position' | 'effectiveStack' | 'groupId'>;
 
@@ -9,6 +25,7 @@ export function SituationsPage(): React.ReactElement {
   const [rows, setRows] = useState<Row[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [archivingId, setArchivingId] = useState<number | null>(null);
+  const [pendingArchive, setPendingArchive] = useState<Row | null>(null);
   const navigate = useNavigate();
 
   async function load(groupId?: number): Promise<void> {
@@ -22,8 +39,6 @@ export function SituationsPage(): React.ReactElement {
 
   async function handleArchive(row: Row): Promise<void> {
     if (archivingId === row.id) return;
-    const ok = confirm(`Arquivar situação "${row.name}"?`);
-    if (!ok) return;
     setArchivingId(row.id);
     try {
       await window.api.situations.delete(row.id);
@@ -44,105 +59,150 @@ export function SituationsPage(): React.ReactElement {
     void reload();
   }, [reload]);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="pt-page-title">Situações</h1>
-        <button
-          type="button"
-          className="pt-btn-primary text-sm"
-          onClick={() => navigate('/situations/new')}
-        >
-          Nova situação
-        </button>
-      </div>
-      <div className="space-y-2">
-        <label className="block max-w-xs" htmlFor="situations-group-filter-input">
-          <span className="pt-label">Filtrar por grupo</span>
-          <select
-            id="situations-group-filter-input"
-            data-testid="situations-group-filter"
-            className="pt-input"
-            value={selectedGroupId ?? ''}
-            onChange={(e) => {
-              const v = e.target.value;
-              setSelectedGroupId(v === '' ? null : Number(v));
+  const columns: EntityTableColumn<Row>[] = [
+    {
+      key: 'name',
+      header: 'Nome',
+      cell: (row) => row.name,
+      headerClassName: 'text-left font-medium',
+    },
+    {
+      key: 'group',
+      header: 'Grupo',
+      cell: (row) => groups.find((g) => g.id === row.groupId)?.name ?? '—',
+      headerClassName: 'text-left font-medium',
+    },
+    {
+      key: 'position',
+      header: 'Posição',
+      cell: (row) => row.position,
+      headerClassName: 'text-left font-medium',
+    },
+    {
+      key: 'stack',
+      header: 'Stack (BB)',
+      cell: (row) => row.effectiveStack,
+      headerClassName: 'text-left font-medium',
+      cellClassName: 'tabular-nums',
+    },
+    {
+      key: 'actions',
+      header: '',
+      headerClassName: 'w-52',
+      cellClassName: 'text-right',
+      cell: (row) => (
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/situations/${row.id}`)}
+          >
+            Editar
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={async () => {
+              await window.api.situations.duplicate(row.id);
+              void reload();
             }}
           >
-            <option value="">Todos os grupos</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            Duplicar
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            disabled={archivingId === row.id}
+            onClick={() => setPendingArchive(row)}
+          >
+            Arquivar
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Situações"
+        actions={
+          <Button type="button" onClick={() => navigate('/situations/new')}>
+            Nova situação
+          </Button>
+        }
+      />
+      <div className="flex flex-col gap-2">
+        <div className="max-w-xs">
+          <Label htmlFor="situations-group-filter-input">Filtrar por grupo</Label>
+          <Select
+            value={selectedGroupId != null ? String(selectedGroupId) : '__all__'}
+            onValueChange={(value) => {
+              if (value === '__all__') {
+                setSelectedGroupId(null);
+                return;
+              }
+              setSelectedGroupId(Number(value));
+            }}
+          >
+            <SelectTrigger
+              id="situations-group-filter-input"
+              data-testid="situations-group-filter"
+              className="w-full"
+            >
+              <SelectValue placeholder="Todos os grupos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">Todos os grupos</SelectItem>
+              {groups.map((group) => (
+                <SelectItem key={group.id} value={String(group.id)}>
+                  {group.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {selectedGroupId != null && (
           <p className="text-sm text-muted-foreground">
             Grupo: {groups.find((g) => g.id === selectedGroupId)?.name ?? '—'}
           </p>
         )}
       </div>
-      <div className="pt-card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted text-muted-foreground">
-            <tr>
-              <th className="p-3 text-left font-medium">Nome</th>
-              <th className="p-3 text-left font-medium">Grupo</th>
-              <th className="p-3 text-left font-medium">Posição</th>
-              <th className="p-3 text-left font-medium">Stack (BB)</th>
-              <th className="p-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-t border-border hover:bg-muted/40">
-                <td className="p-3">{r.name}</td>
-                <td className="p-3">{groups.find((g) => g.id === r.groupId)?.name ?? '—'}</td>
-                <td className="p-3">{r.position}</td>
-                <td className="p-3 tabular-nums">{r.effectiveStack}</td>
-                <td className="space-x-2 p-3 text-right">
-                  <button
-                    type="button"
-                    className="text-primary hover:underline"
-                    onClick={() => navigate(`/situations/${r.id}`)}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    type="button"
-                    className="text-muted-foreground hover:text-foreground"
-                    onClick={async () => {
-                      await window.api.situations.duplicate(r.id);
-                      void reload();
-                    }}
-                  >
-                    Duplicar
-                  </button>
-                  <button
-                    type="button"
-                    className="text-destructive hover:underline"
-                    disabled={archivingId === r.id}
-                    onClick={() => void handleArchive(r)}
-                  >
-                    Arquivar
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {!rows.length && (
-              <tr>
-                <td colSpan={5} className="p-8 text-center text-muted-foreground">
-                  Nenhuma situação.{' '}
-                  <Link to="/situations/new" className="text-primary hover:underline">
-                    Criar a primeira
-                  </Link>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <EntityTable
+        rows={rows}
+        columns={columns}
+        getRowKey={(row) => row.id}
+        tableTestId="situations-list-table"
+        emptyState={
+          <EmptyState
+            title="Nenhuma situação"
+            description="Crie sua primeira situação para começar os treinos."
+            action={
+              <Button asChild>
+                <Link to="/situations/new">Criar a primeira</Link>
+              </Button>
+            }
+            className="border-0 bg-transparent"
+          />
+        }
+      />
+      <ConfirmActionDialog
+        open={pendingArchive != null}
+        onOpenChange={(open) => {
+          if (!open) setPendingArchive(null);
+        }}
+        title={`Arquivar situação \"${pendingArchive?.name ?? ''}\"?`}
+        description="A situação ficará inativa e deixará de aparecer nas listagens."
+        confirmLabel="Arquivar"
+        onConfirm={async () => {
+          if (!pendingArchive) return;
+          await handleArchive(pendingArchive);
+          setPendingArchive(null);
+        }}
+      />
     </div>
   );
 }

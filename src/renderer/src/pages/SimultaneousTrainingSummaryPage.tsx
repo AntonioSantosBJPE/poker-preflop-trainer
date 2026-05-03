@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { PageHeader } from '@/components/app/PageHeader';
+import { TrainingSummaryCards } from '@/components/training/TrainingSummaryCards';
+import { Button } from '@/components/ui/button';
 
 type SessionResult = {
   session: { id: number };
@@ -44,25 +47,16 @@ export function SimultaneousTrainingSummaryPage(): React.ReactElement {
 
   const totalHands = tables.reduce((sum, table) => sum + table.total, 0);
   const totalCorrect = tables.reduce((sum, table) => sum + table.correct, 0);
-  const accuracy = totalHands ? Math.round((totalCorrect / totalHands) * 100) : 0;
+  const accuracyDecimal = totalHands ? totalCorrect / totalHands : 0;
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="pt-page-title">Resumo do treino simultâneo</h1>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className="pt-card p-4">
-          <p className="text-sm text-muted-foreground">Mãos</p>
-          <p className="text-2xl font-semibold text-foreground">{totalHands}</p>
-        </div>
-        <div className="pt-card p-4">
-          <p className="text-sm text-muted-foreground">Acertos</p>
-          <p className="text-2xl font-semibold text-foreground">{totalCorrect}</p>
-        </div>
-        <div className="pt-card p-4">
-          <p className="text-sm text-muted-foreground">Precisão</p>
-          <p className="text-2xl font-semibold text-foreground">{accuracy}%</p>
-        </div>
-      </div>
+      <PageHeader title="Resumo do treino simultâneo" />
+      <TrainingSummaryCards
+        totalHands={totalHands}
+        correct={totalCorrect}
+        accuracy={accuracyDecimal}
+      />
       <div className="space-y-3">
         {tables.map((table, index) => (
           <div key={table.sessionId} className="rounded-xl border border-border bg-card p-4">
@@ -73,13 +67,13 @@ export function SimultaneousTrainingSummaryPage(): React.ReactElement {
           </div>
         ))}
       </div>
-      <div className="flex gap-3">
-        <Link to="/training/simultaneous" className="pt-btn-primary">
-          Novo treino simultâneo
-        </Link>
-        <Link to="/training" className="pt-btn-secondary">
-          Treino normal
-        </Link>
+      <div className="flex flex-wrap gap-3">
+        <Button asChild>
+          <Link to="/training/simultaneous">Novo treino simultâneo</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/training">Treino normal</Link>
+        </Button>
       </div>
     </div>
   );

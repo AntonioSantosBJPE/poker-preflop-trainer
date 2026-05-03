@@ -4,8 +4,7 @@ import type { GroupSummaryDto } from '@shared/ipc/types';
 import type * as schema from './schema';
 import { situationGroups, situations } from './schema';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Db = BaseSQLiteDatabase<'sync', any, typeof schema>;
+type Db = BaseSQLiteDatabase<'sync', unknown, typeof schema>;
 
 /** List user active groups with count of active situations, ordered by sortOrder. */
 export async function listGroups(db: Db, userId: number): Promise<GroupSummaryDto[]> {

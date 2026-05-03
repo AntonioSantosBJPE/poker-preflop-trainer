@@ -7,7 +7,7 @@ export async function registerAccount(page: Page, user: TestUser): Promise<void>
   await page.getByRole('button', { name: 'Criar conta' }).click();
   await page.getByLabel('Nome').fill(user.displayName);
   await page.getByLabel('E-mail').fill(user.email);
-  await page.getByLabel('Senha').fill(user.password);
+  await page.getByRole('textbox', { name: 'Senha' }).fill(user.password);
   await page.getByRole('button', { name: 'Cadastrar e entrar' }).click();
   await expect(
     page.getByRole('heading', { name: new RegExp(`Olá, ${user.displayName}`) }),
@@ -26,7 +26,7 @@ export async function loginWithPassword(
 ): Promise<void> {
   await switchToLoginTab(page);
   await page.getByLabel('E-mail').fill(email);
-  await page.getByLabel('Senha').fill(password);
+  await page.getByRole('textbox', { name: 'Senha' }).fill(password);
   await page.locator('form').getByRole('button', { name: 'Entrar' }).click();
 }
 

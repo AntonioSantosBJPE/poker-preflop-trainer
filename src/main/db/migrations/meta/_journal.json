@@ -29,6 +29,13 @@
       "when": 1777680577501,
       "tag": "0003_famous_omega_sentinel",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1777755303784,
+      "tag": "0004_red_eternity",
+      "breakpoints": true
     }
   ]
 }

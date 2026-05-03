@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures';
-import type { Dialog } from '@playwright/test';
 import { registerAccount } from '../helpers/auth';
 import {
   uniqueGroupName,
@@ -24,15 +23,15 @@ test.describe('Grupos — arquivo em cascata', () => {
 
     await appPage.getByRole('link', { name: 'Grupos' }).click();
     const card = appPage.getByTestId('group-card').filter({ hasText: groupName });
-    appPage.once('dialog', (dialog: Dialog) => dialog.dismiss());
     await card.getByTestId('group-archive-btn').click();
+    await appPage.getByRole('button', { name: 'Cancelar' }).click();
 
     await appPage.getByRole('link', { name: 'Situações' }).click();
     await expect(appPage.getByText(situationName)).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Grupos' }).click();
-    appPage.once('dialog', (dialog: Dialog) => dialog.accept());
     await card.getByTestId('group-archive-btn').click();
+    await appPage.getByRole('button', { name: 'Arquivar' }).click();
 
     await appPage.getByRole('link', { name: 'Situações' }).click();
     await expect(appPage.getByText(situationName)).not.toBeVisible();

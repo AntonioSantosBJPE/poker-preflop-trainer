@@ -7,6 +7,7 @@ import {
 } from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
+import { selectShadcnOption } from '../helpers/shadcn';
 
 test.describe('Treino simultâneo — fluxo completo', () => {
   test('E2E-MT-10: configurar 3 mesas, jogar e concluir com resumo', async ({ appPage }) => {
@@ -22,7 +23,7 @@ test.describe('Treino simultâneo — fluxo completo', () => {
     await appPage.getByRole('button', { name: groupName }).click();
     await expect(appPage.getByTestId('sim-training-step-2')).toBeVisible();
     await appPage.getByRole('checkbox', { name: situationName, exact: true }).check();
-    await appPage.getByLabel('Mesas simultâneas').selectOption({ value: '3' });
+    await selectShadcnOption(appPage, 'Mesas simultâneas', '3 mesas');
     await appPage.getByLabel('Número de mãos por mesa').fill('1');
     await appPage.getByRole('button', { name: 'Iniciar treino simultâneo' }).click();
 
@@ -41,7 +42,7 @@ test.describe('Treino simultâneo — fluxo completo', () => {
     ).toBeVisible();
     await expect(appPage.getByText(/^Mãos$/)).toBeVisible();
     await expect(appPage.getByText(/^Acertos$/)).toBeVisible();
-    await expect(appPage.getByText(/^Precisão$/)).toBeVisible();
+    await expect(appPage.getByText(/^Acerto$/)).toBeVisible();
     await expect(appPage.getByText(/^Mesa 1$/)).toBeVisible();
     await expect(appPage.getByText(/^Mesa 2$/)).toBeVisible();
     await expect(appPage.getByText(/^Mesa 3$/)).toBeVisible();

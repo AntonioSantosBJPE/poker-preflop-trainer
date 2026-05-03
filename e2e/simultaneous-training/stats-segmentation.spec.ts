@@ -10,10 +10,7 @@ import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
 
 function sessionsOverviewValue(appPage: Page) {
-  return appPage
-    .locator('div.pt-card')
-    .filter({ has: appPage.getByText('Sessões', { exact: true }) })
-    .locator('p.font-display.text-2xl.font-bold');
+  return appPage.getByTestId('stats-overview-sessions');
 }
 
 async function startSimultaneousViaApi(
@@ -71,16 +68,20 @@ test.describe('Treino simultâneo — segmentação de stats', () => {
     ).toHaveLength(4);
 
     await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
-    await appPage.getByTestId('stats-session-type-filter').selectOption('simultaneous');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Simultâneo' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('9');
 
-    await appPage.getByTestId('stats-simultaneous-count-filter').selectOption('2');
+    await appPage.getByTestId('stats-simultaneous-count-filter').click();
+    await appPage.getByRole('option', { name: '2 mesas' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('2');
 
-    await appPage.getByTestId('stats-simultaneous-count-filter').selectOption('3');
+    await appPage.getByTestId('stats-simultaneous-count-filter').click();
+    await appPage.getByRole('option', { name: '3 mesas' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('3');
 
-    await appPage.getByTestId('stats-simultaneous-count-filter').selectOption('4');
+    await appPage.getByTestId('stats-simultaneous-count-filter').click();
+    await appPage.getByRole('option', { name: '4 mesas' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('4');
   });
 
@@ -101,11 +102,14 @@ test.describe('Treino simultâneo — segmentação de stats', () => {
     ).toHaveLength(3);
 
     await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
-    await appPage.getByTestId('stats-session-type-filter').selectOption('simultaneous');
-    await appPage.getByTestId('stats-simultaneous-count-filter').selectOption('3');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Simultâneo' }).click();
+    await appPage.getByTestId('stats-simultaneous-count-filter').click();
+    await appPage.getByRole('option', { name: '3 mesas' }).click();
 
-    await appPage.getByTestId('stats-session-type-filter').selectOption('single');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Individual' }).click();
     await expect(appPage.getByTestId('stats-simultaneous-count-filter')).toBeDisabled();
-    await expect(appPage.getByTestId('stats-simultaneous-count-filter')).toHaveValue('');
+    await expect(appPage.getByTestId('stats-simultaneous-count-filter')).toHaveText(/Todas/);
   });
 });

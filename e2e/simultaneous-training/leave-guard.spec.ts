@@ -7,6 +7,7 @@ import {
 } from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
+import { selectShadcnOption } from '../helpers/shadcn';
 
 test.describe('Treino simultâneo — leave guard', () => {
   test('E2E-MT-09: sessão ativa pede confirmação antes de abandonar', async ({ appPage }) => {
@@ -20,7 +21,7 @@ test.describe('Treino simultâneo — leave guard', () => {
     await appPage.getByRole('link', { name: 'Treino Simultâneo' }).click();
     await appPage.getByRole('button', { name: groupName }).click();
     await appPage.getByRole('checkbox', { name: situationName, exact: true }).check();
-    await appPage.getByLabel('Mesas simultâneas').selectOption({ value: '2' });
+    await selectShadcnOption(appPage, 'Mesas simultâneas', '2 mesas');
     await appPage.getByLabel('Número de mãos por mesa').fill('2');
     await appPage.getByRole('button', { name: 'Iniciar treino simultâneo' }).click();
 
