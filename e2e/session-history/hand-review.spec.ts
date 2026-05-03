@@ -1,6 +1,10 @@
 import { test, expect } from '../fixtures';
 import { registerAccount } from '../helpers/auth';
-import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from '../helpers/credentials';
+import {
+  uniqueGroupName,
+  uniqueSituationName,
+  uniqueUserCredentials,
+} from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
 import {
@@ -14,7 +18,9 @@ import {
 } from '../helpers/training';
 
 test.describe('Histórico - revisão mão a mão', () => {
-  test('E2E-HIST-07: clique na sessão navega para review com header e primeira mão', async ({ appPage }) => {
+  test('E2E-HIST-07: clique na sessão navega para review com header e primeira mão', async ({
+    appPage,
+  }) => {
     const user = uniqueUserCredentials();
     const situationName = uniqueSituationName();
     const groupName = uniqueGroupName();
@@ -126,7 +132,10 @@ test.describe('Histórico - revisão mão a mão', () => {
 
     await appPage.getByRole('button', { name: 'Fold' }).click();
     await expect(appPage.getByText(/Correto|Incorreto/)).toBeVisible();
-    const wasCorrect = await appPage.getByText('Correto').isVisible().catch(() => false);
+    const wasCorrect = await appPage
+      .getByText('Correto')
+      .isVisible()
+      .catch(() => false);
     if (wasCorrect) {
       await appPage.getByRole('button', { name: 'Próxima mão' }).click();
     } else {

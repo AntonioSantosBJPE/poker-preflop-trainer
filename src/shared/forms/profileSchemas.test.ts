@@ -89,7 +89,9 @@ describe('profilePreferencesSchema', () => {
     const result = profilePreferencesSchema.safeParse({});
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toBe('Informe ao menos uma preferência para atualizar');
+      expect(result.error.issues[0]?.message).toBe(
+        'Informe ao menos uma preferência para atualizar',
+      );
     }
   });
 

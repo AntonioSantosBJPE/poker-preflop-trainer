@@ -145,7 +145,9 @@ describe('registerProfileIpc', () => {
   it('profile:updatePreferences rejeita payload vazio', async () => {
     const handler = getHandler('profile:updatePreferences');
 
-    await expect(handler({}, {})).rejects.toThrow('Informe ao menos uma preferência para atualizar');
+    await expect(handler({}, {})).rejects.toThrow(
+      'Informe ao menos uma preferência para atualizar',
+    );
     expect(upsertUserPreferences).not.toHaveBeenCalled();
   });
 });

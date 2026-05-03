@@ -37,6 +37,7 @@ Renderer (React)
 ### DA-01: Zero alterações ao schema
 
 As tabelas `trainingSessions` e `sessionHands` (schema §5) já armazenam todos os campos necessários:
+
 - `trainingSessions`: id, userId, groupId, sessionType, simultaneousTableCount, startedAt, finishedAt, totalHands, timerSeconds, feedbackMode, situationIdsJson
 - `sessionHands`: id, sessionId, situationId, card1Rank, card1Suit, card2Rank, card2Suit, chosenActionId, isCorrect, responseMs, handIndex
 
@@ -59,18 +60,20 @@ Duas novas props opcionais em `RangeGrid13`:
 ```typescript
 type Props = {
   // ... existing props ...
-  readOnly?: boolean;                                           // default false
+  readOnly?: boolean; // default false
   highlightCell?: { rowIndex: number; colIndex: number } | null; // default null
 };
 ```
 
 **Quando `readOnly=true`:**
+
 - Mouse handlers (`onMouseDown`, `onMouseEnter`, `onMouseUp`, `onMouseLeave`) são no-ops.
 - `onContextMenu` prevenido apenas no readOnly também.
 - Células são renderizadas como `<div>` em vez de `<button>` (sem interatividade).
 - Footer de ajuda ("Clique esquerdo...") é omitido.
 
 **Quando `highlightCell` está definido:**
+
 - A célula alvo recebe classe adicional `ring-2 ring-amber-400 ring-inset` para destaque visual.
 - Aplica-se independentemente do `readOnly` (mas na prática apenas usado no modo revisão).
 
@@ -95,10 +98,10 @@ Estado dos filtros (`groupId`, `sessionType`, `tableCount`, `page`) é bidirecio
 
 Handlers registados em `src/main/ipc/history.ts`, importado por `src/main/ipc/register.ts`:
 
-| Canal | Handler | Retorno |
-|-------|---------|---------|
-| `training:listSessions` | Lista paginada com filtros | `SessionListResponse` |
-| `training:getSessionDetail` | Sessão + mãos + ranges | `SessionDetailDto` |
+| Canal                       | Handler                    | Retorno               |
+| --------------------------- | -------------------------- | --------------------- |
+| `training:listSessions`     | Lista paginada com filtros | `SessionListResponse` |
+| `training:getSessionDetail` | Sessão + mãos + ranges     | `SessionDetailDto`    |
 
 O módulo segue o padrão existente: `requireUserId()`, validação Zod para parâmetros, Drizzle parametrizado.
 
@@ -113,6 +116,7 @@ O handler `training:getSessionDetail` carrega os `rangeCells` de cada situação
 ### DA-07: shadcn Pagination (novo componente)
 
 Adicionar componente `Pagination` via `npx shadcn@latest add pagination` para obter:
+
 - `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`
 
 Usado apenas na página de histórico (não na navegação entre mãos).
@@ -126,34 +130,49 @@ Usado apenas na página de histórico (não na navegação entre mãos).
 ### Query: `training:listSessions`
 
 Duas fases:
+
 1. `COUNT(*)` com filtros → `total`.
 2. `SELECT` com JOIN + subquery de agregação → `items`.
 
 **SELECT (pseudocode Drizzle):**
+
 ```typescript
 db.select({
   id: trainingSessions.id,
   startedAt: trainingSessions.startedAt,
   finishedAt: trainingSessions.finishedAt,
   groupName: situationGroups.name,
-  situationCount: sql<number>`json_array_length(${trainingSessions.situationIdsJson})`.mapWith(Number),
+  situationCount: sql<number>`json_array_length(${trainingSessions.situationIdsJson})`.mapWith(
+    Number,
+  ),
   totalHands: trainingSessions.totalHands,
-  handsPlayed: sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id})`.mapWith(Number),
-  correct: sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id} AND session_hands.is_correct = 1)`.mapWith(Number),
+  handsPlayed:
+    sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id})`.mapWith(
+      Number,
+    ),
+  correct:
+    sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id} AND session_hands.is_correct = 1)`.mapWith(
+      Number,
+    ),
   sessionType: trainingSessions.sessionType,
   simultaneousTableCount: trainingSessions.simultaneousTableCount,
-  durationMs: sql<number>`(unixepoch(${trainingSessions.finishedAt}) - unixepoch(${trainingSessions.startedAt})) * 1000`.mapWith(Number),
+  durationMs:
+    sql<number>`(unixepoch(${trainingSessions.finishedAt}) - unixepoch(${trainingSessions.startedAt})) * 1000`.mapWith(
+      Number,
+    ),
 })
-.from(trainingSessions)
-.leftJoin(situationGroups, eq(trainingSessions.groupId, situationGroups.id))
-.where(and(
-  eq(trainingSessions.userId, userId),
-  not(isNull(trainingSessions.finishedAt)),  // apenas concluídas
-  ...filters  // groupId, sessionType, simultaneousTableCount
-))
-.orderBy(desc(trainingSessions.startedAt))
-.limit(pageSize)
-.offset((page - 1) * pageSize);
+  .from(trainingSessions)
+  .leftJoin(situationGroups, eq(trainingSessions.groupId, situationGroups.id))
+  .where(
+    and(
+      eq(trainingSessions.userId, userId),
+      not(isNull(trainingSessions.finishedAt)), // apenas concluídas
+      ...filters, // groupId, sessionType, simultaneousTableCount
+    ),
+  )
+  .orderBy(desc(trainingSessions.startedAt))
+  .limit(pageSize)
+  .offset((page - 1) * pageSize);
 ```
 
 **Filtro de grupo:** `eq(trainingSessions.groupId, groupId)` quando `groupId` definido.
@@ -163,30 +182,40 @@ db.select({
 ### Query: `training:getSessionDetail`
 
 Carrega:
+
 1. Sessão (mesma query de listagem, sem paginação, filtrada por `sessionId`).
 2. Todas as `sessionHands` da sessão, ordenadas por `handIndex ASC`.
 3. Para cada `situationId` distinto, carrega `actions` + `rangeCells`.
 4. Para cada hand, computa `correctActionIds` via `evaluateTrainingAnswer()`.
 
 **Algoritmo de correctActionIds por mão:**
+
 ```typescript
 for (const hand of hands) {
   const sitActions = actionsBySituationId.get(hand.situationId) ?? [];
   const cells = rangeCellsBySituationId.get(hand.situationId) ?? [];
 
   const getFrequency = (actionId, row, col) => {
-    const cell = cells.find(c => c.actionId === actionId && c.rowIndex === row && c.colIndex === col);
+    const cell = cells.find(
+      (c) => c.actionId === actionId && c.rowIndex === row && c.colIndex === col,
+    );
     return cell?.frequency ?? 0;
   };
 
-  const { rowIndex, colIndex } = handToGridCell(hand.card1Rank, hand.card2Rank, hand.card1Suit, hand.card2Suit);
-  const foldAction = sitActions.find(a => a.actionType === 'FOLD');
+  const { rowIndex, colIndex } = handToGridCell(
+    hand.card1Rank,
+    hand.card2Rank,
+    hand.card1Suit,
+    hand.card2Suit,
+  );
+  const foldAction = sitActions.find((a) => a.actionType === 'FOLD');
 
   const evalResult = evaluateTrainingAnswer({
-    rowIndex, colIndex,
+    rowIndex,
+    colIndex,
     chosenActionId: hand.chosenActionId,
     timedOut: hand.chosenActionId === null,
-    actionIdsInSituation: sitActions.map(a => a.id),
+    actionIdsInSituation: sitActions.map((a) => a.id),
     getFrequency,
     foldActionId: foldAction?.id ?? null,
   });
@@ -204,15 +233,15 @@ for (const hand of hands) {
 ```typescript
 export type SessionHistoryItemDto = {
   id: number;
-  startedAt: number;           // timestamp ms (Date → epoch)
-  finishedAt: number | null;   // timestamp ms (Date → epoch)
+  startedAt: number; // timestamp ms (Date → epoch)
+  finishedAt: number | null; // timestamp ms (Date → epoch)
   groupName: string | null;
   situationCount: number;
   totalHands: number;
   handsPlayed: number;
   correct: number;
-  accuracy: number;            // computed: correct / handsPlayed (0 se handsPlayed = 0)
-  durationMs: number | null;   // null se finishedAt = null
+  accuracy: number; // computed: correct / handsPlayed (0 se handsPlayed = 0)
+  durationMs: number | null; // null se finishedAt = null
   sessionType: SessionType;
   simultaneousTableCount: number | null;
 };
@@ -228,7 +257,7 @@ export type SessionHandDetailDto = {
     name: string;
     actionType: ActionType;
     colorHex: string;
-  } | null;                     // null when timedOut (chosenActionId = null)
+  } | null; // null when timedOut (chosenActionId = null)
   isCorrect: boolean;
   responseMs: number;
   gridCell: { rowIndex: number; colIndex: number };
@@ -238,18 +267,21 @@ export type SessionHandDetailDto = {
 export type SessionDetailDto = {
   session: SessionHistoryItemDto;
   hands: SessionHandDetailDto[];
-  situationActionsMap: Record<number, {
-    name: string;
-    position: Position;
-    actions: {
-      id: number;
+  situationActionsMap: Record<
+    number,
+    {
       name: string;
-      actionType: ActionType;
-      colorHex: string;
-      sortOrder: number;
-    }[];
-    rangeCells: RangeCellDto[];
-  }>;
+      position: Position;
+      actions: {
+        id: number;
+        name: string;
+        actionType: ActionType;
+        colorHex: string;
+        sortOrder: number;
+      }[];
+      rangeCells: RangeCellDto[];
+    }
+  >;
 };
 
 export type SessionListResponse = {
@@ -257,7 +289,7 @@ export type SessionListResponse = {
   total: number;
   page: number;
   pageSize: number;
-  totalPages: number;           // Math.ceil(total / pageSize)
+  totalPages: number; // Math.ceil(total / pageSize)
 };
 
 export type SessionHistoryFilters = {
@@ -285,10 +317,10 @@ Parser: `parseSessionHistoryFilters(raw)` — aplica defaults e valida.
 
 ### 4.3 Canais IPC
 
-| Canal | Parâmetros | Retorno |
-|-------|-----------|---------|
-| `training:listSessions` | `filters: SessionHistoryFilters` | `SessionListResponse` |
-| `training:getSessionDetail` | `sessionId: number` | `SessionDetailDto` |
+| Canal                       | Parâmetros                       | Retorno               |
+| --------------------------- | -------------------------------- | --------------------- |
+| `training:listSessions`     | `filters: SessionHistoryFilters` | `SessionListResponse` |
+| `training:getSessionDetail` | `sessionId: number`              | `SessionDetailDto`    |
 
 Ambos exigem `requireUserId()`. Ambos propagam erros com mensagens em português.
 
@@ -310,8 +342,10 @@ export function registerHistoryIpc(): void {
       eq(trainingSessions.userId, userId),
       sql`${trainingSessions.finishedAt} IS NOT NULL`,
     ];
-    if (filters.groupId !== undefined) conditions.push(eq(trainingSessions.groupId, filters.groupId));
-    if (filters.sessionType !== undefined) conditions.push(eq(trainingSessions.sessionType, filters.sessionType));
+    if (filters.groupId !== undefined)
+      conditions.push(eq(trainingSessions.groupId, filters.groupId));
+    if (filters.sessionType !== undefined)
+      conditions.push(eq(trainingSessions.sessionType, filters.sessionType));
     if (filters.simultaneousTableCount !== undefined)
       conditions.push(eq(trainingSessions.simultaneousTableCount, filters.simultaneousTableCount));
 
@@ -397,18 +431,26 @@ export function registerHistoryIpc(): void {
     const sitIds = [...new Set(hands.map((h) => h.situationId))];
 
     // Load situations with actions and rangeCells
-    const sitRows = sitIds.length > 0
-      ? await db.select().from(situations).where(inArray(situations.id, sitIds))
-      : [];
-    const actionRows = sitIds.length > 0
-      ? await db.select().from(actions).where(inArray(actions.situationId, sitIds))
-      : [];
-    const cellRows = actionRows.length > 0
-      ? await db
-          .select()
-          .from(rangeCells)
-          .where(inArray(rangeCells.actionId, actionRows.map((a) => a.id)))
-      : [];
+    const sitRows =
+      sitIds.length > 0
+        ? await db.select().from(situations).where(inArray(situations.id, sitIds))
+        : [];
+    const actionRows =
+      sitIds.length > 0
+        ? await db.select().from(actions).where(inArray(actions.situationId, sitIds))
+        : [];
+    const cellRows =
+      actionRows.length > 0
+        ? await db
+            .select()
+            .from(rangeCells)
+            .where(
+              inArray(
+                rangeCells.actionId,
+                actionRows.map((a) => a.id),
+              ),
+            )
+        : [];
 
     // Index data
     const actionsBySit = new Map<number, typeof actionRows>();
@@ -430,15 +472,24 @@ export function registerHistoryIpc(): void {
       const allCells = sitActs.flatMap(
         (a) => cellsByAction.get(a.id)?.map((c) => ({ ...c, actionId: a.id })) ?? [],
       );
-      const { rowIndex, colIndex } = handToGridCell(h.card1Rank, h.card2Rank, h.card1Suit, h.card2Suit);
+      const { rowIndex, colIndex } = handToGridCell(
+        h.card1Rank,
+        h.card2Rank,
+        h.card1Suit,
+        h.card2Suit,
+      );
       const foldAct = sitActs.find((a) => a.actionType === 'FOLD');
 
       const getFrequency = (actionId: number, row: number, col: number): number => {
-        return allCells.find((c) => c.actionId === actionId && c.rowIndex === row && c.colIndex === col)?.frequency ?? 0;
+        return (
+          allCells.find((c) => c.actionId === actionId && c.rowIndex === row && c.colIndex === col)
+            ?.frequency ?? 0
+        );
       };
 
       const evalResult = evaluateTrainingAnswer({
-        rowIndex, colIndex,
+        rowIndex,
+        colIndex,
         chosenActionId: h.chosenActionId,
         timedOut: h.chosenActionId === null,
         actionIdsInSituation: sitActs.map((a) => a.id),
@@ -459,7 +510,12 @@ export function registerHistoryIpc(): void {
         situationName: sitName,
         situationPosition: sitPosition,
         chosenAction: chosenAct
-          ? { id: chosenAct.id, name: chosenAct.name, actionType: chosenAct.actionType as ActionType, colorHex: chosenAct.colorHex }
+          ? {
+              id: chosenAct.id,
+              name: chosenAct.name,
+              actionType: chosenAct.actionType as ActionType,
+              colorHex: chosenAct.colorHex,
+            }
           : null,
         isCorrect: h.isCorrect,
         responseMs: h.responseMs,
@@ -473,7 +529,13 @@ export function registerHistoryIpc(): void {
     for (const s of sitRows) {
       const sitActs = actionsBySit.get(s.id) ?? [];
       const allCells = sitActs.flatMap(
-        (a) => cellsByAction.get(a.id)?.map((c) => ({ actionId: a.id, rowIndex: c.rowIndex, colIndex: c.colIndex, frequency: c.frequency })) ?? [],
+        (a) =>
+          cellsByAction.get(a.id)?.map((c) => ({
+            actionId: a.id,
+            rowIndex: c.rowIndex,
+            colIndex: c.colIndex,
+            frequency: c.frequency,
+          })) ?? [],
       );
       situationActionsMap[s.id] = {
         name: s.name,
@@ -495,18 +557,29 @@ export function registerHistoryIpc(): void {
 
     const session: SessionHistoryItemDto = {
       id: sessRows[0].id,
-      startedAt: sessRows[0].startedAt instanceof Date ? sessRows[0].startedAt.getTime() : Number(sessRows[0].startedAt),
-      finishedAt: sessRows[0].finishedAt instanceof Date ? sessRows[0].finishedAt.getTime() : Number(sessRows[0].finishedAt),
-      groupName: null,  // não carregado neste handler (não essencial para a revisão)
+      startedAt:
+        sessRows[0].startedAt instanceof Date
+          ? sessRows[0].startedAt.getTime()
+          : Number(sessRows[0].startedAt),
+      finishedAt:
+        sessRows[0].finishedAt instanceof Date
+          ? sessRows[0].finishedAt.getTime()
+          : Number(sessRows[0].finishedAt),
+      groupName: null, // não carregado neste handler (não essencial para a revisão)
       situationCount: 0, // não carregado
       totalHands: sessRows[0].totalHands,
       handsPlayed,
       correct,
       accuracy: handsPlayed > 0 ? correct / handsPlayed : 0,
-      durationMs: sessRows[0].finishedAt && sessRows[0].startedAt
-        ? (sessRows[0].finishedAt instanceof Date ? sessRows[0].finishedAt.getTime() : Number(sessRows[0].finishedAt)) -
-          (sessRows[0].startedAt instanceof Date ? sessRows[0].startedAt.getTime() : Number(sessRows[0].startedAt))
-        : null,
+      durationMs:
+        sessRows[0].finishedAt && sessRows[0].startedAt
+          ? (sessRows[0].finishedAt instanceof Date
+              ? sessRows[0].finishedAt.getTime()
+              : Number(sessRows[0].finishedAt)) -
+            (sessRows[0].startedAt instanceof Date
+              ? sessRows[0].startedAt.getTime()
+              : Number(sessRows[0].startedAt))
+          : null,
       sessionType: (sessRows[0].sessionType as SessionType) ?? 'single',
       simultaneousTableCount: sessRows[0].simultaneousTableCount,
     };
@@ -546,7 +619,7 @@ training: {
   // ... existing ...
   listSessions: (filters: SessionHistoryFilters) => Promise<SessionListResponse>;
   getSessionDetail: (sessionId: number) => Promise<SessionDetailDto>;
-};
+}
 ```
 
 ---
@@ -577,6 +650,7 @@ Posição: entre "Treino Simultâneo" e "Estatísticas".
 ### 7.3 Página: `HistoryPage` (`src/renderer/src/pages/HistoryPage.tsx`)
 
 **Estado local:**
+
 ```typescript
 const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
 const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
@@ -588,6 +662,7 @@ const [loading, setLoading] = useState(true);
 ```
 
 **Inicialização a partir de query params:**
+
 ```typescript
 const [searchParams, setSearchParams] = useSearchParams();
 
@@ -605,6 +680,7 @@ useEffect(() => {
 ```
 
 **Sincronização estado local → query params:**
+
 ```typescript
 useEffect(() => {
   const params = new URLSearchParams();
@@ -617,6 +693,7 @@ useEffect(() => {
 ```
 
 **Fetch:**
+
 ```typescript
 useEffect(() => {
   setLoading(true);
@@ -632,6 +709,7 @@ useEffect(() => {
 ```
 
 **Reset de página ao mudar filtros:**
+
 ```typescript
 // Nos handlers de onChange dos filtros, chamar setPage(1)
 const handleGroupChange = (gid: number | null) => {
@@ -641,6 +719,7 @@ const handleGroupChange = (gid: number | null) => {
 ```
 
 **Colunas da EntityTable:**
+
 ```typescript
 const columns: EntityTableColumn<SessionHistoryItemDto>[] = [
   {
@@ -689,12 +768,14 @@ const columns: EntityTableColumn<SessionHistoryItemDto>[] = [
 ```
 
 **Cada linha é clicável:**
+
 ```typescript
 // onClick na TableRow → navigate(`/history/${row.id}${location.search}`)
 // Passa os query params correntes no state para o voltar funcionar
 ```
 
 **Pagination:**
+
 ```typescript
 {data && data.totalPages > 1 && (
   <Pagination>
@@ -714,6 +795,7 @@ const columns: EntityTableColumn<SessionHistoryItemDto>[] = [
 ```
 
 Layout completo:
+
 ```
 <div className="flex flex-col gap-6">
   <PageHeader title="Histórico" />
@@ -771,6 +853,7 @@ Layout completo:
 ### 7.4 Página: `SessionHandReviewPage` (`src/renderer/src/pages/SessionHandReviewPage.tsx`)
 
 **Estado:**
+
 ```typescript
 const { sessionId } = useParams();
 const location = useLocation();
@@ -781,9 +864,11 @@ const [loading, setLoading] = useState(true);
 ```
 
 **Fetch inicial:**
+
 ```typescript
 useEffect(() => {
-  window.api.training.getSessionDetail(Number(sessionId))
+  window.api.training
+    .getSessionDetail(Number(sessionId))
     .then(setDetail)
     .catch(() => setDetail(null)) // erro tratado como sessão não encontrada
     .finally(() => setLoading(false));
@@ -791,6 +876,7 @@ useEffect(() => {
 ```
 
 **Hand atual e navegação:**
+
 ```typescript
 const currentHand = detail?.hands[currentHandIndex] ?? null;
 const totalHands = detail?.hands.length ?? 0;
@@ -801,6 +887,7 @@ const goTo = (index: number) => {
 ```
 
 **Voltar ao histórico:**
+
 ```typescript
 // location.state contém os query params de origem, ou usa location.search
 const backTo = `/history${location.state?.search ?? location.search ?? ''}`;
@@ -808,6 +895,7 @@ const backTo = `/history${location.state?.search ?? location.search ?? ''}`;
 ```
 
 **Estrutura do componente:**
+
 ```
 <div className="flex flex-col gap-6">
   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -838,16 +926,17 @@ const backTo = `/history${location.state?.search ?? location.search ?? ''}`;
 
 4 StatCards em grid 2×2 ou 4-col:
 
-| Label | Value |
-|-------|-------|
-| Data | `formatDate(session.startedAt)` |
-| Acerto | `(session.accuracy * 100).toFixed(1)%` |
-| Duração | `formatDuration(session.durationMs)` |
-| Mãos | `session.handsPlayed` |
+| Label   | Value                                  |
+| ------- | -------------------------------------- |
+| Data    | `formatDate(session.startedAt)`        |
+| Acerto  | `(session.accuracy * 100).toFixed(1)%` |
+| Duração | `formatDuration(session.durationMs)`   |
+| Mãos    | `session.handsPlayed`                  |
 
 ### 7.6 Componente: `HandReviewCard` (`src/renderer/src/components/history/HandReviewCard.tsx`)
 
 Props:
+
 ```typescript
 type Props = {
   hand: SessionHandDetailDto;
@@ -889,11 +978,13 @@ type Props = {
 **Hole cards:** Renderizar com `Card` + texto `{card.rank}{suitSymbol(card.suit)}`. Usar cores para naipes (♠ preto, ♥ vermelho, ♦ vermelho, ♣ preto).
 
 **Feedback de acerto/erro:**
+
 - Acerto: `Badge` verde com `✓` + nome da ação.
 - Erro: `Badge` vermelho com `✗` + nome da ação escolhida + ações corretas em texto (ex: "Correto: RAISE_OPEN, CALL").
 - Timeout: `Badge` vermelho com "⏱ Timeout".
 
 **Grid:**
+
 ```typescript
 // Mapear situationActionsMap[situationId] para props do RangeGrid13
 const sitData = situationActionsMap[hand.situationId];
@@ -904,6 +995,7 @@ const sitData = situationActionsMap[hand.situationId];
 
 **Legenda do grid:**
 Abaixo do grid, mostrar cada ação com sua cor:
+
 ```typescript
 <div className="flex flex-wrap gap-3 mt-3">
   {actions.map(a => (
@@ -916,6 +1008,7 @@ Abaixo do grid, mostrar cada ação com sua cor:
 ```
 
 **Navegação entre mãos:**
+
 ```typescript
 <div className="flex items-center justify-between">
   <Button variant="outline" onClick={onPrev} disabled={handIndex === 0}>
@@ -935,6 +1028,7 @@ Abaixo do grid, mostrar cada ação com sua cor:
 Adicionar ao ficheiro `src/renderer/src/components/grid/RangeGrid13.tsx`:
 
 **Props novas:**
+
 ```typescript
 type Props = {
   // ... existing ...
@@ -946,11 +1040,13 @@ type Props = {
 **Alterações no componente:**
 
 1. Desestruturar novas props com defaults:
+
 ```typescript
 const { actions, activeActionKey, cells, onChange, readOnly = false, highlightCell = null } = props;
 ```
 
 2. Mouse handlers condicionais:
+
 ```typescript
 function onDown(row: number, col: number, ev: React.MouseEvent): void {
   if (readOnly) return;
@@ -964,6 +1060,7 @@ function onEnter(row: number, col: number): void {
 ```
 
 3. Elemento da célula (button vs div):
+
 ```typescript
 const CellTag = readOnly ? 'div' : 'button';
 const cellProps = readOnly
@@ -976,12 +1073,14 @@ const cellProps = readOnly
 ```
 
 4. Highlight class:
+
 ```typescript
 const isHighlighted = highlightCell?.rowIndex === row && highlightCell?.colIndex === col;
 const highlightClass = isHighlighted ? 'ring-2 ring-inset ring-amber-400' : '';
 ```
 
 5. Container events condicionais:
+
 ```typescript
 // No wrapper div:
 {...(!readOnly && {
@@ -992,6 +1091,7 @@ const highlightClass = isHighlighted ? 'ring-2 ring-inset ring-amber-400' : '';
 ```
 
 6. Footer condicional:
+
 ```typescript
 {!readOnly && (
   <p className="mt-2 text-xs text-muted-foreground">
@@ -1008,11 +1108,13 @@ Alternativa: tornar `activeActionKey` opcional com default `''`. É mais limpo p
 ### 7.8 Componente: shadcn Pagination
 
 Adicionar via CLI:
+
 ```bash
 npx shadcn@latest add pagination
 ```
 
 Isto cria `src/renderer/src/components/ui/pagination.tsx` com:
+
 - `Pagination`, `PaginationContent`, `PaginationItem`
 - `PaginationPrevious`, `PaginationNext`, `PaginationLink`
 - `PaginationEllipsis`
@@ -1039,13 +1141,13 @@ export function formatDuration(ms: number): string {
 
 ## 9. Compatibilidade e Regressão
 
-| Área | Risco | Mitigação |
-|------|-------|-----------|
-| `RangeGrid13` | Quebrar pintura no editor | Props novas são opcionais com default `false`/`null`. Sem alteração em caminhos existentes. |
-| `training.ts` IPC | Conflito de merge | Novo módulo `history.ts` separado; `register.ts` apenas adiciona uma linha `registerHistoryIpc()`. |
-| Preload | Quebrar API existente | Novos métodos adicionados ao namespace `training` existente; métodos existentes inalterados. |
-| Rotas | Interferir com `/training/:sessionId` | `/history/:sessionId` é prefixo diferente; sem conflito de rotas. |
-| Sidebar | Layout overflow | Uma entrada adicional (7 total); sidebar atual tem espaço. |
+| Área              | Risco                                 | Mitigação                                                                                          |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `RangeGrid13`     | Quebrar pintura no editor             | Props novas são opcionais com default `false`/`null`. Sem alteração em caminhos existentes.        |
+| `training.ts` IPC | Conflito de merge                     | Novo módulo `history.ts` separado; `register.ts` apenas adiciona uma linha `registerHistoryIpc()`. |
+| Preload           | Quebrar API existente                 | Novos métodos adicionados ao namespace `training` existente; métodos existentes inalterados.       |
+| Rotas             | Interferir com `/training/:sessionId` | `/history/:sessionId` é prefixo diferente; sem conflito de rotas.                                  |
+| Sidebar           | Layout overflow                       | Uma entrada adicional (7 total); sidebar atual tem espaço.                                         |
 
 **Gate:** `pnpm test` (unit + build + E2E) deve passar antes de considerar a feature concluída.
 

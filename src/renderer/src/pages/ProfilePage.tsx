@@ -1,17 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DEFAULT_USER_PREFERENCES, FEEDBACK_MODES, THEME_MODES, type ThemeMode } from '@shared/constants';
 import {
-  profileChangePasswordSchema,
-  profileNameSchema,
-} from '@shared/forms/profileSchemas';
+  DEFAULT_USER_PREFERENCES,
+  FEEDBACK_MODES,
+  THEME_MODES,
+  type ThemeMode,
+} from '@shared/constants';
+import { profileChangePasswordSchema, profileNameSchema } from '@shared/forms/profileSchemas';
 import type { ApiUserPreferences } from '@/env';
 import { PageHeader, SectionCard } from '@/components/app';
-import {
-  FormField,
-  FormNumberField,
-  FormSelectField,
-  PasswordField,
-} from '@/components/forms';
+import { FormField, FormNumberField, FormSelectField, PasswordField } from '@/components/forms';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Controller, useForm } from 'react-hook-form';
@@ -153,9 +150,13 @@ export function ProfilePage(): React.ReactElement {
       setPreferenceValue('theme', effectivePreferences.theme, { shouldDirty: false });
     }
     if (!preferencesDirtyFields.defaultTrainingTotalHands) {
-      setPreferenceValue('defaultTrainingTotalHands', effectivePreferences.defaultTrainingTotalHands, {
-        shouldDirty: false,
-      });
+      setPreferenceValue(
+        'defaultTrainingTotalHands',
+        effectivePreferences.defaultTrainingTotalHands,
+        {
+          shouldDirty: false,
+        },
+      );
     }
     if (!preferencesDirtyFields.defaultTrainingTimerSeconds) {
       setPreferenceValue(
@@ -362,7 +363,9 @@ export function ProfilePage(): React.ReactElement {
                 id="profile-feedback-mode"
                 label="Feedback padrão"
                 value={field.value}
-                onValueChange={(value) => field.onChange(value as PreferencesFormValues['defaultTrainingFeedbackMode'])}
+                onValueChange={(value) =>
+                  field.onChange(value as PreferencesFormValues['defaultTrainingFeedbackMode'])
+                }
                 options={[...feedbackOptions]}
                 error={preferencesErrors.defaultTrainingFeedbackMode?.message}
               />

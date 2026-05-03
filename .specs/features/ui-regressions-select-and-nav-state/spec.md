@@ -9,8 +9,9 @@
 ## Problem Statement
 
 Há duas regressões de UX que afetam diretamente navegação e uso de formulários:
-1) os itens de seleção do `Select` (shadcn) aparecem transparentes e não utilizáveis em ambos os temas;
-2) ao entrar na página de treino simultâneo, o menu "Treino" também permanece destacado como ativo.
+
+1. os itens de seleção do `Select` (shadcn) aparecem transparentes e não utilizáveis em ambos os temas;
+2. ao entrar na página de treino simultâneo, o menu "Treino" também permanece destacado como ativo.
 
 Estas falhas reduzem usabilidade básica e geram ambiguidade de contexto na navegação.
 
@@ -26,11 +27,11 @@ Estas falhas reduzem usabilidade básica e geram ambiguidade de contexto na nave
 
 ## Out of Scope
 
-| Item                                              | Reason                                                        |
-| ------------------------------------------------- | ------------------------------------------------------------- |
-| Redesign completo do sistema de temas             | O escopo é correção de regressão, não rebranding visual       |
-| Troca da biblioteca shadcn/radix para outro stack | Correção deve manter os componentes e padrões já adotados     |
-| Refatoração ampla de roteamento                   | Apenas ajuste da lógica de estado ativo no menu de navegação  |
+| Item                                              | Reason                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| Redesign completo do sistema de temas             | O escopo é correção de regressão, não rebranding visual      |
+| Troca da biblioteca shadcn/radix para outro stack | Correção deve manter os componentes e padrões já adotados    |
+| Refatoração ampla de roteamento                   | Apenas ajuste da lógica de estado ativo no menu de navegação |
 
 ---
 
@@ -79,15 +80,15 @@ Estas falhas reduzem usabilidade básica e geram ambiguidade de contexto na nave
 
 ## Requirement Traceability
 
-| Requirement ID | Story                                                                  | Phase  | Status  |
-| -------------- | ---------------------------------------------------------------------- | ------ | ------- |
-| UIR-01         | P1: Renderizar itens do Select com contraste legível no tema claro     | Design | Done    |
-| UIR-02         | P1: Renderizar itens do Select com contraste legível no tema escuro    | Design | Done    |
-| UIR-03         | P1: Estados hover/focus legíveis para itens do Select                  | Design | Done    |
-| UIR-04         | P1: Seleção de item permanece funcional após correção visual           | Design | Done    |
-| UIR-05         | P1: Em "Treino Simultâneo", apenas menu correspondente fica ativo      | Design | Done    |
-| UIR-06         | P1: Em treino normal, apenas "Treino" fica ativo                       | Design | Done    |
-| UIR-07         | P1: Transição entre rotas de treino não mantém estado ativo residual   | Design | Done    |
+| Requirement ID | Story                                                                | Phase  | Status |
+| -------------- | -------------------------------------------------------------------- | ------ | ------ |
+| UIR-01         | P1: Renderizar itens do Select com contraste legível no tema claro   | Design | Done   |
+| UIR-02         | P1: Renderizar itens do Select com contraste legível no tema escuro  | Design | Done   |
+| UIR-03         | P1: Estados hover/focus legíveis para itens do Select                | Design | Done   |
+| UIR-04         | P1: Seleção de item permanece funcional após correção visual         | Design | Done   |
+| UIR-05         | P1: Em "Treino Simultâneo", apenas menu correspondente fica ativo    | Design | Done   |
+| UIR-06         | P1: Em treino normal, apenas "Treino" fica ativo                     | Design | Done   |
+| UIR-07         | P1: Transição entre rotas de treino não mantém estado ativo residual | Design | Done   |
 
 **Coverage:** 7 total, 7 done, 0 pending.
 

@@ -6,12 +6,12 @@ A cobertura de testes actual do projeto está abaixo dos padrões de mercado par
 
 ## Baseline (medido em 2026-05-02)
 
-| Métrica   | Actual  | Meta P1 | Meta P2 |
-|-----------|---------|---------|---------|
-| Statements | 65.84% | ≥ 80%  | ≥ 90%  |
-| Branches   | 56.25% | ≥ 75%  | ≥ 85%  |
-| Functions  | 74.59% | ≥ 85%  | ≥ 90%  |
-| Lines      | 67.65% | ≥ 80%  | ≥ 90%  |
+| Métrica    | Actual | Meta P1 | Meta P2 |
+| ---------- | ------ | ------- | ------- |
+| Statements | 65.84% | ≥ 80%   | ≥ 90%   |
+| Branches   | 56.25% | ≥ 75%   | ≥ 85%   |
+| Functions  | 74.59% | ≥ 85%   | ≥ 90%   |
+| Lines      | 67.65% | ≥ 80%   | ≥ 90%   |
 
 > **Referência de mercado:** Projectos TypeScript com domínio de negócio crítico (lógica de jogo, auth, persistência) visam tipicamente 80–90% em statements/lines e 70–80% em branches como threshold de CI aceitável. Abaixo de 70% em statements é considerado risco alto pela comunidade (Jest/Vitest docs, Google Testing Blog, Atlassian Engineering standards).
 
@@ -19,29 +19,30 @@ A cobertura de testes actual do projeto está abaixo dos padrões de mercado par
 
 ### Camada Main Process (IPC + Serviços)
 
-| Ficheiro | Stmts | Branches | Funcs | Prioridade |
-|---|---|---|---|---|
-| `main/ipc/training.ts` | 22% | 12% | 19% | **P1 — crítico** |
-| `main/ipc/stats.ts` | 24% | 13% | 24% | **P1 — crítico** |
-| `main/ipc/situations.ts` | 0% | 0% | 0% | **P1 — crítico** |
-| `main/ipc/auth.ts` | 0% | 0% | 0% | **P1 — crítico** |
-| `main/services/session.ts` | 0% | 0% | 0% | **P1 — crítico** |
-| `main/db/schema.ts` | 69% | 100% | 44% | P2 |
-| `shared/poker/grid.ts` | 69% | 60% | 80% | P2 |
-| `shared/forms/authSchemas.ts` | 77% | 56% | 80% | P2 |
+| Ficheiro                      | Stmts | Branches | Funcs | Prioridade       |
+| ----------------------------- | ----- | -------- | ----- | ---------------- |
+| `main/ipc/training.ts`        | 22%   | 12%      | 19%   | **P1 — crítico** |
+| `main/ipc/stats.ts`           | 24%   | 13%      | 24%   | **P1 — crítico** |
+| `main/ipc/situations.ts`      | 0%    | 0%       | 0%    | **P1 — crítico** |
+| `main/ipc/auth.ts`            | 0%    | 0%       | 0%    | **P1 — crítico** |
+| `main/services/session.ts`    | 0%    | 0%       | 0%    | **P1 — crítico** |
+| `main/db/schema.ts`           | 69%   | 100%     | 44%   | P2               |
+| `shared/poker/grid.ts`        | 69%   | 60%      | 80%   | P2               |
+| `shared/forms/authSchemas.ts` | 77%   | 56%      | 80%   | P2               |
 
 ### Camada Renderer (Componentes + Páginas)
 
-| Ficheiro / Grupo | Situação | Prioridade |
-|---|---|---|
-| Páginas (`SituationsPage`, `DashboardPage`, `StatsPage`, `TrainingSessionPage`, `GroupsPage`, etc.) | 0% — sem testes unitários | P2 |
-| `components/ui/*` (card, select, alert-dialog) | 57–83% | P3 |
-| `components/groups/GroupCard` | 0% | P2 |
-| `components/training/SessionSettingsForm`, `TrainingFeedbackPanel`, etc. | 0% | P2 |
+| Ficheiro / Grupo                                                                                    | Situação                  | Prioridade |
+| --------------------------------------------------------------------------------------------------- | ------------------------- | ---------- |
+| Páginas (`SituationsPage`, `DashboardPage`, `StatsPage`, `TrainingSessionPage`, `GroupsPage`, etc.) | 0% — sem testes unitários | P2         |
+| `components/ui/*` (card, select, alert-dialog)                                                      | 57–83%                    | P3         |
+| `components/groups/GroupCard`                                                                       | 0%                        | P2         |
+| `components/training/SessionSettingsForm`, `TrainingFeedbackPanel`, etc.                            | 0%                        | P2         |
 
 ### Camada E2E
 
 21 ficheiros de spec cobrem os fluxos principais. Lacunas identificadas:
+
 - Sem spec para fluxo de **edição de situação** (range editor)
 - Sem spec para fluxo de **dashboard** (verificação de KPIs)
 - Sem spec para **tratamento de erros de rede/IPC** (ex: DB inacessível)
@@ -58,12 +59,12 @@ A cobertura de testes actual do projeto está abaixo dos padrões de mercado par
 
 ## Out of Scope
 
-| Feature | Reason |
-|---|---|
+| Feature                                                                       | Reason                                                                   |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Cobertura de ficheiros `src/renderer/src/components/ui/*` gerados pelo shadcn | Código de biblioteca gerado — testar comportamento externo, não internos |
-| Testes E2E para cada permutation de range grid 13×13 | Cobertura de domínio já existe em unit tests de `grid.ts` |
-| Snapshot tests visuais (screenshot comparison) | Fora do âmbito; requer infra adicional |
-| Cobertura de `src/main/index.ts` (bootstrap) | Ficheiro de bootstrap — testado de forma integrada via E2E |
+| Testes E2E para cada permutation de range grid 13×13                          | Cobertura de domínio já existe em unit tests de `grid.ts`                |
+| Snapshot tests visuais (screenshot comparison)                                | Fora do âmbito; requer infra adicional                                   |
+| Cobertura de `src/main/index.ts` (bootstrap)                                  | Ficheiro de bootstrap — testado de forma integrada via E2E               |
 
 ---
 
@@ -270,30 +271,30 @@ A cobertura de testes actual do projeto está abaixo dos padrões de mercado par
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
-|---|---|---|---|
-| COV-01 | P1-01: situations IPC | Tasks | Pending |
-| COV-02 | P1-01: situations create dedup | Tasks | Pending |
-| COV-03 | P1-01: situations soft-delete | Tasks | Pending |
-| COV-04 | P1-01: situations duplicate naming | Tasks | Pending |
-| COV-05 | P1-02: auth register validation | Tasks | Pending |
-| COV-06 | P1-02: auth login wrong password | Tasks | Pending |
-| COV-07 | P1-02: auth:me token invalid | Tasks | Pending |
-| COV-08 | P1-03: session JWT sign/verify | Tasks | Pending |
-| COV-09 | P1-03: session PT_E2E_TOKEN_FILE | Tasks | Pending |
-| COV-10 | P1-04: training:nextHand | Tasks | Pending |
-| COV-11 | P1-04: training:submitAnswer correcto | Tasks | Pending |
-| COV-12 | P1-04: training:submitAnswer incorrecto | Tasks | Pending |
-| COV-13 | P1-04: training:endSession | Tasks | Pending |
-| COV-14 | P1-05: stats:bySituation | Tasks | Pending |
-| COV-15 | P1-05: stats:evolution | Tasks | Pending |
-| COV-16 | P1-05: stats:worstHands | Tasks | Pending |
-| COV-17 | P1-06: vitest coverage thresholds CI | Tasks | Pending |
-| COV-18 | P2-01: grid.ts edge cases | Tasks | Pending |
-| COV-19 | P2-02: componentes renderer | Tasks | Pending |
-| COV-20 | P2-03: E2E situation-edit | Tasks | Pending |
-| COV-21 | P2-03: E2E auth-flows logout | Tasks | Pending |
-| COV-22 | P3-01: HTML coverage report | Tasks | Pending |
+| Requirement ID | Story                                   | Phase | Status  |
+| -------------- | --------------------------------------- | ----- | ------- |
+| COV-01         | P1-01: situations IPC                   | Tasks | Pending |
+| COV-02         | P1-01: situations create dedup          | Tasks | Pending |
+| COV-03         | P1-01: situations soft-delete           | Tasks | Pending |
+| COV-04         | P1-01: situations duplicate naming      | Tasks | Pending |
+| COV-05         | P1-02: auth register validation         | Tasks | Pending |
+| COV-06         | P1-02: auth login wrong password        | Tasks | Pending |
+| COV-07         | P1-02: auth:me token invalid            | Tasks | Pending |
+| COV-08         | P1-03: session JWT sign/verify          | Tasks | Pending |
+| COV-09         | P1-03: session PT_E2E_TOKEN_FILE        | Tasks | Pending |
+| COV-10         | P1-04: training:nextHand                | Tasks | Pending |
+| COV-11         | P1-04: training:submitAnswer correcto   | Tasks | Pending |
+| COV-12         | P1-04: training:submitAnswer incorrecto | Tasks | Pending |
+| COV-13         | P1-04: training:endSession              | Tasks | Pending |
+| COV-14         | P1-05: stats:bySituation                | Tasks | Pending |
+| COV-15         | P1-05: stats:evolution                  | Tasks | Pending |
+| COV-16         | P1-05: stats:worstHands                 | Tasks | Pending |
+| COV-17         | P1-06: vitest coverage thresholds CI    | Tasks | Pending |
+| COV-18         | P2-01: grid.ts edge cases               | Tasks | Pending |
+| COV-19         | P2-02: componentes renderer             | Tasks | Pending |
+| COV-20         | P2-03: E2E situation-edit               | Tasks | Pending |
+| COV-21         | P2-03: E2E auth-flows logout            | Tasks | Pending |
+| COV-22         | P3-01: HTML coverage report             | Tasks | Pending |
 
 **Coverage:** 22 total, 0 mapped to tasks, 22 unmapped ⚠️
 

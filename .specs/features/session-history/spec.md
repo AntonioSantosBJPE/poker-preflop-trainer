@@ -31,13 +31,13 @@ Sem esta funcionalidade, o ciclo de aprendizagem fica truncado: o utilizador vê
 
 ## Out of Scope
 
-| Item                                                     | Reason                                                    |
-| -------------------------------------------------------- | --------------------------------------------------------- |
-| Exportar histórico (CSV/JSON)                            | Fora do MVP; funcionalidade de export futuro              |
-| Filtro por data (date range)                             | Complexidade de UX adicional; dados já ordenados por data |
-| Revisão interativa (refazer mão)                         | Fora do escopo desta feature; é treino, não revisão       |
-| Agregação por bloco de sessão simultânea                 | Sessões simultâneas usam `sessionBlockId`; agrupamento é P2 |
-| Alterações ao schema da BD                               | Schema atual (`trainingSessions` + `sessionHands`) já cobre todos os dados necessários |
+| Item                                     | Reason                                                                                 |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| Exportar histórico (CSV/JSON)            | Fora do MVP; funcionalidade de export futuro                                           |
+| Filtro por data (date range)             | Complexidade de UX adicional; dados já ordenados por data                              |
+| Revisão interativa (refazer mão)         | Fora do escopo desta feature; é treino, não revisão                                    |
+| Agregação por bloco de sessão simultânea | Sessões simultâneas usam `sessionBlockId`; agrupamento é P2                            |
+| Alterações ao schema da BD               | Schema atual (`trainingSessions` + `sessionHands`) já cobre todos os dados necessários |
 
 ---
 
@@ -57,15 +57,15 @@ Sem esta funcionalidade, o ciclo de aprendizagem fica truncado: o utilizador vê
 
 **Detalhe de cada linha da tabela:**
 
-| Coluna         | Fonte / Cálculo                                                                   |
-| -------------- | --------------------------------------------------------------------------------- |
-| Data           | `training_sessions.startedAt` formatado (dd/mm/aaaa HH:mm)                        |
-| Grupo          | `situation_groups.name` via JOIN (`groupId`)                                      |
-| Situações      | Nº de situações (`JSON.parse(situationIdsJson).length`)                           |
-| Resultado      | `%` acerto = `COUNT(sessionHands WHERE isCorrect) / COUNT(sessionHands)` × 100    |
-| Duração        | `finishedAt - startedAt` formatado (Xmin Ys)                                      |
-| Tipo           | Badge "Individual" ou "Simultâneo (N mesas)"                                      |
-| Mãos           | `totalHands`                                                                      |
+| Coluna    | Fonte / Cálculo                                                                |
+| --------- | ------------------------------------------------------------------------------ |
+| Data      | `training_sessions.startedAt` formatado (dd/mm/aaaa HH:mm)                     |
+| Grupo     | `situation_groups.name` via JOIN (`groupId`)                                   |
+| Situações | Nº de situações (`JSON.parse(situationIdsJson).length`)                        |
+| Resultado | `%` acerto = `COUNT(sessionHands WHERE isCorrect) / COUNT(sessionHands)` × 100 |
+| Duração   | `finishedAt - startedAt` formatado (Xmin Ys)                                   |
+| Tipo      | Badge "Individual" ou "Simultâneo (N mesas)"                                   |
+| Mãos      | `totalHands`                                                                   |
 
 **Independent Test:** Navegar para `/history`, verificar tabela populada, mudar de página, confirmar ordenação cronológica inversa.
 
@@ -158,34 +158,34 @@ Sem esta funcionalidade, o ciclo de aprendizagem fica truncado: o utilizador vê
 
 ### Unit/Integration (suporte)
 
-| Camada                   | O que validar                                                                     | Prioridade |
-| ------------------------ | --------------------------------------------------------------------------------- | ---------- |
-| Shared types             | Novos DTOs (`SessionHistoryItemDto`, `SessionHandDetailDto`, paginação)           | P1         |
-| Main IPC handlers        | `training:listSessions` com paginação, filtros e JOINs corretos                   | P1         |
-| Main IPC handlers        | `training:getSessionDetail` com hands enriquecidas + rangeCells                   | P1         |
-| Main IPC handlers        | Validação de parâmetros (page ≥ 1, pageSize ∈ [10, 50])                           | P1         |
-| Main IPC handlers        | Segurança: `requireUserId` impede acesso a sessões de outros users                | P1         |
-| Renderer components      | `SessionHistoryList` — renderização de estados (loading, empty, dados, erro)      | P2         |
-| Renderer components      | `HandReviewCard` — grid com highlight + indicadores de acerto/erro                | P2         |
-| Renderer hooks           | `useHistoryParams` — sincronização filtros ↔ query params                         | P2         |
+| Camada              | O que validar                                                                | Prioridade |
+| ------------------- | ---------------------------------------------------------------------------- | ---------- |
+| Shared types        | Novos DTOs (`SessionHistoryItemDto`, `SessionHandDetailDto`, paginação)      | P1         |
+| Main IPC handlers   | `training:listSessions` com paginação, filtros e JOINs corretos              | P1         |
+| Main IPC handlers   | `training:getSessionDetail` com hands enriquecidas + rangeCells              | P1         |
+| Main IPC handlers   | Validação de parâmetros (page ≥ 1, pageSize ∈ [10, 50])                      | P1         |
+| Main IPC handlers   | Segurança: `requireUserId` impede acesso a sessões de outros users           | P1         |
+| Renderer components | `SessionHistoryList` — renderização de estados (loading, empty, dados, erro) | P2         |
+| Renderer components | `HandReviewCard` — grid com highlight + indicadores de acerto/erro           | P2         |
+| Renderer hooks      | `useHistoryParams` — sincronização filtros ↔ query params                    | P2         |
 
 ### E2E (Playwright + Electron) — Cobertura obrigatória
 
-| Test ID       | Critério coberto                                                                              | Ficheiro sugerido                             |
-| ------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| E2E-HIST-01   | Sidebar exibe "Histórico" e navega para `/history`                                            | `e2e/session-history/navigation.spec.ts`      |
-| E2E-HIST-02   | Lista exibe sessões com dados corretos (data, grupo, acerto %, duração, tipo, mãos)          | `e2e/session-history/list.spec.ts`            |
-| E2E-HIST-03   | Paginação funciona: muda página, dados atualizam, controlos respondem                         | `e2e/session-history/pagination.spec.ts`      |
-| E2E-HIST-04   | Filtro por grupo limita resultados                                                            | `e2e/session-history/filters.spec.ts`         |
-| E2E-HIST-05   | Filtro por tipo de sessão (single/simultaneous) funciona                                      | `e2e/session-history/filters.spec.ts`         |
-| E2E-HIST-06   | Empty state quando não há sessões                                                             | `e2e/session-history/empty-state.spec.ts`     |
-| E2E-HIST-07   | Drill-down para `/history/:sessionId` mostra cabeçalho e primeira mão                         | `e2e/session-history/hand-review.spec.ts`     |
-| E2E-HIST-08   | Navegação entre mãos (anterior/próxima) com bloqueio nos extremos                             | `e2e/session-history/hand-review.spec.ts`     |
-| E2E-HIST-09   | Grid 13×13 mostra range e célula da mão destacada                                             | `e2e/session-history/hand-review.spec.ts`     |
-| E2E-HIST-10   | Mão errada mostra indicador visual de erro; mão certa mostra check                            | `e2e/session-history/hand-review.spec.ts`     |
-| E2E-HIST-11   | Timeout hand mostra "Timeout" como ação e indicador de erro                                   | `e2e/session-history/hand-review.spec.ts`     |
-| E2E-HIST-12   | "Voltar ao histórico" preserva filtros e página                                               | `e2e/session-history/back-navigation.spec.ts` |
-| E2E-HIST-13   | Sessão inexistente mostra erro claro                                                          | `e2e/session-history/error-handling.spec.ts`  |
+| Test ID     | Critério coberto                                                                    | Ficheiro sugerido                             |
+| ----------- | ----------------------------------------------------------------------------------- | --------------------------------------------- |
+| E2E-HIST-01 | Sidebar exibe "Histórico" e navega para `/history`                                  | `e2e/session-history/navigation.spec.ts`      |
+| E2E-HIST-02 | Lista exibe sessões com dados corretos (data, grupo, acerto %, duração, tipo, mãos) | `e2e/session-history/list.spec.ts`            |
+| E2E-HIST-03 | Paginação funciona: muda página, dados atualizam, controlos respondem               | `e2e/session-history/pagination.spec.ts`      |
+| E2E-HIST-04 | Filtro por grupo limita resultados                                                  | `e2e/session-history/filters.spec.ts`         |
+| E2E-HIST-05 | Filtro por tipo de sessão (single/simultaneous) funciona                            | `e2e/session-history/filters.spec.ts`         |
+| E2E-HIST-06 | Empty state quando não há sessões                                                   | `e2e/session-history/empty-state.spec.ts`     |
+| E2E-HIST-07 | Drill-down para `/history/:sessionId` mostra cabeçalho e primeira mão               | `e2e/session-history/hand-review.spec.ts`     |
+| E2E-HIST-08 | Navegação entre mãos (anterior/próxima) com bloqueio nos extremos                   | `e2e/session-history/hand-review.spec.ts`     |
+| E2E-HIST-09 | Grid 13×13 mostra range e célula da mão destacada                                   | `e2e/session-history/hand-review.spec.ts`     |
+| E2E-HIST-10 | Mão errada mostra indicador visual de erro; mão certa mostra check                  | `e2e/session-history/hand-review.spec.ts`     |
+| E2E-HIST-11 | Timeout hand mostra "Timeout" como ação e indicador de erro                         | `e2e/session-history/hand-review.spec.ts`     |
+| E2E-HIST-12 | "Voltar ao histórico" preserva filtros e página                                     | `e2e/session-history/back-navigation.spec.ts` |
+| E2E-HIST-13 | Sessão inexistente mostra erro claro                                                | `e2e/session-history/error-handling.spec.ts`  |
 
 **Regras para os E2E desta feature:**
 
@@ -198,29 +198,29 @@ Sem esta funcionalidade, o ciclo de aprendizagem fica truncado: o utilizador vê
 
 ## Requirement Traceability
 
-| Requirement ID | Descrição                                                                      | Status |
-| -------------- | ------------------------------------------------------------------------------ | ------ |
-| HIST-01        | Sidebar exibe entrada "Histórico" com navegação para `/history`                | [x]    |
-| HIST-02        | Lista paginada de sessões concluídas (ordenada por data desc)                  | [x]    |
-| HIST-03        | Colunas: data, grupo, situações, acerto %, duração, tipo, mãos                 | [x]    |
-| HIST-04        | Server-side pagination com query params (`page`, `pageSize`)                   | [x]    |
-| HIST-05        | Empty state quando não há sessões                                              | [x]    |
-| HIST-06        | Omissão de sessões com `finishedAt` = NULL                                     | [x]    |
-| HIST-07        | Filtro por grupo (tabs horizontais + "Todos", padrão StatsPage)               | [x]    |
-| HIST-08        | Filtro por tipo de sessão (single/simultaneous/all)                            | [x]    |
-| HIST-09        | Filtro por nº de mesas (2/3/4/Todas) quando tipo = simultaneous                | [x]    |
-| HIST-10        | Reset de página ao alterar filtros                                             | [x]    |
-| HIST-11        | Drill-down: clique na linha → `/history/:sessionId`                            | [x]    |
-| HIST-12        | Cabeçalho da revisão: data, grupo, acerto %, duração                           | [x]    |
-| HIST-13        | Exibição de hole cards, situação, ação escolhida, indicador acerto/erro        | [x]    |
-| HIST-14        | Grid 13×13 read-only com range da situação e célula da mão destacada           | [x]    |
-| HIST-15        | Navegação anterior/próxima entre mãos com bloqueio nos extremos                | [x]    |
-| HIST-16        | Tratamento de timeout (`chosenActionId` = NULL → "Timeout")                    | [x]    |
-| HIST-17        | Tratamento de FOLD implícito (range vazio → FOLD é correto)                    | [x]    |
-| HIST-18        | "Voltar ao histórico" preserva filtros e página                                | [x]    |
-| HIST-19        | Resiliência a situações/grupos arquivados (não filtra por `isActive`)          | [x]    |
-| HIST-20        | Segurança: `requireUserId` em todos os handlers IPC novos                      | [x]    |
-| HIST-21        | Query params sincronizam filtros e página (grupo, tipo, mesas, página)         | [x]    |
+| Requirement ID | Descrição                                                               | Status |
+| -------------- | ----------------------------------------------------------------------- | ------ |
+| HIST-01        | Sidebar exibe entrada "Histórico" com navegação para `/history`         | [x]    |
+| HIST-02        | Lista paginada de sessões concluídas (ordenada por data desc)           | [x]    |
+| HIST-03        | Colunas: data, grupo, situações, acerto %, duração, tipo, mãos          | [x]    |
+| HIST-04        | Server-side pagination com query params (`page`, `pageSize`)            | [x]    |
+| HIST-05        | Empty state quando não há sessões                                       | [x]    |
+| HIST-06        | Omissão de sessões com `finishedAt` = NULL                              | [x]    |
+| HIST-07        | Filtro por grupo (tabs horizontais + "Todos", padrão StatsPage)         | [x]    |
+| HIST-08        | Filtro por tipo de sessão (single/simultaneous/all)                     | [x]    |
+| HIST-09        | Filtro por nº de mesas (2/3/4/Todas) quando tipo = simultaneous         | [x]    |
+| HIST-10        | Reset de página ao alterar filtros                                      | [x]    |
+| HIST-11        | Drill-down: clique na linha → `/history/:sessionId`                     | [x]    |
+| HIST-12        | Cabeçalho da revisão: data, grupo, acerto %, duração                    | [x]    |
+| HIST-13        | Exibição de hole cards, situação, ação escolhida, indicador acerto/erro | [x]    |
+| HIST-14        | Grid 13×13 read-only com range da situação e célula da mão destacada    | [x]    |
+| HIST-15        | Navegação anterior/próxima entre mãos com bloqueio nos extremos         | [x]    |
+| HIST-16        | Tratamento de timeout (`chosenActionId` = NULL → "Timeout")             | [x]    |
+| HIST-17        | Tratamento de FOLD implícito (range vazio → FOLD é correto)             | [x]    |
+| HIST-18        | "Voltar ao histórico" preserva filtros e página                         | [x]    |
+| HIST-19        | Resiliência a situações/grupos arquivados (não filtra por `isActive`)   | [x]    |
+| HIST-20        | Segurança: `requireUserId` em todos os handlers IPC novos               | [x]    |
+| HIST-21        | Query params sincronizam filtros e página (grupo, tipo, mesas, página)  | [x]    |
 
 ---
 
@@ -228,25 +228,25 @@ Sem esta funcionalidade, o ciclo de aprendizagem fica truncado: o utilizador vê
 
 ### Novos canais IPC
 
-| Canal                        | Parâmetros                                                                | Retorno                                     |
-| ---------------------------- | ------------------------------------------------------------------------- | ------------------------------------------- |
-| `training:listSessions`      | `{ page, pageSize, groupId?, sessionType?, simultaneousTableCount? }`     | `{ items: SessionHistoryItemDto[], total: number, page: number, pageSize: number }` |
-| `training:getSessionDetail`  | `sessionId: number`                                                       | `SessionDetailDto` (sessão + hands enriquecidas + rangeCells) |
+| Canal                       | Parâmetros                                                            | Retorno                                                                             |
+| --------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `training:listSessions`     | `{ page, pageSize, groupId?, sessionType?, simultaneousTableCount? }` | `{ items: SessionHistoryItemDto[], total: number, page: number, pageSize: number }` |
+| `training:getSessionDetail` | `sessionId: number`                                                   | `SessionDetailDto` (sessão + hands enriquecidas + rangeCells)                       |
 
 ### Novos DTOs (em `src/shared/ipc/types.ts`)
 
 ```typescript
 export type SessionHistoryItemDto = {
   id: number;
-  startedAt: number;          // timestamp ms
-  finishedAt: number | null;  // timestamp ms
-  groupName: string | null;   // via JOIN situation_groups
-  situationCount: number;     // parsed from situationIdsJson
+  startedAt: number; // timestamp ms
+  finishedAt: number | null; // timestamp ms
+  groupName: string | null; // via JOIN situation_groups
+  situationCount: number; // parsed from situationIdsJson
   totalHands: number;
-  handsPlayed: number;        // COUNT sessionHands
-  correct: number;            // COUNT sessionHands WHERE isCorrect
-  accuracy: number;           // correct / handsPlayed (0 se 0)
-  durationMs: number | null;  // finishedAt - startedAt (null se inacabada)
+  handsPlayed: number; // COUNT sessionHands
+  correct: number; // COUNT sessionHands WHERE isCorrect
+  accuracy: number; // correct / handsPlayed (0 se 0)
+  durationMs: number | null; // finishedAt - startedAt (null se inacabada)
   sessionType: SessionType;
   simultaneousTableCount: number | null;
 };
@@ -262,7 +262,7 @@ export type SessionHandDetailDto = {
     name: string;
     actionType: ActionType;
     colorHex: string;
-  } | null;                   // null quando timeout
+  } | null; // null quando timeout
   isCorrect: boolean;
   responseMs: number;
   gridCell: { rowIndex: number; colIndex: number };
@@ -272,7 +272,7 @@ export type SessionHandDetailDto = {
 export type SessionDetailDto = {
   session: SessionHistoryItemDto;
   hands: SessionHandDetailDto[];
-  situationRangeCells: Record<number, RangeCellDto[]>;  // situationId -> cells
+  situationRangeCells: Record<number, RangeCellDto[]>; // situationId -> cells
 };
 
 export type SessionListResponse = {
@@ -304,6 +304,7 @@ Mesma estrutura do `StatsPage`: `FilterToolbar` com `Tabs` horizontais para grup
 ### Query params (P2)
 
 Formato:
+
 ```
 /history?page=2&groupId=3&sessionType=simultaneous&tableCount=4
 ```

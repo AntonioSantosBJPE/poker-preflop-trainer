@@ -71,7 +71,9 @@ describe('registerHistoryIpc', () => {
   describe('training:listSessions', () => {
     it('retorna lista vazia quando não há sessões', async () => {
       const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, {})) as {
@@ -104,7 +106,9 @@ describe('registerHistoryIpc', () => {
         durationMs: 300000,
       };
       const db = createListSessionsDbMock({ countTotal: 1, rows: [row] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, {})) as {
@@ -152,7 +156,9 @@ describe('registerHistoryIpc', () => {
         durationMs: 300000,
       }));
       const db = createListSessionsDbMock({ countTotal: 25, rows });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, { page: 2 })) as {
@@ -170,7 +176,9 @@ describe('registerHistoryIpc', () => {
 
     it('filtra por groupId', async () => {
       const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, { groupId: 5 })) as { total: number };
@@ -179,7 +187,9 @@ describe('registerHistoryIpc', () => {
 
     it('filtra por sessionType', async () => {
       const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, { sessionType: 'simultaneous' })) as { total: number };
@@ -188,7 +198,9 @@ describe('registerHistoryIpc', () => {
 
     it('filtra por simultaneousTableCount', async () => {
       const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, { simultaneousTableCount: 4 })) as { total: number };
@@ -210,7 +222,9 @@ describe('registerHistoryIpc', () => {
         durationMs: 300000,
       };
       const db = createListSessionsDbMock({ countTotal: 1, rows: [row] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, {})) as { items: { accuracy: number }[] };
@@ -232,7 +246,9 @@ describe('registerHistoryIpc', () => {
         durationMs: 300000,
       };
       const db = createListSessionsDbMock({ countTotal: 1, rows: [row] });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:listSessions');
       const res = (await handler({}, {})) as { items: { groupName: string | null }[] };
@@ -337,19 +353,45 @@ describe('registerHistoryIpc', () => {
         ],
         situationRows: [{ id: 10, name: 'BTN Open', position: 'BTN' }],
         actionRows: [
-          { id: 1, situationId: 10, name: 'Raise', actionType: 'RAISE_OPEN', sizeBb: 2.5, colorHex: '#ff0000', sortOrder: 0 },
-          { id: 2, situationId: 10, name: 'Fold', actionType: 'FOLD', sizeBb: null, colorHex: '#888888', sortOrder: 1 },
+          {
+            id: 1,
+            situationId: 10,
+            name: 'Raise',
+            actionType: 'RAISE_OPEN',
+            sizeBb: 2.5,
+            colorHex: '#ff0000',
+            sortOrder: 0,
+          },
+          {
+            id: 2,
+            situationId: 10,
+            name: 'Fold',
+            actionType: 'FOLD',
+            sizeBb: null,
+            colorHex: '#888888',
+            sortOrder: 1,
+          },
         ],
         rangeCellRows: [{ id: 1, actionId: 1, rowIndex: 0, colIndex: 1, frequency: 1 }],
       });
 
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:getSessionDetail');
       const res = (await handler({}, 1)) as {
         session: { id: number; handsPlayed: number; accuracy: number };
-        hands: { handIndex: number; isCorrect: boolean; situationName: string; correctActionIds: number[] }[];
-        situationActionsMap: Record<number, { name: string; actions: unknown[]; rangeCells: unknown[] }>;
+        hands: {
+          handIndex: number;
+          isCorrect: boolean;
+          situationName: string;
+          correctActionIds: number[];
+        }[];
+        situationActionsMap: Record<
+          number,
+          { name: string; actions: unknown[]; rangeCells: unknown[] }
+        >;
       };
 
       expect(res.session.id).toBe(1);
@@ -383,7 +425,9 @@ describe('registerHistoryIpc', () => {
         sessionRow: sessionRow(),
         hands: [],
       });
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:getSessionDetail');
       const res = (await handler({}, 1)) as {
@@ -416,12 +460,22 @@ describe('registerHistoryIpc', () => {
         ],
         situationRows: [{ id: 10, name: 'BTN Open', position: 'BTN' }],
         actionRows: [
-          { id: 1, situationId: 10, name: 'Raise', actionType: 'RAISE_OPEN', sizeBb: 2.5, colorHex: '#ff0000', sortOrder: 0 },
+          {
+            id: 1,
+            situationId: 10,
+            name: 'Raise',
+            actionType: 'RAISE_OPEN',
+            sizeBb: 2.5,
+            colorHex: '#ff0000',
+            sortOrder: 0,
+          },
         ],
         rangeCellRows: [],
       });
 
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:getSessionDetail');
       const res = (await handler({}, 1)) as {
@@ -455,7 +509,9 @@ describe('registerHistoryIpc', () => {
         rangeCellRows: [],
       });
 
-      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<typeof getDb>);
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
 
       const handler = getHandler('training:getSessionDetail');
       const res = (await handler({}, 1)) as {

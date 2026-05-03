@@ -41,9 +41,11 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
   const preferredTotalHands =
     rawPreferences?.defaultTrainingTotalHands ?? DEFAULT_USER_PREFERENCES.defaultTrainingTotalHands;
   const preferredTimerSeconds =
-    rawPreferences?.defaultTrainingTimerSeconds ?? DEFAULT_USER_PREFERENCES.defaultTrainingTimerSeconds;
+    rawPreferences?.defaultTrainingTimerSeconds ??
+    DEFAULT_USER_PREFERENCES.defaultTrainingTimerSeconds;
   const preferredFeedbackMode =
-    rawPreferences?.defaultTrainingFeedbackMode ?? DEFAULT_USER_PREFERENCES.defaultTrainingFeedbackMode;
+    rawPreferences?.defaultTrainingFeedbackMode ??
+    DEFAULT_USER_PREFERENCES.defaultTrainingFeedbackMode;
 
   const {
     register,

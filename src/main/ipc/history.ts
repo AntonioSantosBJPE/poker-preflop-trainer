@@ -2,10 +2,21 @@ import { ipcMain } from 'electron';
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { ActionType, Position, RankChar, SuitChar } from '@shared/constants';
 import type { CardDto } from '@shared/ipc/types';
-import type { SessionDetailDto, SessionHandDetailDto, SessionHistoryItemDto } from '@shared/ipc/types';
+import type {
+  SessionDetailDto,
+  SessionHandDetailDto,
+  SessionHistoryItemDto,
+} from '@shared/ipc/types';
 import { evaluateTrainingAnswer, handToGridCell } from '@shared/poker/grid';
 import { parseSessionHistoryFilters } from '@shared/forms/trainingSchemas';
-import { actions, rangeCells, sessionHands, situationGroups, situations, trainingSessions } from '../db/schema';
+import {
+  actions,
+  rangeCells,
+  sessionHands,
+  situationGroups,
+  situations,
+  trainingSessions,
+} from '../db/schema';
 import { getDb } from '../db/client';
 import { requireUserId } from '../services/session';
 
@@ -20,9 +31,7 @@ export function registerHistoryIpc(): void {
     const userId = await requireUserId();
     const db = getDb();
 
-    const conditions: ReturnType<typeof eq>[] = [
-      eq(trainingSessions.userId, userId),
-    ];
+    const conditions: ReturnType<typeof eq>[] = [eq(trainingSessions.userId, userId)];
     conditions.push(sql`${trainingSessions.finishedAt} IS NOT NULL` as ReturnType<typeof eq>);
     if (filters.groupId !== undefined) {
       conditions.push(eq(trainingSessions.groupId, filters.groupId));
@@ -57,15 +66,18 @@ export function registerHistoryIpc(): void {
         simultaneousTableCount: trainingSessions.simultaneousTableCount,
         situationCount:
           sql<number>`json_array_length(${trainingSessions.situationIdsJson})`.mapWith(Number),
-        handsPlayed: sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id})`.mapWith(
-          Number,
-        ),
-        correct: sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id} AND session_hands.is_correct = 1)`.mapWith(
-          Number,
-        ),
-        durationMs: sql<number>`(unixepoch(${trainingSessions.finishedAt}) - unixepoch(${trainingSessions.startedAt})) * 1000`.mapWith(
-          Number,
-        ),
+        handsPlayed:
+          sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id})`.mapWith(
+            Number,
+          ),
+        correct:
+          sql<number>`(SELECT COUNT(*) FROM session_hands WHERE session_hands.session_id = ${trainingSessions.id} AND session_hands.is_correct = 1)`.mapWith(
+            Number,
+          ),
+        durationMs:
+          sql<number>`(unixepoch(${trainingSessions.finishedAt}) - unixepoch(${trainingSessions.startedAt})) * 1000`.mapWith(
+            Number,
+          ),
       })
       .from(trainingSessions)
       .leftJoin(situationGroups, eq(trainingSessions.groupId, situationGroups.id))
@@ -135,9 +147,8 @@ export function registerHistoryIpc(): void {
         handsPlayed: 0,
         correct: 0,
         accuracy: 0,
-        durationMs: s.finishedAt && s.startedAt
-          ? toTimestamp(s.finishedAt) - toTimestamp(s.startedAt)
-          : null,
+        durationMs:
+          s.finishedAt && s.startedAt ? toTimestamp(s.finishedAt) - toTimestamp(s.startedAt) : null,
         sessionType: (s.sessionType as SessionDetailDto['session']['sessionType']) ?? 'single',
         simultaneousTableCount: s.simultaneousTableCount,
       };
@@ -146,26 +157,26 @@ export function registerHistoryIpc(): void {
 
     const sitIds = [...new Set(hands.map((h) => h.situationId))];
 
-    const sitRows = sitIds.length > 0
-      ? await db.select().from(situations).where(inArray(situations.id, sitIds))
-      : [];
-    const actionRows = sitIds.length > 0
-      ? await db
-          .select()
-          .from(actions)
-          .where(inArray(actions.situationId, sitIds))
-      : [];
-    const cellRows = actionRows.length > 0
-      ? await db
-          .select()
-          .from(rangeCells)
-          .where(
-            inArray(
-              rangeCells.actionId,
-              actionRows.map((a) => a.id),
-            ),
-          )
-      : [];
+    const sitRows =
+      sitIds.length > 0
+        ? await db.select().from(situations).where(inArray(situations.id, sitIds))
+        : [];
+    const actionRows =
+      sitIds.length > 0
+        ? await db.select().from(actions).where(inArray(actions.situationId, sitIds))
+        : [];
+    const cellRows =
+      actionRows.length > 0
+        ? await db
+            .select()
+            .from(rangeCells)
+            .where(
+              inArray(
+                rangeCells.actionId,
+                actionRows.map((a) => a.id),
+              ),
+            )
+        : [];
 
     const actionsBySit = new Map<number, (typeof actionRows)[number][]>();
     const cellsByAction = new Map<number, (typeof cellRows)[number][]>();
@@ -277,9 +288,7 @@ export function registerHistoryIpc(): void {
       correct,
       accuracy: handsPlayed > 0 ? correct / handsPlayed : 0,
       durationMs:
-        s.finishedAt && s.startedAt
-          ? toTimestamp(s.finishedAt) - toTimestamp(s.startedAt)
-          : null,
+        s.finishedAt && s.startedAt ? toTimestamp(s.finishedAt) - toTimestamp(s.startedAt) : null,
       sessionType: (s.sessionType as SessionDetailDto['session']['sessionType']) ?? 'single',
       simultaneousTableCount: s.simultaneousTableCount,
     };

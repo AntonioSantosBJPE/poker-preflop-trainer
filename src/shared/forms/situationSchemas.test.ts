@@ -183,16 +183,16 @@ describe('situationPayloadSchema', () => {
   });
 
   it('com FOLD e tabuleiro incompleto → mensagem Range incompleto', () => {
-    const spy = vi.spyOn(implicitFoldRangeCells, 'appendImplicitFoldRangeCells').mockReturnValueOnce([
-      { actionClientKey: 'k1', rowIndex: 0, colIndex: 0, frequency: 1 },
-    ]);
+    const spy = vi
+      .spyOn(implicitFoldRangeCells, 'appendImplicitFoldRangeCells')
+      .mockReturnValueOnce([{ actionClientKey: 'k1', rowIndex: 0, colIndex: 0, frequency: 1 }]);
     const r = situationPayloadSchema.safeParse(minimalValid);
     expect(r.success).toBe(false);
     spy.mockRestore();
     if (!r.success) {
-      expect(
-        r.error.issues.some((i) => i.message.includes('Range incompleto: verifique')),
-      ).toBe(true);
+      expect(r.error.issues.some((i) => i.message.includes('Range incompleto: verifique'))).toBe(
+        true,
+      );
     }
   });
 });

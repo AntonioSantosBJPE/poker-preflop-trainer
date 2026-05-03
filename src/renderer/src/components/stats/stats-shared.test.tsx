@@ -23,9 +23,7 @@ describe('StatsOverviewCards', () => {
 
   it('renders zero state correctly', () => {
     render(
-      <StatsOverviewCards
-        overview={{ sessions: 0, hands: 0, accuracy: 0, avgResponseMs: 0 }}
-      />,
+      <StatsOverviewCards overview={{ sessions: 0, hands: 0, accuracy: 0, avgResponseMs: 0 }} />,
     );
 
     expect(screen.getByTestId('stats-overview-sessions')).toHaveTextContent('0');

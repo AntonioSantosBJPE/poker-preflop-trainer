@@ -78,7 +78,9 @@ describe('ProfilePage', () => {
 
   it('mostra erro de senha atual inválida no formulário de segurança', async () => {
     const user = userEvent.setup();
-    vi.mocked(window.api.profile.changePassword).mockRejectedValueOnce(new Error('Senha atual inválida'));
+    vi.mocked(window.api.profile.changePassword).mockRejectedValueOnce(
+      new Error('Senha atual inválida'),
+    );
 
     render(
       <MemoryRouter>
@@ -192,8 +194,6 @@ describe('Profile route and shell entry', () => {
     expect(window.api.profile.updatePreferences).toHaveBeenCalledWith({ theme: 'light' });
 
     await user.click(await screen.findByRole('link', { name: 'Perfil' }));
-    expect(await screen.findByRole('combobox', { name: 'Tema' })).toHaveTextContent(
-      'Claro',
-    );
+    expect(await screen.findByRole('combobox', { name: 'Tema' })).toHaveTextContent('Claro');
   });
 });

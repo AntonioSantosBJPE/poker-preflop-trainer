@@ -145,10 +145,13 @@ describe('registerSimultaneousTrainingIpc', () => {
   });
 
   it('rejeita quando as situações pertencem a grupos diferentes', async () => {
-    const { db } = createDbMock([201, 202], [
-      { id: 10, groupId: 1 },
-      { id: 11, groupId: 2 },
-    ]);
+    const { db } = createDbMock(
+      [201, 202],
+      [
+        { id: 10, groupId: 1 },
+        { id: 11, groupId: 2 },
+      ],
+    );
     vi.mocked(getDb).mockReturnValue(db as unknown as ReturnType<typeof getDb>);
     const handler = getHandler('simultaneous-training:startSession');
 

@@ -34,6 +34,7 @@ Bloco 6 — CI Gate [T11]                          ← gate: coverage ≥ thresh
 **Depends on:** (nenhum)
 
 **Done when:**
+
 - `vitest.config.ts` contém `coverage.provider = 'v8'`
 - Thresholds configurados: `statements: 80, branches: 75, functions: 85, lines: 80`
 - Excluídos: `src/main/index.ts`, `src/main/db/client.ts`, `src/renderer/src/main.tsx`, `src/renderer/src/components/ui/**`, `src/main/ipc/register.ts`
@@ -61,6 +62,7 @@ Bloco 6 — CI Gate [T11]                          ← gate: coverage ≥ thresh
 **Reuses:** Padrão `vi.mock` de `training.test.ts` e `groups.test.ts`
 
 **Done when:**
+
 - `signUserToken` testado: JWT contém `sub` e `email` correctos
 - `getUserIdFromStoredToken` testado: token válido → userId; sem token → null; token expirado → null
 - `requireUserId` testado: sem token → rejeita com `'Não autenticado'`; com token → resolve userId
@@ -68,6 +70,7 @@ Bloco 6 — CI Gate [T11]                          ← gate: coverage ≥ thresh
 - Cobertura de `session.ts` ≥ 80% statements, ≥ 75% branches
 
 **Tests:**
+
 ```
 describe('signUserToken') → 2 tests
 describe('getUserIdFromStoredToken') → 3 tests (válido, sem token, expirado)
@@ -75,6 +78,7 @@ describe('requireUserId') → 2 tests (autenticado, não autenticado)
 describe('saveToken / readToken / clearToken - keytar path') → 3 tests
 describe('saveToken / readToken / clearToken - E2E file path') → 3 tests
 ```
+
 Total estimado: ~13 testes
 
 **Gate:** `pnpm test:unit src/main/services/session.test.ts` passa
@@ -96,6 +100,7 @@ Total estimado: ~13 testes
 **Reuses:** Padrão `vi.mock` de `groups.test.ts`; `vi.mock('bcryptjs')` para evitar hash real
 
 **Done when:**
+
 - `auth:register`: email duplicado → erro; payload Zod inválido → erro; sucesso → retorna userId+name+email
 - `auth:login`: user não encontrado → `'Credenciais inválidas'`; password errada → mesmo erro; sucesso → chama saveToken + retorna token+user
 - `auth:logout`: chama `clearToken`
@@ -103,12 +108,14 @@ Total estimado: ~13 testes
 - Cobertura de `auth.ts` ≥ 80% statements, ≥ 75% branches
 
 **Tests:**
+
 ```
 describe('auth:register') → 3 tests
 describe('auth:login') → 3 tests
 describe('auth:logout') → 1 test
 describe('auth:me') → 3 tests
 ```
+
 Total estimado: ~10 testes
 
 **Gate:** `pnpm test:unit src/main/ipc/auth.test.ts` passa
@@ -130,6 +137,7 @@ Total estimado: ~10 testes
 **Reuses:** Padrão de mock de DB de `training.test.ts` (mock em cadeia com `select().from().where()`)
 
 **Done when:**
+
 - `situations:list` com filtro groupId → retorna apenas situações do grupo ordenadas
 - `situations:list` sem filtro → retorna todas situações activas
 - `situations:get` id inexistente → lança `'Situação não encontrada'`
@@ -142,6 +150,7 @@ Total estimado: ~10 testes
 - Cobertura de `situations.ts` ≥ 80% statements, ≥ 70% branches
 
 **Tests:**
+
 ```
 describe('situations:list') → 3 tests
 describe('situations:get') → 2 tests
@@ -150,6 +159,7 @@ describe('situations:update') → 3 tests
 describe('situations:delete') → 2 tests
 describe('situations:duplicate') → 3 tests
 ```
+
 Total estimado: ~16 testes
 
 **Gate:** `pnpm test:unit src/main/ipc/situations.test.ts` passa
@@ -171,6 +181,7 @@ Total estimado: ~16 testes
 **Reuses:** Helpers `getHandler` e `createStartSessionDbMock` já existentes no ficheiro
 
 **Done when:**
+
 - `training:nextHand` com sessionId → selecciona mão de range cells e regista em `pendingBySession`; sem range cells → rejeita
 - `training:submitAnswer` resposta correcta → persiste `isCorrect = true` e retorna `{ correct: true, correctActionId }`
 - `training:submitAnswer` resposta incorrecta → persiste `isCorrect = false` e retorna acção correcta
@@ -179,11 +190,13 @@ Total estimado: ~16 testes
 - Cobertura de `training.ts` ≥ 70% statements, ≥ 65% branches
 
 **Tests:**
+
 ```
 describe('training:nextHand') → 3 tests
 describe('training:submitAnswer') → 4 tests
 describe('training:endSession') → 2 tests
 ```
+
 Total estimado: ~9 novos testes
 
 **Gate:** `pnpm test:unit src/main/ipc/training.test.ts` passa com todos os testes anteriores + novos
@@ -205,6 +218,7 @@ Total estimado: ~9 novos testes
 **Reuses:** Helpers `getHandler` e `createOverviewDbMock` já existentes
 
 **Done when:**
+
 - `stats:overview` com sessões e mãos → calcula accuracy e avgResponseMs correctamente
 - `stats:bySituation` com dados → retorna lista com accuracy por situação
 - `stats:bySituation` sem dados → retorna lista vazia
@@ -213,12 +227,14 @@ Total estimado: ~9 novos testes
 - Cobertura de `stats.ts` ≥ 70% statements, ≥ 65% branches
 
 **Tests:**
+
 ```
 describe('stats:overview') → +2 tests (com dados)
 describe('stats:bySituation') → 3 tests
 describe('stats:evolution') → 2 tests
 describe('stats:worstHands') → 2 tests
 ```
+
 Total estimado: ~9 novos testes
 
 **Gate:** `pnpm test:unit src/main/ipc/stats.test.ts` passa com todos os testes anteriores + novos
@@ -238,8 +254,9 @@ Total estimado: ~9 novos testes
 **Depends on:** T01
 
 **Done when:**
+
 - `handToGridCell` pocket pair → diagonal (`row === col`)
-- `handToGridCell` suited → célula acima da diagonal (`col > row`)  
+- `handToGridCell` suited → célula acima da diagonal (`col > row`)
 - `handToGridCell` offsuit → célula abaixo da diagonal (`row > col`)
 - `evaluateTrainingAnswer` com range cell → acção correcta e incorrecta ambas testadas
 - `evaluateTrainingAnswer` sem range cell (fold implícito) → fold correcto, outra acção incorrecta
@@ -260,6 +277,7 @@ Total estimado: ~9 novos testes
 **What:** Criar testes para `GroupCard`, `TrainingFeedbackPanel`, `PlayingCard`, `SessionSettingsForm`.
 
 **Where:**
+
 - `src/renderer/src/components/groups/GroupCard.test.tsx` (novo)
 - `src/renderer/src/components/training/training-feedback.test.tsx` (novo)
 
@@ -268,6 +286,7 @@ Total estimado: ~9 novos testes
 **Reuses:** Padrão `// @vitest-environment jsdom` + `render` + `screen` de `stats-shared.test.tsx`
 
 **Done when:**
+
 - `GroupCard` activo: nome, contagem de situações e botões de acção visíveis
 - `GroupCard` arquivado: badge/estado de arquivado visível
 - `TrainingFeedbackPanel` com resultado correcto: mensagem positiva + label da mão
@@ -296,6 +315,7 @@ Total estimado: ~9 novos testes
 **Reuses:** Fixtures e padrões de `e2e/situations.spec.ts`
 
 **Done when:**
+
 - Fluxo: login → criar situação → editar → alterar range cells → guardar → reabrir → verificar células
 - Fluxo: criar segunda situação com mesmo nome → ver mensagem de erro contextual
 - Spec passa 3x consecutivas sem flaky
@@ -321,6 +341,7 @@ Total estimado: ~9 novos testes
 **Reuses:** Fixture de auth de `e2e/auth.spec.ts`
 
 **Done when:**
+
 - Fluxo: login → ir a dashboard → clicar logout → redirigido para login → session limpa
 - Fluxo: sem sessão → aceder `/situations` → redirigido para login
 - Spec passa 3x consecutivas sem flaky
@@ -344,6 +365,7 @@ Total estimado: ~9 novos testes
 **Depends on:** T01–T10 todos completos
 
 **Done when:**
+
 - `pnpm test:unit --coverage` retorna exit code 0 com todos os thresholds atingidos
 - `pnpm test` (pipeline completa) retorna exit code 0
 - Relatório final mostra: statements ≥ 80%, branches ≥ 75%, functions ≥ 85%, lines ≥ 80%
@@ -354,15 +376,15 @@ Total estimado: ~9 novos testes
 
 ## Resumo por bloco
 
-| Bloco | Tasks | Testes novos estimados | Dep |
-|---|---|---|---|
-| 0 — Infra | T01 | 0 | — |
-| 1 — Main crítico | T02, T03, T04 [P] | ~39 | T01 |
-| 2 — Main expansão | T05, T06 [P] | ~18 | T01, T02 |
-| 3 — Shared | T07 | ~8 | T01 |
-| 4 — Renderer | T08 | ~12 | T01 |
-| 5 — E2E | T09, T10 [P] | ~4 | T03, T04 |
-| 6 — Gate | T11 | 0 | T01–T10 |
+| Bloco             | Tasks             | Testes novos estimados | Dep      |
+| ----------------- | ----------------- | ---------------------- | -------- |
+| 0 — Infra         | T01               | 0                      | —        |
+| 1 — Main crítico  | T02, T03, T04 [P] | ~39                    | T01      |
+| 2 — Main expansão | T05, T06 [P]      | ~18                    | T01, T02 |
+| 3 — Shared        | T07               | ~8                     | T01      |
+| 4 — Renderer      | T08               | ~12                    | T01      |
+| 5 — E2E           | T09, T10 [P]      | ~4                     | T03, T04 |
+| 6 — Gate          | T11               | 0                      | T01–T10  |
 
 **Total estimado:** ~81 testes novos (119 actuais → ~200 total)
 
@@ -370,28 +392,28 @@ Total estimado: ~9 novos testes
 
 ## Status
 
-| Task | Status | Gate |
-|---|---|---|
-| T01 — vitest coverage config | ✅ Done | pnpm test:unit passa |
-| T02 — session.test.ts | ✅ Done | 13 testes verdes |
-| T03 — auth.test.ts | ✅ Done | 10 testes verdes |
-| T04 — situations.test.ts | ✅ Done | 16 testes verdes |
-| T05 — training.test.ts (expand) | ✅ Done | 11 testes verdes (+9 novos) |
-| T06 — stats.test.ts (expand) | ✅ Done | 13 testes verdes (+11 novos) |
-| T07 — grid.test.ts (expand) | ✅ Done | 22 testes verdes (+14 novos) |
-| T08 — renderer components | ✅ Done | 11 testes novos; 205 total |
-| T09 — E2E situation-edit | ✅ Done | Ficheiro criado (build E2E pendente) |
-| T10 — E2E auth-flows | ✅ Done | Ficheiro criado (build E2E pendente) |
-| T11 — Gate final | ✅ Done | 205 unit tests; stmts 91.18% / branches 75.12% / funcs 91.97% / lines 92.84% — todos ≥ threshold |
+| Task                            | Status  | Gate                                                                                             |
+| ------------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| T01 — vitest coverage config    | ✅ Done | pnpm test:unit passa                                                                             |
+| T02 — session.test.ts           | ✅ Done | 13 testes verdes                                                                                 |
+| T03 — auth.test.ts              | ✅ Done | 10 testes verdes                                                                                 |
+| T04 — situations.test.ts        | ✅ Done | 16 testes verdes                                                                                 |
+| T05 — training.test.ts (expand) | ✅ Done | 11 testes verdes (+9 novos)                                                                      |
+| T06 — stats.test.ts (expand)    | ✅ Done | 13 testes verdes (+11 novos)                                                                     |
+| T07 — grid.test.ts (expand)     | ✅ Done | 22 testes verdes (+14 novos)                                                                     |
+| T08 — renderer components       | ✅ Done | 11 testes novos; 205 total                                                                       |
+| T09 — E2E situation-edit        | ✅ Done | Ficheiro criado (build E2E pendente)                                                             |
+| T10 — E2E auth-flows            | ✅ Done | Ficheiro criado (build E2E pendente)                                                             |
+| T11 — Gate final                | ✅ Done | 205 unit tests; stmts 91.18% / branches 75.12% / funcs 91.97% / lines 92.84% — todos ≥ threshold |
 
 ## Coverage final (2026-05-02)
 
-| Métrica | Baseline | P1 Result | Meta P1 | P2 Result | Meta P2 | ✅? |
-|---|---|---|---|---|---|---|
-| Statements | 65.84% | 91.18% | ≥ 80% | **94.03%** | ≥ 90% | ✅ |
-| Branches | 56.25% | 75.12% | ≥ 75% | **85.99%** | ≥ 85% | ✅ |
-| Functions | 74.59% | 91.97% | ≥ 85% | **93.04%** | ≥ 90% | ✅ |
-| Lines | 67.65% | 92.84% | ≥ 80% | **95.93%** | ≥ 90% | ✅ |
+| Métrica    | Baseline | P1 Result | Meta P1 | P2 Result  | Meta P2 | ✅? |
+| ---------- | -------- | --------- | ------- | ---------- | ------- | --- |
+| Statements | 65.84%   | 91.18%    | ≥ 80%   | **94.03%** | ≥ 90%   | ✅  |
+| Branches   | 56.25%   | 75.12%    | ≥ 75%   | **85.99%** | ≥ 85%   | ✅  |
+| Functions  | 74.59%   | 91.97%    | ≥ 85%   | **93.04%** | ≥ 90%   | ✅  |
+| Lines      | 67.65%   | 92.84%    | ≥ 80%   | **95.93%** | ≥ 90%   | ✅  |
 
 **Testes:** 119 baseline → 248 final (+129 novos)  
 **E2E:** 21 specs existentes + 2 novas (situation-edit, auth-flows) = 57 testes E2E verdes  

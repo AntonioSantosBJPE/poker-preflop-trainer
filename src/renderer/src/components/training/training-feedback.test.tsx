@@ -7,26 +7,20 @@ import { TrainingFeedbackPanel } from '@/components/training/TrainingFeedbackPan
 
 describe('TrainingFeedbackPanel', () => {
   it('shows success copy when feedback.ok is true', () => {
-    render(
-      <TrainingFeedbackPanel feedback={{ ok: true, ms: 120 }} onNextHand={vi.fn()} />,
-    );
+    render(<TrainingFeedbackPanel feedback={{ ok: true, ms: 120 }} onNextHand={vi.fn()} />);
 
     expect(screen.getByText(/Correto — 120 ms/)).toBeInTheDocument();
   });
 
   it('shows incorrect copy and offers next hand when feedback.ok is false', () => {
-    render(
-      <TrainingFeedbackPanel feedback={{ ok: false, ms: 340 }} onNextHand={vi.fn()} />,
-    );
+    render(<TrainingFeedbackPanel feedback={{ ok: false, ms: 340 }} onNextHand={vi.fn()} />);
 
     expect(screen.getByText(/Incorreto — 340 ms/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Próxima mão' })).toBeInTheDocument();
   });
 
   it('does not display hand or hole-card labels (panel is feedback + next only)', () => {
-    render(
-      <TrainingFeedbackPanel feedback={{ ok: true, ms: 50 }} onNextHand={vi.fn()} />,
-    );
+    render(<TrainingFeedbackPanel feedback={{ ok: true, ms: 50 }} onNextHand={vi.fn()} />);
 
     expect(screen.queryByLabelText(/de /)).not.toBeInTheDocument();
     expect(screen.queryByText('♠')).not.toBeInTheDocument();
@@ -36,9 +30,7 @@ describe('TrainingFeedbackPanel', () => {
     const user = userEvent.setup();
     const onNextHand = vi.fn();
 
-    render(
-      <TrainingFeedbackPanel feedback={{ ok: true, ms: 10 }} onNextHand={onNextHand} />,
-    );
+    render(<TrainingFeedbackPanel feedback={{ ok: true, ms: 10 }} onNextHand={onNextHand} />);
 
     await user.click(screen.getByRole('button', { name: 'Próxima mão' }));
     expect(onNextHand).toHaveBeenCalledTimes(1);

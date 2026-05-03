@@ -1,7 +1,11 @@
 import { test, expect } from '../fixtures';
 import type { Page } from '@playwright/test';
 import { registerAccount } from '../helpers/auth';
-import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from '../helpers/credentials';
+import {
+  uniqueGroupName,
+  uniqueSituationName,
+  uniqueUserCredentials,
+} from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
 import { createSituationMinimal } from '../helpers/situation';
 import {
@@ -13,11 +17,7 @@ import {
   startTrainingSession,
 } from '../helpers/training';
 
-async function completeOneHandSession(
-  appPage: Page,
-  groupName: string,
-  situationName: string,
-) {
+async function completeOneHandSession(appPage: Page, groupName: string, situationName: string) {
   await openTrainingConfig(appPage);
   await selectGroupForTraining(appPage, groupName);
   await selectSituationsForTraining(appPage, [situationName]);

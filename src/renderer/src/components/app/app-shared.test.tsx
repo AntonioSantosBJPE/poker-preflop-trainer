@@ -39,11 +39,7 @@ describe('app shared components', () => {
 
   it('renders sidebar theme toggle for dark mode (claro)', () => {
     render(
-      <AppSidebar
-        isDarkTheme
-        onToggleTheme={vi.fn()}
-        onLogout={vi.fn()}
-      >
+      <AppSidebar isDarkTheme onToggleTheme={vi.fn()} onLogout={vi.fn()}>
         <a href="/groups">Grupos</a>
       </AppSidebar>,
     );
@@ -53,22 +49,13 @@ describe('app shared components', () => {
   });
 
   it('StatCard shows helperText when provided', () => {
-    render(
-      <StatCard
-        label="Mãos"
-        value={42}
-        valueTestId="stat-val"
-        helperText="Últimos 7 dias"
-      />,
-    );
+    render(<StatCard label="Mãos" value={42} valueTestId="stat-val" helperText="Últimos 7 dias" />);
     expect(screen.getByTestId('stat-val')).toHaveTextContent('42');
     expect(screen.getByText('Últimos 7 dias')).toBeInTheDocument();
   });
 
   it('StatCard omits helperText when not provided', () => {
-    const { container } = render(
-      <StatCard label="Taxa" value="50%" valueTestId="stat-rate" />,
-    );
+    const { container } = render(<StatCard label="Taxa" value="50%" valueTestId="stat-rate" />);
     expect(screen.getByTestId('stat-rate')).toHaveTextContent('50%');
     expect(container.querySelectorAll('p')).toHaveLength(2);
   });
@@ -154,16 +141,9 @@ describe('app shared components', () => {
       { id: 1, name: 'Linha A' },
       { id: 2, name: 'Linha B' },
     ];
-    const columns = [
-      { key: 'name', header: 'Nome', cell: (r: (typeof rows)[0]) => r.name },
-    ];
+    const columns = [{ key: 'name', header: 'Nome', cell: (r: (typeof rows)[0]) => r.name }];
     render(
-      <EntityTable
-        rows={rows}
-        columns={columns}
-        getRowKey={(r) => r.id}
-        tableTestId="my-table"
-      />,
+      <EntityTable rows={rows} columns={columns} getRowKey={(r) => r.id} tableTestId="my-table" />,
     );
     expect(screen.getByTestId('my-table')).toBeInTheDocument();
     expect(screen.getByText('Linha A')).toBeInTheDocument();
@@ -171,9 +151,7 @@ describe('app shared components', () => {
   });
 
   it('EntityTable renders emptyState when rows is empty', () => {
-    const columns = [
-      { key: 'name', header: 'Nome', cell: () => null },
-    ];
+    const columns = [{ key: 'name', header: 'Nome', cell: () => null }];
     render(
       <EntityTable
         rows={[]}

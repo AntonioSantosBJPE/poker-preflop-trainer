@@ -1,4 +1,11 @@
-import type { ActionType, FeedbackMode, Position, RankChar, SuitChar, ThemeMode } from '../constants';
+import type {
+  ActionType,
+  FeedbackMode,
+  Position,
+  RankChar,
+  SuitChar,
+  ThemeMode,
+} from '../constants';
 
 export type UserDto = { id: number; name: string; email: string };
 

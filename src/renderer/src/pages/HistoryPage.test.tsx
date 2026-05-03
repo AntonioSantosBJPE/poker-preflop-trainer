@@ -44,7 +44,9 @@ describe('HistoryPage', () => {
 
     renderHistory();
 
-    expect(screen.getAllByText('', { selector: '[data-slot="skeleton"]' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('', { selector: '[data-slot="skeleton"]' }).length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('shows empty state when no sessions exist', async () => {
@@ -196,7 +198,9 @@ describe('HistoryPage', () => {
 
   it('shows simultaneous badge for simultaneous session type', async () => {
     vi.mocked(window.api.training.listSessions).mockResolvedValue({
-      items: [{ ...sampleSession, sessionType: 'simultaneous' as const, simultaneousTableCount: 4 }],
+      items: [
+        { ...sampleSession, sessionType: 'simultaneous' as const, simultaneousTableCount: 4 },
+      ],
       total: 1,
       page: 1,
       pageSize: 10,

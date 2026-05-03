@@ -327,7 +327,11 @@ describe('registerStatsIpc', () => {
       vi.mocked(getDb).mockReturnValue({ select } as unknown as ReturnType<typeof getDb>);
       const handler = getHandler('stats:timeline');
 
-      const out = (await handler({}, {})) as Array<{ date: string; accuracy: number; avgTimeMs: number }>;
+      const out = (await handler({}, {})) as Array<{
+        date: string;
+        accuracy: number;
+        avgTimeMs: number;
+      }>;
 
       expect(out).toEqual([{ date: '2026-03-15', accuracy: 0, avgTimeMs: 0 }]);
     });

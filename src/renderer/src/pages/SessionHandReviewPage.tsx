@@ -36,7 +36,9 @@ export function SessionHandReviewPage(): React.ReactElement {
 
   const currentHand = detail?.hands[currentHandIndex] ?? null;
   const totalHands = detail?.hands.length ?? 0;
-  const situationData = currentHand ? detail?.situationActionsMap[currentHand.situationId] : undefined;
+  const situationData = currentHand
+    ? detail?.situationActionsMap[currentHand.situationId]
+    : undefined;
 
   const goTo = (index: number) => {
     if (index >= 0 && index < totalHands) setCurrentHandIndex(index);

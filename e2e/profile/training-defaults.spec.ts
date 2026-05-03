@@ -1,6 +1,10 @@
 import { test, expect } from '../fixtures';
 import { registerAccount } from '../helpers/auth';
-import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from '../helpers/credentials';
+import {
+  uniqueGroupName,
+  uniqueSituationName,
+  uniqueUserCredentials,
+} from '../helpers/credentials';
 import { createGroup } from '../helpers/group';
 import { selectShadcnOption } from '../helpers/shadcn';
 import { createSituationMinimal } from '../helpers/situation';

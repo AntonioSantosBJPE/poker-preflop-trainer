@@ -6,13 +6,13 @@
 
 ## Requirements
 
-| ID | Description | Verification |
-|----|------------|-------------|
-| NSELECT-01 | `HistoryPage.tsx`: filtro "Tipo de sessão" usa `<Select>` shadcn | Render + interação |
-| NSELECT-02 | `HistoryPage.tsx`: filtro "Mesas simultâneas" usa `<Select>` shadcn com `disabled` condicional | Render com disabled/abled |
-| NSELECT-03 | `StatsPage.tsx`: filtro "Tipo de sessão" usa `<Select>` shadcn preservando `data-testid="stats-session-type-filter"` | Render + query by testid |
-| NSELECT-04 | `StatsPage.tsx`: filtro "Mesas simultâneas" usa `<Select>` shadcn preservando `data-testid="stats-simultaneous-count-filter"` com `disabled` condicional | Render + query by testid |
-| NSELECT-05 | Testes existentes continuam verdes após as alterações | `pnpm test:unit` |
+| ID         | Description                                                                                                                                              | Verification              |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| NSELECT-01 | `HistoryPage.tsx`: filtro "Tipo de sessão" usa `<Select>` shadcn                                                                                         | Render + interação        |
+| NSELECT-02 | `HistoryPage.tsx`: filtro "Mesas simultâneas" usa `<Select>` shadcn com `disabled` condicional                                                           | Render com disabled/abled |
+| NSELECT-03 | `StatsPage.tsx`: filtro "Tipo de sessão" usa `<Select>` shadcn preservando `data-testid="stats-session-type-filter"`                                     | Render + query by testid  |
+| NSELECT-04 | `StatsPage.tsx`: filtro "Mesas simultâneas" usa `<Select>` shadcn preservando `data-testid="stats-simultaneous-count-filter"` com `disabled` condicional | Render + query by testid  |
+| NSELECT-05 | Testes existentes continuam verdes após as alterações                                                                                                    | `pnpm test:unit`          |
 
 ## Out of Scope
 
@@ -21,10 +21,10 @@
 
 ## Changes
 
-| File | Change |
-|------|--------|
+| File                                     | Change                                     |
+| ---------------------------------------- | ------------------------------------------ |
 | `src/renderer/src/pages/HistoryPage.tsx` | Import shadcn Select; replace 2 `<select>` |
-| `src/renderer/src/pages/StatsPage.tsx` | Import shadcn Select; replace 2 `<select>` |
+| `src/renderer/src/pages/StatsPage.tsx`   | Import shadcn Select; replace 2 `<select>` |
 
 ## Design Decision
 

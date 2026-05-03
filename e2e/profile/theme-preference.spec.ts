@@ -39,11 +39,11 @@ test.describe('Profile - theme preference', () => {
 
     await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
 
-    await expect(appPage.getByRole('combobox', { name: 'Tema', exact: true })).toHaveText(
-      'Claro',
-    );
+    await expect(appPage.getByRole('combobox', { name: 'Tema', exact: true })).toHaveText('Claro');
 
-    const isDark = await appPage.evaluate(() => document.documentElement.classList.contains('dark'));
+    const isDark = await appPage.evaluate(() =>
+      document.documentElement.classList.contains('dark'),
+    );
     expect(isDark).toBe(false);
   });
 
@@ -66,9 +66,7 @@ test.describe('Profile - theme preference', () => {
     await loginWithPassword(appPage, user.email, user.password);
 
     await appPage.getByRole('link', { name: 'Perfil' }).click();
-    await expect(appPage.getByRole('combobox', { name: 'Tema', exact: true })).toHaveText(
-      'Escuro',
-    );
+    await expect(appPage.getByRole('combobox', { name: 'Tema', exact: true })).toHaveText('Escuro');
   });
 
   test('select do tema mantém opções legíveis e selecionáveis em claro e escuro', async ({
@@ -84,18 +82,14 @@ test.describe('Profile - theme preference', () => {
     await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
     await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
     await expect
-      .poll(async () =>
-        appPage.evaluate(() => document.documentElement.classList.contains('dark')),
-      )
+      .poll(async () => appPage.evaluate(() => document.documentElement.classList.contains('dark')))
       .toBe(false);
 
     await assertSelectReadableAndChoose(appPage, 'Tema', 'Escuro');
     await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
     await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
     await expect
-      .poll(async () =>
-        appPage.evaluate(() => document.documentElement.classList.contains('dark')),
-      )
+      .poll(async () => appPage.evaluate(() => document.documentElement.classList.contains('dark')))
       .toBe(true);
 
     await assertSelectReadableAndChoose(appPage, 'Tema', 'Claro');

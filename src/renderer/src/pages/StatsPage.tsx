@@ -27,7 +27,13 @@ import {
 } from '@/components/app';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useChartPalette } from '../hooks/useChartPalette';
 import { StatsChartCard, StatsOverviewCards, StatsWorstHandsList } from '@/components/stats';
 
@@ -148,7 +154,11 @@ export function StatsPage(): React.ReactElement {
               value={sessionType}
               onValueChange={(value) => setSessionType(value as 'all' | 'single' | 'simultaneous')}
             >
-              <SelectTrigger id="stats-session-type" data-testid="stats-session-type-filter" className="w-full">
+              <SelectTrigger
+                id="stats-session-type"
+                data-testid="stats-session-type-filter"
+                className="w-full"
+              >
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
@@ -162,10 +172,16 @@ export function StatsPage(): React.ReactElement {
             <Label>Mesas simultâneas</Label>
             <Select
               value={simultaneousTableCount}
-              onValueChange={(value) => setSimultaneousTableCount(value as '__all__' | '2' | '3' | '4')}
+              onValueChange={(value) =>
+                setSimultaneousTableCount(value as '__all__' | '2' | '3' | '4')
+              }
               disabled={sessionType !== 'simultaneous'}
             >
-              <SelectTrigger id="stats-table-count" data-testid="stats-simultaneous-count-filter" className="w-full">
+              <SelectTrigger
+                id="stats-table-count"
+                data-testid="stats-simultaneous-count-filter"
+                className="w-full"
+              >
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
               <SelectContent>
