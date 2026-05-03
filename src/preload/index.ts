@@ -96,6 +96,9 @@ const api = {
     timeline: (filters?: unknown) => ipcRenderer.invoke('stats:timeline', filters),
     worstHands: (filters: unknown, limit: number) =>
       ipcRenderer.invoke('stats:worstHands', filters, limit),
+    estimateDeleteSessions: (period: unknown) =>
+      ipcRenderer.invoke('stats:estimateDeleteSessions', period),
+    deleteSessions: (period: unknown) => ipcRenderer.invoke('stats:deleteSessions', period),
   },
 };
 

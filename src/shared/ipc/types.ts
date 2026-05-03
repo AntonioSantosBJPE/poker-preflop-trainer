@@ -132,6 +132,16 @@ export type StatsBySituationRowDto = {
   avgResponseMs: number;
 };
 
+export type DeleteEstimateDto = {
+  sessionCount: number;
+  handCount: number;
+};
+
+export type DeletePeriodInput = {
+  fromTs?: number;
+  toTs?: number;
+};
+
 export type StatsWorstHandRowDto = {
   label: string;
   count: number;

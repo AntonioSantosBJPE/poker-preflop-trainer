@@ -104,4 +104,108 @@ test.describe('Estatísticas', () => {
     await appPage.getByRole('option', { name: 'Simultâneo' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('2');
   });
+
+  test.describe('Limpar histórico', () => {
+    test('botão está visível na página de estatísticas', async ({ appPage }) => {
+      const user = uniqueUserCredentials();
+      await registerAccount(appPage, user);
+      await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
+      await expect(appPage.getByRole('heading', { name: 'Estatísticas' })).toBeVisible();
+
+      await expect(appPage.getByTestId('clear-stats-button')).toBeVisible();
+    });
+
+    test('diálogo abre e mostra preview com sessões', async ({ appPage }) => {
+      const user = uniqueUserCredentials();
+      const situationName = uniqueSituationName();
+      const groupName = uniqueGroupName();
+      await registerAccount(appPage, user);
+      await createGroup(appPage, groupName);
+      await createSituationMinimal(appPage, situationName, groupName);
+
+      await openTrainingConfig(appPage);
+      await selectGroupForTraining(appPage, groupName);
+      await selectSituationsForTraining(appPage, [situationName]);
+      await setTrainingHands(appPage, 1);
+      await startTrainingSession(appPage);
+      await answerFoldImmediate(appPage);
+
+      await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
+      await expect(sessionsOverviewValue(appPage)).toHaveText('1');
+
+      await appPage.getByTestId('clear-stats-button').click();
+      await expect(appPage.getByRole('heading', { name: 'Limpar histórico' })).toBeVisible();
+      await expect(appPage.getByTestId('clear-stats-remove-btn')).toBeVisible();
+    });
+
+    test('período sem sessões mostra mensagem e desabilita botão', async ({ appPage }) => {
+      const user = uniqueUserCredentials();
+      await registerAccount(appPage, user);
+      await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
+      await expect(appPage.getByRole('heading', { name: 'Estatísticas' })).toBeVisible();
+
+      await appPage.getByTestId('clear-stats-button').click();
+      await expect(appPage.getByRole('heading', { name: 'Limpar histórico' })).toBeVisible();
+    });
+
+    test('fluxo completo: remover sessões e verificar actualização', async ({ appPage }) => {
+      const user = uniqueUserCredentials();
+      const situationName = uniqueSituationName();
+      const groupName = uniqueGroupName();
+      await registerAccount(appPage, user);
+      await createGroup(appPage, groupName);
+      await createSituationMinimal(appPage, situationName, groupName);
+
+      await openTrainingConfig(appPage);
+      await selectGroupForTraining(appPage, groupName);
+      await selectSituationsForTraining(appPage, [situationName]);
+      await setTrainingHands(appPage, 1);
+      await startTrainingSession(appPage);
+      await answerFoldImmediate(appPage);
+
+      await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
+      await expect(sessionsOverviewValue(appPage)).toHaveText('1');
+
+      await appPage.getByTestId('clear-stats-button').click();
+      await expect(appPage.getByRole('heading', { name: 'Limpar histórico' })).toBeVisible();
+
+      await expect(appPage.getByTestId('clear-stats-remove-btn')).toBeVisible();
+      await appPage.getByTestId('clear-stats-remove-btn').click();
+
+      await expect(appPage.getByText('Tem a certeza?')).toBeVisible();
+      await appPage.getByText('Sim, remover permanentemente').click();
+
+      await expect(sessionsOverviewValue(appPage)).toHaveText('0');
+    });
+
+    test('cancelamento no segundo diálogo não remove sessões', async ({ appPage }) => {
+      const user = uniqueUserCredentials();
+      const situationName = uniqueSituationName();
+      const groupName = uniqueGroupName();
+      await registerAccount(appPage, user);
+      await createGroup(appPage, groupName);
+      await createSituationMinimal(appPage, situationName, groupName);
+
+      await openTrainingConfig(appPage);
+      await selectGroupForTraining(appPage, groupName);
+      await selectSituationsForTraining(appPage, [situationName]);
+      await setTrainingHands(appPage, 1);
+      await startTrainingSession(appPage);
+      await answerFoldImmediate(appPage);
+
+      await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
+      await expect(sessionsOverviewValue(appPage)).toHaveText('1');
+
+      await appPage.getByTestId('clear-stats-button').click();
+      await expect(appPage.getByRole('heading', { name: 'Limpar histórico' })).toBeVisible();
+
+      await expect(appPage.getByTestId('clear-stats-remove-btn')).toBeVisible();
+      await appPage.getByTestId('clear-stats-remove-btn').click();
+
+      await expect(appPage.getByText('Tem a certeza?')).toBeVisible();
+      await appPage.locator('[data-slot="alert-dialog-cancel"]').click();
+
+      await expect(sessionsOverviewValue(appPage)).toHaveText('1');
+    });
+  });
 });

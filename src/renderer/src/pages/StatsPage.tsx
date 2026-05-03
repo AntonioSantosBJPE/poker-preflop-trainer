@@ -26,6 +26,7 @@ import {
   PageHeader,
   type EntityTableColumn,
 } from '@/components/app';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -36,7 +37,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useChartPalette } from '../hooks/useChartPalette';
-import { StatsChartCard, StatsOverviewCards, StatsWorstHandsList } from '@/components/stats';
+import {
+  ClearStatsDialog,
+  StatsChartCard,
+  StatsOverviewCards,
+  StatsWorstHandsList,
+} from '@/components/stats';
 
 export function StatsPage(): React.ReactElement {
   const chart = useChartPalette();
@@ -57,6 +63,7 @@ export function StatsPage(): React.ReactElement {
   const [worstHands, setWorstHands] = useState<StatsWorstHandRowDto[]>([]);
   const [fromTs, setFromTs] = useState<number | undefined>(undefined);
   const [toTs, setToTs] = useState<number | undefined>(undefined);
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
 
   const handleDatePeriodChange = useCallback((dateFilters: { fromTs?: number; toTs?: number }) => {
     setFromTs(dateFilters.fromTs);
@@ -75,22 +82,24 @@ export function StatsPage(): React.ReactElement {
     setSimultaneousTableCount('__all__');
   }, [sessionType]);
 
-  useEffect(() => {
-    void (async () => {
-      const filters: StatsFilters = {};
-      if (activeGroupId !== null) filters.groupId = activeGroupId;
-      if (sessionType !== 'all') filters.sessionType = sessionType;
-      if (sessionType === 'simultaneous' && simultaneousTableCount !== '__all__') {
-        filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount;
-      }
-      if (fromTs !== undefined) filters.fromTs = fromTs;
-      if (toTs !== undefined) filters.toTs = toTs;
-      setOverview(await window.api.stats.overview(filters));
-      setTimeline(await window.api.stats.timeline(filters));
-      setBySituation(await window.api.stats.bySituation(filters));
-      setWorstHands(await window.api.stats.worstHands(filters, 15));
-    })();
+  const loadStats = useCallback(async () => {
+    const filters: StatsFilters = {};
+    if (activeGroupId !== null) filters.groupId = activeGroupId;
+    if (sessionType !== 'all') filters.sessionType = sessionType;
+    if (sessionType === 'simultaneous' && simultaneousTableCount !== '__all__') {
+      filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount;
+    }
+    if (fromTs !== undefined) filters.fromTs = fromTs;
+    if (toTs !== undefined) filters.toTs = toTs;
+    setOverview(await window.api.stats.overview(filters));
+    setTimeline(await window.api.stats.timeline(filters));
+    setBySituation(await window.api.stats.bySituation(filters));
+    setWorstHands(await window.api.stats.worstHands(filters, 15));
   }, [activeGroupId, sessionType, simultaneousTableCount, fromTs, toTs]);
+
+  useEffect(() => {
+    void loadStats();
+  }, [loadStats]);
 
   const groupTabValue = activeGroupId === null ? 'all' : String(activeGroupId);
 
@@ -128,7 +137,25 @@ export function StatsPage(): React.ReactElement {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Estatísticas" />
+      <PageHeader
+        title="Estatísticas"
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setClearDialogOpen(true)}
+            data-testid="clear-stats-button"
+          >
+            Limpar histórico
+          </Button>
+        }
+      />
+
+      <ClearStatsDialog
+        open={clearDialogOpen}
+        onOpenChange={setClearDialogOpen}
+        onComplete={loadStats}
+      />
 
       <FilterToolbar>
         <Tabs

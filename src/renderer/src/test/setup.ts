@@ -81,6 +81,8 @@ function createWindowApiMock(): Window['api'] {
       bySituation: vi.fn(),
       timeline: vi.fn(),
       worstHands: vi.fn(),
+      estimateDeleteSessions: vi.fn(),
+      deleteSessions: vi.fn(),
     },
   } as unknown as Window['api'];
 }

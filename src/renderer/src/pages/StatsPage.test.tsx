@@ -95,6 +95,24 @@ describe('StatsPage', () => {
     });
   });
 
+  it('renderiza botão Limpar histórico', async () => {
+    render(<StatsPage />);
+    expect(await screen.findByTestId('clear-stats-button')).toBeInTheDocument();
+  });
+
+  it('abre ClearStatsDialog ao clicar Limpar histórico', async () => {
+    vi.mocked(window.api.stats.estimateDeleteSessions).mockResolvedValue({
+      sessionCount: 0,
+      handCount: 0,
+    } as never);
+    const user = userEvent.setup();
+    render(<StatsPage />);
+
+    await user.click(await screen.findByTestId('clear-stats-button'));
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
   it('both group tab filter and date filter compose correctly', async () => {
     const user = userEvent.setup();
     render(<StatsPage />);

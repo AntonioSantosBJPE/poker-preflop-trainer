@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron';
-import { and, eq, gte, inArray, lte } from 'drizzle-orm';
+import { and, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 import { sessionHands, situations, trainingSessions } from '../db/schema';
 import { getDb } from '../db/client';
 import { requireUserId } from '../services/session';
 import type { Position } from '@shared/constants';
-import type { StatsFilters } from '@shared/ipc/types';
-import { parseStatsFilters } from '@shared/forms/statsSchemas';
+import type { DeleteEstimateDto, StatsFilters } from '@shared/ipc/types';
+import { parseDeletePeriod, parseStatsFilters } from '@shared/forms/statsSchemas';
 
 function sessionWhereClause(userId: number, filters?: StatsFilters) {
   const parts: ReturnType<typeof eq | typeof gte | typeof lte>[] = [
@@ -174,4 +174,75 @@ export function registerStatsIpc(): void {
       }));
     },
   );
+
+  ipcMain.handle('stats:estimateDeleteSessions', async (_e, rawPeriod: unknown) => {
+    const period = parseDeletePeriod(rawPeriod);
+    const userId = await requireUserId();
+    const db = getDb();
+    const sessions = await db
+      .select({ id: trainingSessions.id })
+      .from(trainingSessions)
+      .where(
+        and(
+          eq(trainingSessions.userId, userId),
+          gte(trainingSessions.startedAt, new Date(period.fromTs * 1000)),
+          lte(trainingSessions.startedAt, new Date(period.toTs * 1000)),
+        ),
+      );
+    const sessionIds = sessions.map((s) => s.id);
+    if (!sessionIds.length) {
+      return { sessionCount: 0, handCount: 0 } satisfies DeleteEstimateDto;
+    }
+    const [handResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(sessionHands)
+      .where(inArray(sessionHands.sessionId, sessionIds));
+    return {
+      sessionCount: sessionIds.length,
+      handCount: handResult?.count ?? 0,
+    } satisfies DeleteEstimateDto;
+  });
+
+  ipcMain.handle('stats:deleteSessions', async (_e, rawPeriod: unknown) => {
+    const period = parseDeletePeriod(rawPeriod);
+    const userId = await requireUserId();
+    const db = getDb();
+
+    return db.transaction((tx) => {
+      const sessions = tx
+        .select({ id: trainingSessions.id })
+        .from(trainingSessions)
+        .where(
+          and(
+            eq(trainingSessions.userId, userId),
+            gte(trainingSessions.startedAt, new Date(period.fromTs * 1000)),
+            lte(trainingSessions.startedAt, new Date(period.toTs * 1000)),
+          ),
+        )
+        .all();
+      const sessionIds = sessions.map((s) => s.id);
+      if (!sessionIds.length) {
+        throw new Error('Nenhuma sessão encontrada no período');
+      }
+      const [handResult] = tx
+        .select({ count: sql<number>`count(*)` })
+        .from(sessionHands)
+        .where(inArray(sessionHands.sessionId, sessionIds))
+        .all();
+      const totalHands = handResult?.count ?? 0;
+      tx.delete(trainingSessions)
+        .where(
+          and(
+            eq(trainingSessions.userId, userId),
+            gte(trainingSessions.startedAt, new Date(period.fromTs * 1000)),
+            lte(trainingSessions.startedAt, new Date(period.toTs * 1000)),
+          ),
+        )
+        .run();
+      return {
+        sessionCount: sessionIds.length,
+        handCount: totalHands,
+      } satisfies DeleteEstimateDto;
+    });
+  });
 }

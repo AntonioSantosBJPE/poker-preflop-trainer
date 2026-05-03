@@ -1,5 +1,6 @@
 import type {
   AuthSessionDto,
+  DeleteEstimateDto,
   GroupSummaryDto,
   SessionDetailDto,
   SessionHistoryFilters,
@@ -96,6 +97,11 @@ export type Api = {
       filters: StatsFilters | undefined,
       limit: number,
     ) => Promise<StatsWorstHandRowDto[]>;
+    estimateDeleteSessions: (period: {
+      fromTs?: number;
+      toTs?: number;
+    }) => Promise<DeleteEstimateDto>;
+    deleteSessions: (period: { fromTs?: number; toTs?: number }) => Promise<DeleteEstimateDto>;
   };
 };
 

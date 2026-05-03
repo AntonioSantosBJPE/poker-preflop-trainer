@@ -41,6 +41,24 @@ export const statsFiltersSchema = baseStatsFiltersSchema.superRefine((data, ctx)
 export type StatsFiltersInput = z.input<typeof statsFiltersSchema>;
 export type StatsFiltersValues = z.infer<typeof statsFiltersSchema>;
 
+export const deletePeriodSchema = z.object({
+  fromTs: z.number().int().nonnegative({ message: 'fromTs é obrigatório e deve ser >= 0' }),
+  toTs: z.number().int().nonnegative({ message: 'toTs é obrigatório e deve ser >= 0' }),
+});
+
+export type DeletePeriodInput = z.infer<typeof deletePeriodSchema>;
+
+export function parseDeletePeriod(raw: unknown): DeletePeriodInput {
+  const result = deletePeriodSchema.safeParse(raw);
+  if (!result.success) {
+    throw new Error(result.error.issues[0]?.message ?? 'Período inválido');
+  }
+  if (result.data.fromTs > result.data.toTs) {
+    throw new Error('Data inicial não pode ser maior que a data final');
+  }
+  return result.data;
+}
+
 export function parseStatsFilters(raw: unknown): StatsFilters {
   if (raw === undefined || raw === null) return {};
   const result = statsFiltersSchema.safeParse(raw);
