@@ -40,7 +40,7 @@ test.describe('Histórico - navegação de volta e erros', () => {
     const tabFilteredTable = appPage.getByTestId('history-sessions-table');
     await expect(tabFilteredTable.getByText(groupName)).toBeVisible();
 
-    await tabFilteredTable.getByText(groupName).click();
+    await tabFilteredTable.getByRole('button').click();
     await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
 
     await appPage.getByRole('button', { name: '← Voltar ao histórico' }).click();

@@ -16,9 +16,11 @@ import {
   type EntityTableColumn,
 } from '@/components/app';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -265,8 +267,28 @@ export function HistoryPage(): React.ReactElement {
         cell: (row) => `${row.handsPlayed}/${row.totalHands}`,
         cellClassName: 'tabular-nums',
       },
+      {
+        key: 'actions',
+        header: '',
+        cell: (row) => (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              navigate(`/history/${row.id}${location.search}`, {
+                state: { search: location.search },
+              })
+            }
+            data-testid={`review-session-${row.id}`}
+            title="Revisar sessão"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+        ),
+        cellClassName: 'text-right',
+      },
     ],
-    [],
+    [navigate, location.search],
   );
 
   const totalPages = data?.totalPages ?? 0;
@@ -355,9 +377,6 @@ export function HistoryPage(): React.ReactElement {
           rows={data?.items ?? []}
           columns={columns}
           getRowKey={(row) => row.id}
-          onRowClick={(row) =>
-            navigate(`/history/${row.id}${location.search}`, { state: { search: location.search } })
-          }
           selectable={true}
           selectedKeys={selectedRef.current as Set<number | string>}
           onSelectionChange={handleSelectionChange}

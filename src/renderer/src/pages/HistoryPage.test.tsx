@@ -87,7 +87,7 @@ describe('HistoryPage', () => {
     });
   });
 
-  it('navigates to review page on row click', async () => {
+  it('navigates to review page via action button', async () => {
     const user = userEvent.setup();
     vi.mocked(window.api.training.listSessions).mockResolvedValue({
       items: [sampleSession],
@@ -103,7 +103,7 @@ describe('HistoryPage', () => {
       expect(screen.getByText('Meu Grupo')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('Meu Grupo'));
+    await user.click(screen.getByTestId('review-session-1'));
 
     expect(screen.getByTestId('review-page')).toBeInTheDocument();
   });
