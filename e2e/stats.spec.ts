@@ -96,10 +96,12 @@ test.describe('Estatísticas', () => {
     await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('3');
 
-    await appPage.getByTestId('stats-session-type-filter').selectOption('single');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Individual' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('1');
 
-    await appPage.getByTestId('stats-session-type-filter').selectOption('simultaneous');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Simultâneo' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('2');
   });
 });

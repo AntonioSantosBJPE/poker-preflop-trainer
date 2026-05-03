@@ -94,12 +94,14 @@ test.describe('Histórico - paginação e filtros', () => {
     await appPage.getByRole('link', { name: 'Histórico' }).click();
     await expect(appPage.getByRole('heading', { name: 'Histórico' })).toBeVisible();
 
-    const sessionTypeSelect = appPage.locator('select').first();
-    await sessionTypeSelect.selectOption('single');
+    const sessionTypeSelect = appPage.getByRole('combobox').first();
+    await sessionTypeSelect.click();
+    await appPage.getByRole('option', { name: 'Individual' }).click();
     const table2 = appPage.getByTestId('history-sessions-table');
     await expect(table2.getByText('Individual')).toBeVisible();
 
-    await sessionTypeSelect.selectOption('simultaneous');
+    await sessionTypeSelect.click();
+    await appPage.getByRole('option', { name: 'Simultâneo' }).click();
     await expect(appPage.getByText('Nenhuma sessão encontrada')).toBeVisible();
   });
 });

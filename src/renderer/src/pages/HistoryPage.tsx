@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import type { SessionListResponse } from '@shared/ipc/types';
 
@@ -41,8 +42,8 @@ export function HistoryPage(): React.ReactElement {
   const sessionType: 'all' | 'single' | 'simultaneous' =
     sessionTypeRaw === 'single' || sessionTypeRaw === 'simultaneous' ? sessionTypeRaw : 'all';
   const tableCountRaw = searchParams.get('tableCount');
-  const tableCount: '' | '2' | '3' | '4' =
-    tableCountRaw === '2' || tableCountRaw === '3' || tableCountRaw === '4' ? tableCountRaw : '';
+  const tableCount: '__all__' | '2' | '3' | '4' =
+    tableCountRaw === '2' || tableCountRaw === '3' || tableCountRaw === '4' ? tableCountRaw : '__all__';
 
   useEffect(() => {
     void (async () => {
@@ -78,7 +79,7 @@ export function HistoryPage(): React.ReactElement {
     const filters: { page: number; groupId?: number; sessionType?: 'single' | 'simultaneous'; simultaneousTableCount?: SimultaneousTableCount } = { page };
     if (activeGroupId !== null) filters.groupId = activeGroupId;
     if (sessionType !== 'all') filters.sessionType = sessionType;
-    if (tableCount) filters.simultaneousTableCount = Number(tableCount) as SimultaneousTableCount;
+    if (tableCount !== '__all__') filters.simultaneousTableCount = Number(tableCount) as SimultaneousTableCount;
     void window.api.training.listSessions(filters).then((res) => {
       setData(res);
       setLoading(false);
@@ -109,7 +110,7 @@ export function HistoryPage(): React.ReactElement {
 
   const handleTableCountChange = useCallback(
     (value: string) => {
-      updateParams({ tableCount: value || null, page: null });
+      updateParams({ tableCount: value === '__all__' ? null : value, page: null });
     },
     [updateParams],
   );
@@ -184,29 +185,34 @@ export function HistoryPage(): React.ReactElement {
         <FilterToolbarRow>
           <div className="flex min-w-44 flex-col gap-1">
             <Label>Tipo de sessão</Label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={sessionType}
-              onChange={(e) => handleSessionTypeChange(e.target.value)}
-            >
-              <option value="all">Todos</option>
-              <option value="single">Individual</option>
-              <option value="simultaneous">Simultâneo</option>
-            </select>
+            <Select value={sessionType} onValueChange={handleSessionTypeChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="single">Individual</SelectItem>
+                <SelectItem value="simultaneous">Simultâneo</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex min-w-44 flex-col gap-1">
             <Label>Mesas simultâneas</Label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            <Select
               value={tableCount}
-              onChange={(e) => handleTableCountChange(e.target.value)}
+              onValueChange={handleTableCountChange}
               disabled={sessionType !== 'simultaneous'}
             >
-              <option value="">Todas</option>
-              <option value="2">2 mesas</option>
-              <option value="3">3 mesas</option>
-              <option value="4">4 mesas</option>
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Todas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">Todas</SelectItem>
+                <SelectItem value="2">2 mesas</SelectItem>
+                <SelectItem value="3">3 mesas</SelectItem>
+                <SelectItem value="4">4 mesas</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </FilterToolbarRow>
       </FilterToolbar>

@@ -105,12 +105,14 @@ test.describe('Estatísticas — filtro por grupo', () => {
 
     await appPage.getByRole('link', { name: 'Estatísticas', exact: true }).click();
     await appPage.getByRole('tab', { name: group1 }).click();
-    await appPage.getByTestId('stats-session-type-filter').selectOption('single');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Individual' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('1');
     await expect(appPage.getByRole('row').filter({ hasText: sit1 })).toBeVisible();
 
     await appPage.getByRole('tab', { name: group2 }).click();
-    await appPage.getByTestId('stats-session-type-filter').selectOption('simultaneous');
+    await appPage.getByTestId('stats-session-type-filter').click();
+    await appPage.getByRole('option', { name: 'Simultâneo' }).click();
     await expect(sessionsOverviewValue(appPage)).toHaveText('2');
     await expect(appPage.getByText('Sem dados por situação')).toBeVisible();
   });

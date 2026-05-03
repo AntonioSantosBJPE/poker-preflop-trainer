@@ -27,6 +27,7 @@ import {
 } from '@/components/app';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useChartPalette } from '../hooks/useChartPalette';
 import { StatsChartCard, StatsOverviewCards, StatsWorstHandsList } from '@/components/stats';
 
@@ -36,8 +37,8 @@ export function StatsPage(): React.ReactElement {
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
   const [sessionType, setSessionType] = useState<'all' | 'single' | 'simultaneous'>('all');
   const [simultaneousTableCount, setSimultaneousTableCount] = useState<
-    '' | `${SimultaneousTableCount}`
-  >('');
+    '__all__' | `${SimultaneousTableCount}`
+  >('__all__');
   const [overview, setOverview] = useState<StatsOverviewDto>({
     sessions: 0,
     hands: 0,
@@ -57,7 +58,7 @@ export function StatsPage(): React.ReactElement {
 
   useEffect(() => {
     if (sessionType === 'simultaneous') return;
-    setSimultaneousTableCount('');
+    setSimultaneousTableCount('__all__');
   }, [sessionType]);
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export function StatsPage(): React.ReactElement {
       const filters: StatsFilters = {};
       if (activeGroupId !== null) filters.groupId = activeGroupId;
       if (sessionType !== 'all') filters.sessionType = sessionType;
-      if (sessionType === 'simultaneous' && simultaneousTableCount) {
+      if (sessionType === 'simultaneous' && simultaneousTableCount !== '__all__') {
         filters.simultaneousTableCount = Number(simultaneousTableCount) as SimultaneousTableCount;
       }
       setOverview(await window.api.stats.overview(filters));
@@ -142,38 +143,38 @@ export function StatsPage(): React.ReactElement {
 
         <FilterToolbarRow>
           <div className="flex min-w-52 flex-col gap-1">
-            <Label htmlFor="stats-session-type">Tipo de sessão</Label>
-            <select
-              id="stats-session-type"
-              data-testid="stats-session-type-filter"
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            <Label>Tipo de sessão</Label>
+            <Select
               value={sessionType}
-              onChange={(event) =>
-                setSessionType(event.currentTarget.value as 'all' | 'single' | 'simultaneous')
-              }
+              onValueChange={(value) => setSessionType(value as 'all' | 'single' | 'simultaneous')}
             >
-              <option value="all">Todos</option>
-              <option value="single">Individual</option>
-              <option value="simultaneous">Simultâneo</option>
-            </select>
+              <SelectTrigger id="stats-session-type" data-testid="stats-session-type-filter" className="w-full">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="single">Individual</SelectItem>
+                <SelectItem value="simultaneous">Simultâneo</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex min-w-52 flex-col gap-1">
-            <Label htmlFor="stats-table-count">Mesas simultâneas</Label>
-            <select
-              id="stats-table-count"
-              data-testid="stats-simultaneous-count-filter"
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+            <Label>Mesas simultâneas</Label>
+            <Select
               value={simultaneousTableCount}
-              onChange={(event) =>
-                setSimultaneousTableCount(event.currentTarget.value as '' | '2' | '3' | '4')
-              }
+              onValueChange={(value) => setSimultaneousTableCount(value as '__all__' | '2' | '3' | '4')}
               disabled={sessionType !== 'simultaneous'}
             >
-              <option value="">Todas</option>
-              <option value="2">2 mesas</option>
-              <option value="3">3 mesas</option>
-              <option value="4">4 mesas</option>
-            </select>
+              <SelectTrigger id="stats-table-count" data-testid="stats-simultaneous-count-filter" className="w-full">
+                <SelectValue placeholder="Todas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">Todas</SelectItem>
+                <SelectItem value="2">2 mesas</SelectItem>
+                <SelectItem value="3">3 mesas</SelectItem>
+                <SelectItem value="4">4 mesas</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </FilterToolbarRow>
       </FilterToolbar>
