@@ -16,13 +16,14 @@ vi.mock('../services/session', () => ({
 
 vi.mock('@shared/forms/statsSchemas', () => ({
   parseStatsFilters: vi.fn(),
+  parseDeletePeriod: vi.fn(),
 }));
 
 const mockHandle = vi.mocked(ipcMain.handle);
 
 import { getDb } from '../db/client';
 import { requireUserId } from '../services/session';
-import { parseStatsFilters } from '@shared/forms/statsSchemas';
+import { parseStatsFilters, parseDeletePeriod } from '@shared/forms/statsSchemas';
 
 describe('registerStatsIpc', () => {
   beforeAll(() => {
@@ -51,9 +52,13 @@ describe('registerStatsIpc', () => {
     vi.mocked(requireUserId).mockClear();
     vi.mocked(getDb).mockClear();
     vi.mocked(parseStatsFilters).mockClear();
+    vi.mocked(parseDeletePeriod).mockClear();
     vi.mocked(requireUserId).mockResolvedValue(7);
     vi.mocked(parseStatsFilters).mockImplementation(
       (raw) => (raw ?? {}) as Record<string, unknown>,
+    );
+    vi.mocked(parseDeletePeriod).mockImplementation(
+      (raw) => (raw ?? { fromTs: 0, toTs: 0 }) as { fromTs: number; toTs: number },
     );
   });
 
@@ -437,6 +442,143 @@ describe('registerStatsIpc', () => {
       const handler = getHandler('stats:worstHands');
 
       await expect(handler({}, {}, 20)).resolves.toEqual([]);
+    });
+  });
+
+  describe('stats:estimateDeleteSessions', () => {
+    it('valida período com parseDeletePeriod', async () => {
+      const sessionsWhere = vi.fn().mockResolvedValue([]);
+      const sessionsFrom = vi.fn(() => ({ where: sessionsWhere }));
+      const select = vi.fn().mockImplementationOnce(() => ({ from: sessionsFrom }));
+      vi.mocked(getDb).mockReturnValue({ select } as unknown as ReturnType<typeof getDb>);
+      const handler = getHandler('stats:estimateDeleteSessions');
+
+      await handler({}, { fromTs: 1_700_000_000, toTs: 1_800_000_000 });
+
+      expect(parseDeletePeriod).toHaveBeenCalledWith({
+        fromTs: 1_700_000_000,
+        toTs: 1_800_000_000,
+      });
+    });
+
+    it('período sem sessões retorna zeros', async () => {
+      const sessionsWhere = vi.fn().mockResolvedValue([]);
+      const sessionsFrom = vi.fn(() => ({ where: sessionsWhere }));
+      const select = vi.fn().mockImplementationOnce(() => ({ from: sessionsFrom }));
+      vi.mocked(getDb).mockReturnValue({ select } as unknown as ReturnType<typeof getDb>);
+      const handler = getHandler('stats:estimateDeleteSessions');
+
+      const out = await handler({}, { fromTs: 1, toTs: 2 });
+
+      expect(out).toEqual({ sessionCount: 0, handCount: 0 });
+    });
+
+    it('período com sessões retorna contagens agregadas', async () => {
+      const sessionsWhere = vi.fn().mockResolvedValue([{ id: 1 }, { id: 2 }]);
+      const sessionsFrom = vi.fn(() => ({ where: sessionsWhere }));
+      const handsFrom = vi.fn(() => ({ where: handsWhere }));
+      const handsWhere = vi.fn().mockResolvedValue([{ count: 5 }]);
+      const select = vi
+        .fn()
+        .mockImplementationOnce(() => ({ from: sessionsFrom }))
+        .mockImplementationOnce(() => ({ from: handsFrom }));
+      vi.mocked(getDb).mockReturnValue({ select } as unknown as ReturnType<typeof getDb>);
+      const handler = getHandler('stats:estimateDeleteSessions');
+
+      const out = await handler({}, { fromTs: 1, toTs: 2 });
+
+      expect(out).toEqual({ sessionCount: 2, handCount: 5 });
+    });
+
+    it('propaga erro de parseDeletePeriod', async () => {
+      vi.mocked(parseDeletePeriod).mockImplementation(() => {
+        throw new Error('Período inválido');
+      });
+      const handler = getHandler('stats:estimateDeleteSessions');
+
+      await expect(handler({}, {})).rejects.toThrow('Período inválido');
+      expect(requireUserId).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('stats:deleteSessions', () => {
+    it('valida período com parseDeletePeriod', async () => {
+      const txRun = vi.fn();
+      const txWhere = vi.fn(() => ({ run: txRun }));
+      const txDelete = vi.fn(() => ({ where: txWhere }));
+      const txAll = vi.fn().mockReturnValue([]);
+      const txWhereSelect = vi.fn(() => ({ all: txAll }));
+      const txFrom = vi.fn(() => ({ where: txWhereSelect }));
+      const txSelect = vi.fn(() => ({ from: txFrom }));
+      const tx = { select: txSelect, delete: txDelete };
+      const mockTransaction = vi.fn((cb: (tx: Record<string, unknown>) => unknown) => cb(tx));
+      vi.mocked(getDb).mockReturnValue({
+        transaction: mockTransaction,
+      } as unknown as ReturnType<typeof getDb>);
+      const handler = getHandler('stats:deleteSessions');
+
+      await expect(handler({}, { fromTs: 1_700_000_000, toTs: 1_800_000_000 })).rejects.toThrow(
+        'Nenhuma sessão encontrada no período',
+      );
+
+      expect(parseDeletePeriod).toHaveBeenCalledWith({
+        fromTs: 1_700_000_000,
+        toTs: 1_800_000_000,
+      });
+    });
+
+    it('período sem sessões rejeita com erro', async () => {
+      const txAll = vi.fn().mockReturnValue([]);
+      const txWhereSelect = vi.fn(() => ({ all: txAll }));
+      const txFrom = vi.fn(() => ({ where: txWhereSelect }));
+      const txSelect = vi.fn(() => ({ from: txFrom }));
+      const tx = { select: txSelect, delete: vi.fn() };
+      const mockTransaction = vi.fn((cb: (tx: Record<string, unknown>) => unknown) => cb(tx));
+      vi.mocked(getDb).mockReturnValue({
+        transaction: mockTransaction,
+      } as unknown as ReturnType<typeof getDb>);
+      const handler = getHandler('stats:deleteSessions');
+
+      await expect(handler({}, { fromTs: 1, toTs: 2 })).rejects.toThrow(
+        'Nenhuma sessão encontrada no período',
+      );
+    });
+
+    it('período com sessões apaga e retorna contagens', async () => {
+      const txRun = vi.fn();
+      const txDeleteWhere = vi.fn(() => ({ run: txRun }));
+      const txDelete = vi.fn(() => ({ where: txDeleteWhere }));
+      const txHandsAll = vi.fn().mockReturnValue([{ count: 5 }]);
+      const txHandsWhere = vi.fn(() => ({ all: txHandsAll }));
+      const txHandsFrom = vi.fn(() => ({ where: txHandsWhere }));
+      const txSessionsAll = vi.fn().mockReturnValue([{ id: 1 }, { id: 2 }]);
+      const txSessionsWhere = vi.fn(() => ({ all: txSessionsAll }));
+      const txSessionsFrom = vi.fn(() => ({ where: txSessionsWhere }));
+      const txSelect = vi.fn();
+      txSelect
+        .mockImplementationOnce(() => ({ from: txSessionsFrom }))
+        .mockImplementationOnce(() => ({ from: txHandsFrom }));
+      const tx = { select: txSelect, delete: txDelete };
+      const mockTransaction = vi.fn((cb: (tx: Record<string, unknown>) => unknown) => cb(tx));
+      vi.mocked(getDb).mockReturnValue({
+        transaction: mockTransaction,
+      } as unknown as ReturnType<typeof getDb>);
+      const handler = getHandler('stats:deleteSessions');
+
+      const out = await handler({}, { fromTs: 1, toTs: 2 });
+
+      expect(out).toEqual({ sessionCount: 2, handCount: 5 });
+      expect(txRun).toHaveBeenCalled();
+    });
+
+    it('propaga erro de parseDeletePeriod', async () => {
+      vi.mocked(parseDeletePeriod).mockImplementation(() => {
+        throw new Error('Período inválido');
+      });
+      const handler = getHandler('stats:deleteSessions');
+
+      await expect(handler({}, {})).rejects.toThrow('Período inválido');
+      expect(requireUserId).not.toHaveBeenCalled();
     });
   });
 });

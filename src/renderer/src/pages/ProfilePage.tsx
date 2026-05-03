@@ -56,13 +56,7 @@ const simultaneousTableOptions = [
   { value: '4', label: '4 mesas' },
 ] as const;
 
-function ipcErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  if (typeof err === 'object' && err !== null && 'message' in err) {
-    return String((err as { message: unknown }).message);
-  }
-  return 'Erro';
-}
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 
 function toPreferencesFormValues(raw: ApiUserPreferences | null): PreferencesFormValues {
   return {
@@ -232,7 +226,7 @@ export function ProfilePage(): React.ReactElement {
       const snapshot = await window.api.profile.updatePreferences(values);
       applySessionSnapshot(snapshot);
       resetPreferencesForm(toPreferencesFormValues(snapshot.preferences));
-      setPreferencesFeedback('Preferências guardadas com sucesso.');
+      setPreferencesFeedback('Preferências salvas com sucesso.');
     } catch (err) {
       setThemeLocally(previousTheme);
       setPreferencesError('root', { message: ipcErrorMessage(err) });
@@ -282,7 +276,7 @@ export function ProfilePage(): React.ReactElement {
 
           <div className="md:col-span-2">
             <Button type="submit" disabled={isUpdatingName}>
-              Guardar nome
+              Salvar nome
             </Button>
           </div>
         </form>
@@ -415,7 +409,7 @@ export function ProfilePage(): React.ReactElement {
 
           <div className="md:col-span-2">
             <Button type="submit" disabled={isSavingPreferences}>
-              Guardar preferências
+              Salvar preferências
             </Button>
           </div>
         </form>

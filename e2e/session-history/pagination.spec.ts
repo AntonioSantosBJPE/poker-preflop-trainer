@@ -94,7 +94,7 @@ test.describe('Histórico - paginação e filtros', () => {
     await appPage.getByRole('link', { name: 'Histórico' }).click();
     await expect(appPage.getByRole('heading', { name: 'Histórico' })).toBeVisible();
 
-    const sessionTypeSelect = appPage.getByRole('combobox').first();
+    const sessionTypeSelect = appPage.getByRole('combobox').nth(1);
     await sessionTypeSelect.click();
     await appPage.getByRole('option', { name: 'Individual' }).click();
     const table2 = appPage.getByTestId('history-sessions-table');

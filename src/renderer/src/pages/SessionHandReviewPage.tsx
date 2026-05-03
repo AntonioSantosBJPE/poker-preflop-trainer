@@ -67,12 +67,10 @@ export function SessionHandReviewPage(): React.ReactElement {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageHeader title="Revisão da Sessão" />
-        <Button variant="outline" onClick={() => navigate(`/history${search}`)}>
-          ← Voltar ao histórico
-        </Button>
-      </div>
+      <PageHeader
+        title="Revisão da sessão"
+        backLink={{ to: `/history${search}`, label: '← Voltar ao histórico' }}
+      />
 
       <SessionReviewHeader session={detail.session} />
 

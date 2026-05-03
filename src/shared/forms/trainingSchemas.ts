@@ -54,12 +54,42 @@ export const sessionHistoryFiltersSchema = z.object({
   groupId: z.number().int().positive().optional(),
   sessionType: z.enum(['single', 'simultaneous']).optional(),
   simultaneousTableCount: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  fromTs: z.number().int().nonnegative().optional(),
+  toTs: z.number().int().nonnegative().optional(),
 });
 
 export type SessionHistoryFiltersInput = z.infer<typeof sessionHistoryFiltersSchema>;
 
 export function parseSessionHistoryFilters(raw: unknown): SessionHistoryFiltersInput {
   const r = sessionHistoryFiltersSchema.safeParse(raw);
+  if (!r.success) {
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
+  }
+  return r.data;
+}
+
+export const deleteSessionsByIdsSchema = z.object({
+  ids: z.array(z.number().int().positive()).nonempty(),
+});
+
+export type DeleteSessionsByIdsInput = z.infer<typeof deleteSessionsByIdsSchema>;
+
+export function parseDeleteSessionsByIds(raw: unknown): DeleteSessionsByIdsInput {
+  const r = deleteSessionsByIdsSchema.safeParse(raw);
+  if (!r.success) {
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
+  }
+  return r.data;
+}
+
+export const multiSessionDetailSchema = z.object({
+  ids: z.array(z.number().int().positive()).nonempty(),
+});
+
+export type MultiSessionDetailInput = z.infer<typeof multiSessionDetailSchema>;
+
+export function parseMultiSessionDetail(raw: unknown): MultiSessionDetailInput {
+  const r = multiSessionDetailSchema.safeParse(raw);
   if (!r.success) {
     throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
   }

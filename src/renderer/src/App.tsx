@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { HistoryPage } from './pages/HistoryPage';
+import { MultiSessionReviewPage } from './pages/MultiSessionReviewPage';
 import { SessionHandReviewPage } from './pages/SessionHandReviewPage';
 import { GroupDetailPage } from './pages/GroupDetailPage';
 import { GroupsPage } from './pages/GroupsPage';
@@ -17,6 +18,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { TrainingConfigPage } from './pages/TrainingConfigPage';
 import { TrainingResultPage } from './pages/TrainingResultPage';
 import { TrainingSessionPage } from './pages/TrainingSessionPage';
+import { Toaster } from './components/ui/sonner';
 import { useAuthStore } from './stores/auth';
 
 function Protected({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -42,6 +44,7 @@ export function App(): React.ReactElement {
 
   return (
     <BrowserRouter>
+      <Toaster richColors />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
@@ -70,6 +73,7 @@ export function App(): React.ReactElement {
           <Route path="training/:sessionId" element={<TrainingSessionPage />} />
           <Route path="training/:sessionId/result" element={<TrainingResultPage />} />
           <Route path="history" element={<HistoryPage />} />
+          <Route path="history/review-multi" element={<MultiSessionReviewPage />} />
           <Route path="history/:sessionId" element={<SessionHandReviewPage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="profile" element={<ProfilePage />} />

@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { PageHeader } from '@/components/app/PageHeader';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TrainingSummaryCards } from '@/components/training/TrainingSummaryCards';
 import { useChartPalette } from '../hooks/useChartPalette';
 
@@ -42,10 +43,21 @@ export function TrainingResultPage(): ReactElement {
     })();
   }, [sessionId]);
 
-  if (!summary) return <p className="text-muted-foreground">Carregando…</p>;
+  if (!summary)
+    return (
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-10 w-64" />
+        <div className="grid gap-4 md:grid-cols-3">
+          <Skeleton className="h-24 rounded-xl" />
+          <Skeleton className="h-24 rounded-xl" />
+          <Skeleton className="h-24 rounded-xl" />
+        </div>
+        <Skeleton className="h-64 rounded-xl" />
+      </div>
+    );
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="flex flex-col gap-6">
       <PageHeader title="Resultado da sessão" />
       <TrainingSummaryCards
         totalHands={summary.totalHands}
@@ -68,10 +80,13 @@ export function TrainingResultPage(): ReactElement {
         </ResponsiveContainer>
       </div>
       <div className="flex flex-wrap gap-3">
-        <Button variant="outline" asChild>
+        <Button variant="default" asChild>
+          <Link to={`/history/${sessionId}`}>Revisão da sessão</Link>
+        </Button>
+        <Button variant="secondary" asChild>
           <Link to="/training">Nova sessão</Link>
         </Button>
-        <Button variant="default" asChild>
+        <Button variant="outline" asChild>
           <Link to="/stats">Ver estatísticas</Link>
         </Button>
       </div>

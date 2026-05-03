@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type {
   GroupSummaryDto,
@@ -7,6 +7,7 @@ import type {
 } from '@shared/ipc/types';
 import { formatDuration } from '@shared/utils/format';
 import {
+  DatePeriodFilter,
   EmptyState,
   EntityTable,
   FilterToolbar,
@@ -15,9 +16,11 @@ import {
   type EntityTableColumn,
 } from '@/components/app';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -34,6 +37,9 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import type { SessionListResponse } from '@shared/ipc/types';
+import { toast } from 'sonner';
+import { SelectionToolbar } from '@/components/history/SelectionToolbar';
+import { DeleteSessionsDialog } from '@/components/history/DeleteSessionsDialog';
 
 function getPageNumbers(current: number, total: number): number[] {
   const pages: number[] = [];
@@ -59,6 +65,10 @@ export function HistoryPage(): React.ReactElement {
   const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
   const [data, setData] = useState<SessionListResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const selectedRef = useRef<Set<number>>(new Set());
+  const [, forceRender] = useReducer((x: number) => x + 1, 0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const activeGroupId = searchParams.get('groupId') ? Number(searchParams.get('groupId')) : null;
@@ -70,6 +80,10 @@ export function HistoryPage(): React.ReactElement {
     tableCountRaw === '2' || tableCountRaw === '3' || tableCountRaw === '4'
       ? tableCountRaw
       : '__all__';
+
+  const fromTs = searchParams.get('fromTs') ? Number(searchParams.get('fromTs')) : undefined;
+  const toTs = searchParams.get('toTs') ? Number(searchParams.get('toTs')) : undefined;
+  const ignoreInitialFilter = useRef(fromTs !== undefined || toTs !== undefined);
 
   useEffect(() => {
     void (async () => {
@@ -110,16 +124,20 @@ export function HistoryPage(): React.ReactElement {
       groupId?: number;
       sessionType?: 'single' | 'simultaneous';
       simultaneousTableCount?: SimultaneousTableCount;
+      fromTs?: number;
+      toTs?: number;
     } = { page };
     if (activeGroupId !== null) filters.groupId = activeGroupId;
     if (sessionType !== 'all') filters.sessionType = sessionType;
     if (tableCount !== '__all__')
       filters.simultaneousTableCount = Number(tableCount) as SimultaneousTableCount;
+    if (fromTs !== undefined) filters.fromTs = fromTs;
+    if (toTs !== undefined) filters.toTs = toTs;
     void window.api.training.listSessions(filters).then((res) => {
       setData(res);
       setLoading(false);
     });
-  }, [page, activeGroupId, sessionType, tableCount]);
+  }, [page, activeGroupId, sessionType, tableCount, fromTs, toTs, refreshCounter]);
 
   const groupTabValue = activeGroupId === null ? 'all' : String(activeGroupId);
 
@@ -152,6 +170,56 @@ export function HistoryPage(): React.ReactElement {
     },
     [updateParams],
   );
+
+  const handlePeriodChange = useCallback(
+    (filters: { fromTs?: number; toTs?: number }) => {
+      if (ignoreInitialFilter.current) {
+        ignoreInitialFilter.current = false;
+        return;
+      }
+      updateParams({
+        fromTs: filters.fromTs !== undefined ? String(filters.fromTs) : null,
+        toTs: filters.toTs !== undefined ? String(filters.toTs) : null,
+        page: null,
+      });
+    },
+    [updateParams],
+  );
+
+  const handleSelectionChange = useCallback((keys: Set<number | string>) => {
+    selectedRef.current = new Set(Array.from(keys, Number));
+    forceRender();
+  }, []);
+
+  const handleClearSelection = useCallback(() => {
+    selectedRef.current = new Set();
+    forceRender();
+  }, []);
+
+  const handleReviewMultiple = useCallback(() => {
+    const ids = Array.from(selectedRef.current);
+    if (ids.length === 1) {
+      navigate(`/history/${ids[0]}${location.search}`, {
+        state: { search: location.search },
+      });
+    } else {
+      navigate(`/history/review-multi?ids=${ids.join(',')}`);
+    }
+  }, [navigate, location.search]);
+
+  const handleDeleteComplete = useCallback(() => {
+    selectedRef.current = new Set();
+    forceRender();
+    setRefreshCounter((c) => c + 1);
+    toast.success('Sessões removidas com sucesso.');
+  }, []);
+
+  useEffect(() => {
+    if (selectedRef.current.size > 0) {
+      selectedRef.current = new Set();
+      forceRender();
+    }
+  }, [activeGroupId, sessionType, fromTs, toTs]);
 
   const columns = useMemo<EntityTableColumn<SessionHistoryItemDto>[]>(
     () => [
@@ -199,8 +267,28 @@ export function HistoryPage(): React.ReactElement {
         cell: (row) => `${row.handsPlayed}/${row.totalHands}`,
         cellClassName: 'tabular-nums',
       },
+      {
+        key: 'actions',
+        header: '',
+        cell: (row) => (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              navigate(`/history/${row.id}${location.search}`, {
+                state: { search: location.search },
+              })
+            }
+            data-testid={`review-session-${row.id}`}
+            title="Revisar sessão"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+        ),
+        cellClassName: 'text-right',
+      },
     ],
-    [],
+    [navigate, location.search],
   );
 
   const totalPages = data?.totalPages ?? 0;
@@ -221,6 +309,10 @@ export function HistoryPage(): React.ReactElement {
             ))}
           </TabsList>
         </Tabs>
+
+        <div data-testid="date-period-filter">
+          <DatePeriodFilter onChange={handlePeriodChange} />
+        </div>
 
         <FilterToolbarRow>
           <div className="flex min-w-44 flex-col gap-1">
@@ -257,6 +349,22 @@ export function HistoryPage(): React.ReactElement {
         </FilterToolbarRow>
       </FilterToolbar>
 
+      {selectedRef.current.size > 0 && (
+        <SelectionToolbar
+          selectedCount={selectedRef.current.size}
+          onRemove={() => setDeleteDialogOpen(true)}
+          onReviewMultiple={handleReviewMultiple}
+          onClearSelection={handleClearSelection}
+        />
+      )}
+
+      <DeleteSessionsDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        sessionIds={Array.from(selectedRef.current)}
+        onComplete={handleDeleteComplete}
+      />
+
       {loading ? (
         <div className="flex flex-col gap-2">
           <Skeleton className="h-10 w-full" />
@@ -269,9 +377,9 @@ export function HistoryPage(): React.ReactElement {
           rows={data?.items ?? []}
           columns={columns}
           getRowKey={(row) => row.id}
-          onRowClick={(row) =>
-            navigate(`/history/${row.id}${location.search}`, { state: { search: location.search } })
-          }
+          selectable={true}
+          selectedKeys={selectedRef.current as Set<number | string>}
+          onSelectionChange={handleSelectionChange}
           tableTestId="history-sessions-table"
           emptyState={
             <EmptyState

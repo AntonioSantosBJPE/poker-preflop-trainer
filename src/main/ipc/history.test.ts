@@ -260,6 +260,139 @@ describe('registerHistoryIpc', () => {
       const handler = getHandler('training:listSessions');
       await expect(handler({}, {})).rejects.toThrow('Não autenticado');
     });
+
+    it('filtra por fromTs', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 1700000000 })) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('filtra por toTs', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { toTs: 1800000000 })) as {
+        items: unknown[];
+        total: number;
+      };
+
+      expect(res.total).toBe(0);
+    });
+
+    it('filtra por fromTs e toTs', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 1700000000, toTs: 1800000000 })) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('fromTs=0 é válido (desde o início)', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 0 })) as { total: number };
+      expect(res.total).toBe(0);
+    });
+
+    it('filtros de data combinam com groupId', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, { fromTs: 1700000000, groupId: 5 })) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('sem filtros de data mantém compatibilidade', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, {})) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.items).toEqual([]);
+      expect(res.total).toBe(0);
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+      expect(res.totalPages).toBe(0);
+    });
+
+    it('aceita página padrão quando não fornecida', async () => {
+      const db = createListSessionsDbMock({ countTotal: 0, rows: [] });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:listSessions');
+      const res = (await handler({}, {})) as {
+        items: unknown[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
+
+      expect(res.page).toBe(1);
+      expect(res.pageSize).toBe(10);
+    });
   });
 
   describe('training:getSessionDetail', () => {
@@ -525,6 +658,377 @@ describe('registerHistoryIpc', () => {
       vi.mocked(requireUserId).mockRejectedValueOnce(new Error('Não autenticado'));
       const handler = getHandler('training:getSessionDetail');
       await expect(handler({}, 1)).rejects.toThrow('Não autenticado');
+    });
+  });
+
+  describe('training:estimateDeleteSessionsByIds', () => {
+    function createEstimateDeleteDbMock(opts: { sessionCount: number; handCount: number }) {
+      const sessionCountWhere = vi.fn().mockResolvedValue([{ count: opts.sessionCount }]);
+      const sessionCountFrom = vi.fn(() => ({ where: sessionCountWhere }));
+      const handCountWhere = vi.fn().mockResolvedValue([{ count: opts.handCount }]);
+      const handCountFrom = vi.fn(() => ({ where: handCountWhere }));
+
+      const select = vi
+        .fn()
+        .mockReturnValueOnce({ from: sessionCountFrom })
+        .mockReturnValueOnce({ from: handCountFrom });
+
+      return { select };
+    }
+
+    it('retorna { sessionCount, handCount } com IDs válidos', async () => {
+      const db = createEstimateDeleteDbMock({ sessionCount: 2, handCount: 50 });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:estimateDeleteSessionsByIds');
+      const res = (await handler({}, { ids: [1, 2] })) as {
+        sessionCount: number;
+        handCount: number;
+      };
+
+      expect(res.sessionCount).toBe(2);
+      expect(res.handCount).toBe(50);
+    });
+
+    it('retorna { sessionCount: 0, handCount: 0 } quando IDs não existem', async () => {
+      const db = createEstimateDeleteDbMock({ sessionCount: 0, handCount: 0 });
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:estimateDeleteSessionsByIds');
+      const res = (await handler({}, { ids: [999] })) as {
+        sessionCount: number;
+        handCount: number;
+      };
+
+      expect(res.sessionCount).toBe(0);
+      expect(res.handCount).toBe(0);
+    });
+
+    it('rejeita quando não autenticado', async () => {
+      vi.mocked(requireUserId).mockRejectedValueOnce(new Error('Não autenticado'));
+      const handler = getHandler('training:estimateDeleteSessionsByIds');
+      await expect(handler({}, { ids: [1] })).rejects.toThrow('Não autenticado');
+    });
+
+    it('rejeita com input inválido (array vazio)', async () => {
+      const handler = getHandler('training:estimateDeleteSessionsByIds');
+      await expect(handler({}, { ids: [] })).rejects.toThrow();
+    });
+  });
+
+  describe('training:deleteSessionsByIds', () => {
+    function createDeleteSessionsDbMock(opts: { matchedIds: number[]; handCount: number }) {
+      const matchedAll = vi.fn(() => opts.matchedIds.map((id) => ({ id })));
+      const matchedWhere = vi.fn(() => ({ all: matchedAll }));
+      const matchedFrom = vi.fn(() => ({ where: matchedWhere }));
+      const handCountAll = vi.fn(() => [{ count: opts.handCount }]);
+      const handCountWhere = vi.fn(() => ({ all: handCountAll }));
+      const handCountFrom = vi.fn(() => ({ where: handCountWhere }));
+      const deleteRun = vi.fn();
+      const deleteWhere = vi.fn(() => ({ run: deleteRun }));
+
+      const tx = {
+        select: vi
+          .fn()
+          .mockReturnValueOnce({ from: matchedFrom })
+          .mockReturnValueOnce({ from: handCountFrom }),
+        delete: vi.fn(() => ({ where: deleteWhere })),
+      };
+
+      const transaction = vi.fn().mockImplementation((cb) => cb(tx));
+
+      return { transaction };
+    }
+
+    it('deleta sessões e retorna contagens corretas', async () => {
+      const db = createDeleteSessionsDbMock({ matchedIds: [1, 2], handCount: 50 });
+      vi.mocked(getDb).mockReturnValue({ transaction: db.transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:deleteSessionsByIds');
+      const res = (await handler({}, { ids: [1, 2] })) as {
+        sessionCount: number;
+        handCount: number;
+      };
+
+      expect(res.sessionCount).toBe(2);
+      expect(res.handCount).toBe(50);
+    });
+
+    it('lança erro quando nenhuma sessão é encontrada', async () => {
+      const db = createDeleteSessionsDbMock({ matchedIds: [], handCount: 0 });
+      vi.mocked(getDb).mockReturnValue({ transaction: db.transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:deleteSessionsByIds');
+      await expect(handler({}, { ids: [999] })).rejects.toThrow('Nenhuma sessão encontrada');
+    });
+
+    it('rejeita quando não autenticado', async () => {
+      vi.mocked(requireUserId).mockRejectedValueOnce(new Error('Não autenticado'));
+      const handler = getHandler('training:deleteSessionsByIds');
+      await expect(handler({}, { ids: [1] })).rejects.toThrow('Não autenticado');
+    });
+  });
+
+  describe('training:getMultiSessionDetail', () => {
+    function createMultiSessionDetailDbMock(opts: {
+      sessionRows: Array<Record<string, unknown>>;
+      hands: unknown[];
+      situationRows?: unknown[];
+      actionRows?: unknown[];
+      rangeCellRows?: unknown[];
+    }) {
+      const sessionRows = opts.sessionRows ?? [];
+      const hands = opts.hands ?? [];
+      const sitRows = opts.situationRows ?? [];
+      const actRows = opts.actionRows ?? [];
+      const cellRows = opts.rangeCellRows ?? [];
+
+      const sessionWhere = vi.fn().mockResolvedValue(sessionRows);
+      const sessionFrom = vi.fn(() => ({ where: sessionWhere }));
+
+      const handsWhere = vi.fn().mockResolvedValue(hands);
+      const handsFrom = vi.fn(() => ({ where: handsWhere }));
+
+      const select = vi
+        .fn()
+        .mockReturnValueOnce({ from: sessionFrom })
+        .mockReturnValueOnce({ from: handsFrom });
+
+      if (hands.length > 0) {
+        const sitsWhere = vi.fn().mockResolvedValue(sitRows);
+        const sitsFrom = vi.fn(() => ({ where: sitsWhere }));
+        const actsWhere = vi.fn().mockResolvedValue(actRows);
+        const actsFrom = vi.fn(() => ({ where: actsWhere }));
+        const cellsWhere = vi.fn().mockResolvedValue(cellRows);
+        const cellsFrom = vi.fn(() => ({ where: cellsWhere }));
+
+        select
+          .mockReturnValueOnce({ from: sitsFrom })
+          .mockReturnValueOnce({ from: actsFrom })
+          .mockReturnValueOnce({ from: cellsFrom });
+      }
+
+      return { select };
+    }
+
+    function sessionRow(id: number, overrides?: Record<string, unknown>) {
+      return {
+        id,
+        startedAt: new Date(`2026-05-0${id}T10:00:00Z`),
+        finishedAt: new Date(`2026-05-0${id}T10:05:00Z`),
+        groupId: 1,
+        totalHands: 2,
+        sessionType: 'single',
+        simultaneousTableCount: null,
+        ...overrides,
+      };
+    }
+
+    it('retorna dados agregados para múltiplas sessões', async () => {
+      const db = createMultiSessionDetailDbMock({
+        sessionRows: [sessionRow(1), sessionRow(2)],
+        hands: [
+          {
+            id: 1,
+            sessionId: 1,
+            situationId: 10,
+            card1Rank: 'A',
+            card1Suit: 's',
+            card2Rank: 'K',
+            card2Suit: 's',
+            chosenActionId: 1,
+            isCorrect: true,
+            responseMs: 1500,
+            handIndex: 1,
+          },
+          {
+            id: 2,
+            sessionId: 2,
+            situationId: 10,
+            card1Rank: '2',
+            card1Suit: 'h',
+            card2Rank: '7',
+            card2Suit: 'd',
+            chosenActionId: 2,
+            isCorrect: false,
+            responseMs: 2000,
+            handIndex: 1,
+          },
+        ],
+        situationRows: [{ id: 10, name: 'BTN Open', position: 'BTN' }],
+        actionRows: [
+          {
+            id: 1,
+            situationId: 10,
+            name: 'Raise',
+            actionType: 'RAISE_OPEN',
+            sizeBb: 2.5,
+            colorHex: '#ff0000',
+            sortOrder: 0,
+          },
+          {
+            id: 2,
+            situationId: 10,
+            name: 'Fold',
+            actionType: 'FOLD',
+            sizeBb: null,
+            colorHex: '#888888',
+            sortOrder: 1,
+          },
+        ],
+        rangeCellRows: [{ id: 1, actionId: 1, rowIndex: 0, colIndex: 1, frequency: 1 }],
+      });
+
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:getMultiSessionDetail');
+      const res = (await handler({}, { ids: [1, 2] })) as {
+        sessions: { id: number; handsPlayed: number; accuracy: number }[];
+        hands: { situationName: string; isCorrect: boolean }[];
+        handSessionMap: { sessionIndex: number; sessionId: number }[];
+        situationActionsMap: Record<number, unknown>;
+      };
+
+      expect(res.sessions).toHaveLength(2);
+      expect(res.sessions[0]!.handsPlayed).toBe(1);
+      expect(res.sessions[1]!.handsPlayed).toBe(1);
+      expect(res.sessions[0]!.accuracy).toBe(1);
+      expect(res.sessions[1]!.accuracy).toBe(0);
+      expect(res.hands).toHaveLength(2);
+      expect(res.hands[0]!.situationName).toBe('BTN Open');
+      expect(res.situationActionsMap[10]).toBeDefined();
+    });
+
+    it('retorna arrays vazios quando sessões não encontradas', async () => {
+      const db = createMultiSessionDetailDbMock({
+        sessionRows: [],
+        hands: [],
+      });
+
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:getMultiSessionDetail');
+      const res = (await handler({}, { ids: [999] })) as {
+        sessions: unknown[];
+        hands: unknown[];
+        handSessionMap: unknown[];
+        omittedIds: number[];
+      };
+
+      expect(res.sessions).toEqual([]);
+      expect(res.hands).toEqual([]);
+      expect(res.handSessionMap).toEqual([]);
+      expect(res.omittedIds).toEqual([999]);
+    });
+
+    it('constrói handSessionMap corretamente', async () => {
+      const db = createMultiSessionDetailDbMock({
+        sessionRows: [sessionRow(1), sessionRow(2)],
+        hands: [
+          {
+            id: 1,
+            sessionId: 2,
+            situationId: 10,
+            card1Rank: 'A',
+            card1Suit: 's',
+            card2Rank: 'K',
+            card2Suit: 's',
+            chosenActionId: 1,
+            isCorrect: true,
+            responseMs: 1500,
+            handIndex: 1,
+          },
+          {
+            id: 2,
+            sessionId: 1,
+            situationId: 10,
+            card1Rank: '2',
+            card1Suit: 'h',
+            card2Rank: '7',
+            card2Suit: 'd',
+            chosenActionId: 2,
+            isCorrect: false,
+            responseMs: 2000,
+            handIndex: 1,
+          },
+        ],
+        situationRows: [{ id: 10, name: 'BTN Open', position: 'BTN' }],
+        actionRows: [
+          {
+            id: 1,
+            situationId: 10,
+            name: 'Raise',
+            actionType: 'RAISE_OPEN',
+            sizeBb: 2.5,
+            colorHex: '#ff0000',
+            sortOrder: 0,
+          },
+          {
+            id: 2,
+            situationId: 10,
+            name: 'Fold',
+            actionType: 'FOLD',
+            sizeBb: null,
+            colorHex: '#888888',
+            sortOrder: 1,
+          },
+        ],
+        rangeCellRows: [],
+      });
+
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:getMultiSessionDetail');
+      const res = (await handler({}, { ids: [1, 2] })) as {
+        sessions: { id: number }[];
+        handSessionMap: { sessionIndex: number; sessionId: number }[];
+      };
+
+      expect(res.handSessionMap).toHaveLength(2);
+      expect(res.handSessionMap[0]!.sessionId).toBe(1);
+      expect(res.handSessionMap[0]!.sessionIndex).toBe(0);
+      expect(res.handSessionMap[1]!.sessionId).toBe(2);
+      expect(res.handSessionMap[1]!.sessionIndex).toBe(1);
+    });
+
+    it('retorna omittedIds para sessões ausentes', async () => {
+      const db = createMultiSessionDetailDbMock({
+        sessionRows: [sessionRow(1)],
+        hands: [],
+      });
+
+      vi.mocked(getDb).mockReturnValue({ select: db.select } as unknown as ReturnType<
+        typeof getDb
+      >);
+
+      const handler = getHandler('training:getMultiSessionDetail');
+      const res = (await handler({}, { ids: [1, 999] })) as {
+        sessions: unknown[];
+        omittedIds: number[];
+      };
+
+      expect(res.sessions).toHaveLength(1);
+      expect(res.omittedIds).toEqual([999]);
+    });
+
+    it('rejeita quando não autenticado', async () => {
+      vi.mocked(requireUserId).mockRejectedValueOnce(new Error('Não autenticado'));
+      const handler = getHandler('training:getMultiSessionDetail');
+      await expect(handler({}, { ids: [1] })).rejects.toThrow('Não autenticado');
     });
   });
 });

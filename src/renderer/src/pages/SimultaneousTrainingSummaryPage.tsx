@@ -50,7 +50,7 @@ export function SimultaneousTrainingSummaryPage(): React.ReactElement {
   const accuracyDecimal = totalHands ? totalCorrect / totalHands : 0;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="flex flex-col gap-6">
       <PageHeader title="Resumo do treino simultâneo" />
       <TrainingSummaryCards
         totalHands={totalHands}
@@ -64,14 +64,20 @@ export function SimultaneousTrainingSummaryPage(): React.ReactElement {
             <p className="text-sm text-muted-foreground">
               {table.correct}/{table.total} acertos ({table.accuracyPct}%)
             </p>
+            <Button variant="outline" size="sm" asChild className="mt-2">
+              <Link to={`/history/${table.sessionId}`}>Revisão da sessão</Link>
+            </Button>
           </div>
         ))}
       </div>
       <div className="flex flex-wrap gap-3">
-        <Button asChild>
+        <Button variant="default" asChild>
+          <Link to={`/history/review-multi?ids=${sessionIds.join(',')}`}>Revisão múltipla</Link>
+        </Button>
+        <Button variant="secondary" asChild>
           <Link to="/training/simultaneous">Novo treino simultâneo</Link>
         </Button>
-        <Button asChild variant="outline">
+        <Button variant="outline" asChild>
           <Link to="/training">Treino normal</Link>
         </Button>
       </div>

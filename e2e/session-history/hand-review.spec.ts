@@ -41,8 +41,8 @@ test.describe('Histórico - revisão mão a mão', () => {
     await appPage.getByRole('link', { name: 'Histórico' }).click();
     await expect(appPage.getByRole('heading', { name: 'Histórico' })).toBeVisible();
 
-    await appPage.getByTestId('history-sessions-table').getByText(groupName).click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await appPage.getByTestId('history-sessions-table').getByRole('button').click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
     await expect(appPage.getByTestId('session-review-header')).toBeVisible();
     await expect(appPage.getByText(/Mão 1 de 2/)).toBeVisible();
   });
@@ -67,8 +67,8 @@ test.describe('Histórico - revisão mão a mão', () => {
     await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Histórico' }).click();
-    await appPage.getByTestId('history-sessions-table').getByText(groupName).click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await appPage.getByTestId('history-sessions-table').getByRole('button').click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
 
     const prevBtn = appPage.getByText('← Anterior');
     const nextBtn = appPage.getByText('Próxima →');
@@ -109,8 +109,8 @@ test.describe('Histórico - revisão mão a mão', () => {
     await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Histórico' }).click();
-    await appPage.getByTestId('history-sessions-table').getByText(groupName).click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await appPage.getByTestId('history-sessions-table').getByRole('button').click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
 
     await expect(appPage.getByTestId('range-grid-13')).toBeVisible();
     await expect(appPage.locator('.ring-amber-400')).toHaveCount(1);
@@ -144,8 +144,8 @@ test.describe('Histórico - revisão mão a mão', () => {
     await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Histórico' }).click();
-    await appPage.getByTestId('history-sessions-table').getByText(groupName).click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await appPage.getByTestId('history-sessions-table').getByRole('button').click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
     await expect(appPage.getByTestId('hand-review-card')).toBeVisible();
   });
 
@@ -171,8 +171,8 @@ test.describe('Histórico - revisão mão a mão', () => {
     await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Histórico' }).click();
-    await appPage.getByTestId('history-sessions-table').getByText(groupName).click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await appPage.getByTestId('history-sessions-table').getByRole('button').click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
     await expect(appPage.getByText(/Timeout/)).toBeVisible();
   });
 });

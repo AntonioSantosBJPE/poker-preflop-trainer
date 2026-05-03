@@ -17,6 +17,7 @@ export interface ConfirmActionDialogProps {
   description: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  variant?: 'destructive' | 'default';
   onConfirm: () => void | Promise<void>;
 }
 
@@ -27,6 +28,7 @@ export function ConfirmActionDialog({
   description,
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
+  variant = 'destructive',
   onConfirm,
 }: ConfirmActionDialogProps): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
@@ -52,7 +54,11 @@ export function ConfirmActionDialog({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={submitting}>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className={
+              variant === 'destructive'
+                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                : ''
+            }
             disabled={submitting}
             onClick={(event) => {
               event.preventDefault();

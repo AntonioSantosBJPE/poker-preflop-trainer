@@ -85,6 +85,12 @@ const api = {
     listSessions: (filters: unknown) => ipcRenderer.invoke('training:listSessions', filters),
     getSessionDetail: (sessionId: number) =>
       ipcRenderer.invoke('training:getSessionDetail', sessionId),
+    estimateDeleteSessionsByIds: (payload: unknown) =>
+      ipcRenderer.invoke('training:estimateDeleteSessionsByIds', payload),
+    deleteSessionsByIds: (payload: unknown) =>
+      ipcRenderer.invoke('training:deleteSessionsByIds', payload),
+    getMultiSessionDetail: (payload: unknown) =>
+      ipcRenderer.invoke('training:getMultiSessionDetail', payload),
   },
   simultaneousTraining: {
     startSession: (config: unknown) =>
@@ -96,6 +102,9 @@ const api = {
     timeline: (filters?: unknown) => ipcRenderer.invoke('stats:timeline', filters),
     worstHands: (filters: unknown, limit: number) =>
       ipcRenderer.invoke('stats:worstHands', filters, limit),
+    estimateDeleteSessions: (period: unknown) =>
+      ipcRenderer.invoke('stats:estimateDeleteSessions', period),
+    deleteSessions: (period: unknown) => ipcRenderer.invoke('stats:deleteSessions', period),
   },
 };
 

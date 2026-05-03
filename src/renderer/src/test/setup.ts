@@ -72,6 +72,9 @@ function createWindowApiMock(): Window['api'] {
         .fn()
         .mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 0 }),
       getSessionDetail: vi.fn(),
+      estimateDeleteSessionsByIds: vi.fn(),
+      deleteSessionsByIds: vi.fn(),
+      getMultiSessionDetail: vi.fn(),
     },
     simultaneousTraining: {
       startSession: vi.fn(),
@@ -81,6 +84,8 @@ function createWindowApiMock(): Window['api'] {
       bySituation: vi.fn(),
       timeline: vi.fn(),
       worstHands: vi.fn(),
+      estimateDeleteSessions: vi.fn(),
+      deleteSessions: vi.fn(),
     },
   } as unknown as Window['api'];
 }

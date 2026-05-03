@@ -132,6 +132,20 @@ export type StatsBySituationRowDto = {
   avgResponseMs: number;
 };
 
+export type DeleteEstimateDto = {
+  sessionCount: number;
+  handCount: number;
+};
+
+export type DeleteSessionsByIdsInput = {
+  ids: number[];
+};
+
+export type DeletePeriodInput = {
+  fromTs?: number;
+  toTs?: number;
+};
+
 export type StatsWorstHandRowDto = {
   label: string;
   count: number;
@@ -193,6 +207,28 @@ export type SessionDetailDto = {
   >;
 };
 
+export type MultiSessionDetailDto = {
+  sessions: SessionHistoryItemDto[];
+  hands: SessionHandDetailDto[];
+  handSessionMap: { sessionIndex: number; sessionId: number }[];
+  situationActionsMap: Record<
+    number,
+    {
+      name: string;
+      position: Position;
+      actions: {
+        id: number;
+        name: string;
+        actionType: ActionType;
+        colorHex: string;
+        sortOrder: number;
+      }[];
+      rangeCells: RangeCellDto[];
+    }
+  >;
+  omittedIds?: number[];
+};
+
 export type SessionListResponse = {
   items: SessionHistoryItemDto[];
   total: number;
@@ -204,6 +240,8 @@ export type SessionListResponse = {
 export type SessionHistoryFilters = {
   page?: number;
   groupId?: number;
+  fromTs?: number;
+  toTs?: number;
   sessionType?: SessionType;
   simultaneousTableCount?: SimultaneousTableCount;
 };

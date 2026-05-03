@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/app/PageHeader';
+import { EmptyState } from '@/components/app/EmptyState';
 import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
 import { SimultaneousTablePanel } from '@/components/training/SimultaneousTablePanel';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { FeedbackMode } from '../env';
 
 type Card = { rank: string; suit: string };
@@ -38,6 +40,8 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
   const feedbackMode = location.state?.feedbackMode ?? 'IMMEDIATE';
   const [tables, setTables] = useState<TableState[]>([]);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [simSessionError, setSimSessionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!sessionIds.length || !totalHands) {
@@ -58,36 +62,41 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
   }, [navigate, sessionIds, totalHands]);
 
   async function dealNext(sessionId: number): Promise<void> {
-    const h = (await window.api.training.dealHand(sessionId)) as HandData;
-    const detail = (await window.api.situations.get(h.situationId)) as { name: string };
-    setTables((current) =>
-      current.map((table) =>
-        table.sessionId === sessionId
-          ? {
-              ...table,
-              hand: h,
-              situationName: detail.name,
-              feedback: null,
-              deadlineMs: timerSeconds > 0 ? Date.now() + timerSeconds * 1000 : null,
-            }
-          : table,
-      ),
-    );
+    try {
+      const h = (await window.api.training.dealHand(sessionId)) as HandData;
+      const detail = (await window.api.situations.get(h.situationId)) as { name: string };
+      setTables((current) =>
+        current.map((table) =>
+          table.sessionId === sessionId
+            ? {
+                ...table,
+                hand: h,
+                situationName: detail.name,
+                feedback: null,
+                deadlineMs: timerSeconds > 0 ? Date.now() + timerSeconds * 1000 : null,
+              }
+            : table,
+        ),
+      );
+    } catch {
+      setSimSessionError('Erro ao processar mão');
+    }
   }
 
   useEffect(() => {
-    if (!tables.length) return;
+    if (!tables.length || isPaused) return;
     for (const table of tables) {
       if (!table.hand && !table.finished) {
         void dealNext(table.sessionId);
       }
     }
-  }, [tables]);
+  }, [tables, isPaused]);
 
   useEffect(() => {
     if (!tables.length || timerSeconds <= 0) return;
     const timer = setInterval(() => {
       setTables((current) => [...current]);
+      if (isPaused) return;
       const now = Date.now();
       for (const table of tables) {
         if (
@@ -101,7 +110,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
       }
     }, 200);
     return () => clearInterval(timer);
-  }, [tables, timerSeconds]);
+  }, [tables, timerSeconds, isPaused]);
 
   const isCompleted = useMemo(() => tables.length > 0 && tables.every((t) => t.finished), [tables]);
 
@@ -171,23 +180,58 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
     navigate('/training/simultaneous', { replace: true });
   }
 
+  if (simSessionError) {
+    return (
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6">
+        <PageHeader title="Treino simultâneo" />
+        <EmptyState
+          title="Erro na sessão"
+          description={simSessionError}
+          action={
+            <Button variant="outline" onClick={() => navigate('/training/simultaneous')}>
+              Voltar à configuração
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
   if (!tables.length) {
-    return <p className="text-muted-foreground">Carregando sessão simultânea…</p>;
+    return (
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6">
+        <Skeleton className="h-10 w-64" />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Skeleton className="h-48 rounded-xl" />
+          <Skeleton className="h-48 rounded-xl" />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6">
       <PageHeader
         title="Treino simultâneo"
         actions={
-          <Button
-            type="button"
-            variant="outline"
-            data-testid="sim-training-leave-btn"
-            onClick={() => setShowLeaveConfirm(true)}
-          >
-            Encerrar
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="sim-training-pause-btn"
+              onClick={() => setIsPaused((p) => !p)}
+            >
+              {isPaused ? 'Continuar' : 'Pausar'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="sim-training-leave-btn"
+              onClick={() => setShowLeaveConfirm(true)}
+            >
+              Encerrar
+            </Button>
+          </div>
         }
       />
 
@@ -213,6 +257,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
             timerSeconds={timerSeconds}
             deadlineMs={table.deadlineMs}
             finished={table.finished}
+            isPaused={isPaused}
             feedbackMode={feedbackMode}
             onAction={(sessionId, actionId) => void submit(sessionId, actionId, false)}
             onNextHand={(sessionId) => void advance(sessionId)}

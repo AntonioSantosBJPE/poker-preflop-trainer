@@ -10,19 +10,14 @@ import {
 import { countCombosForCell } from '@shared/poker/grid';
 import type { RangeCellEdit } from '../components/grid/RangeGrid13';
 import type { GroupSummaryDto } from '@shared/ipc/types';
+import { PageHeader } from '@/components/app';
 import { RangeEditorPanel, SituationActionsEditor, SituationForm } from '@/components/situations';
 import { Button } from '@/components/ui/button';
 
+import { ipcErrorMessage } from '@/hooks/useIpcError';
+
 function uid(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-function ipcErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  if (typeof err === 'object' && err !== null && 'message' in err) {
-    return String((err as { message: unknown }).message);
-  }
-  return 'Erro';
 }
 
 export function SituationEditPage(): React.ReactElement {
@@ -249,16 +244,15 @@ export function SituationEditPage(): React.ReactElement {
 
   return (
     <form
-      className="max-w-6xl space-y-6"
+      className="flex flex-col gap-6"
       onSubmit={(e) => void handleSubmit(onValid)(e)}
       noValidate
     >
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-          {isNew ? 'Nova situação' : 'Editar situação'}
-        </h1>
-        <Button type="submit">Salvar</Button>
-      </div>
+      <PageHeader
+        title={isNew ? 'Nova situação' : 'Editar situação'}
+        backLink={{ to: '/situations', label: '← Situações' }}
+        actions={<Button type="submit">Salvar</Button>}
+      />
       {errors.root?.message && (
         <p className="text-sm text-destructive" role="alert">
           {errors.root.message}

@@ -13,7 +13,7 @@ test.describe('Profile - update name', () => {
     await expect(appPage.getByRole('heading', { name: 'Perfil' })).toBeVisible();
 
     await appPage.getByLabel('Nome').fill(updatedName);
-    await appPage.getByRole('button', { name: 'Guardar nome' }).click();
+    await appPage.getByRole('button', { name: 'Salvar nome' }).click();
 
     await expect(appPage.getByText('Nome atualizado com sucesso.')).toBeVisible();
     await expect(appPage.getByText(updatedName)).toBeVisible();

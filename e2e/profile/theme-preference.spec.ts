@@ -35,9 +35,9 @@ test.describe('Profile - theme preference', () => {
     await expect(appPage.getByRole('heading', { name: 'Perfil' })).toBeVisible();
 
     await selectShadcnOption(appPage, 'Tema', 'Claro');
-    await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
+    await appPage.getByRole('button', { name: 'Salvar preferências' }).click();
 
-    await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
+    await expect(appPage.getByText('Preferências salvas com sucesso.')).toBeVisible();
 
     await expect(appPage.getByRole('combobox', { name: 'Tema', exact: true })).toHaveText('Claro');
 
@@ -55,8 +55,8 @@ test.describe('Profile - theme preference', () => {
     await expect(appPage.getByRole('heading', { name: 'Perfil' })).toBeVisible();
 
     await selectShadcnOption(appPage, 'Tema', 'Claro');
-    await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
-    await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
+    await appPage.getByRole('button', { name: 'Salvar preferências' }).click();
+    await expect(appPage.getByText('Preferências salvas com sucesso.')).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Início' }).click();
     await appPage.getByRole('button', { name: 'Ativar tema escuro' }).click();
@@ -79,15 +79,15 @@ test.describe('Profile - theme preference', () => {
     await expect(appPage.getByRole('heading', { name: 'Perfil' })).toBeVisible();
 
     await selectShadcnOption(appPage, 'Tema', 'Claro');
-    await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
-    await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
+    await appPage.getByRole('button', { name: 'Salvar preferências' }).click();
+    await expect(appPage.getByText('Preferências salvas com sucesso.')).toBeVisible();
     await expect
       .poll(async () => appPage.evaluate(() => document.documentElement.classList.contains('dark')))
       .toBe(false);
 
     await assertSelectReadableAndChoose(appPage, 'Tema', 'Escuro');
-    await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
-    await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
+    await appPage.getByRole('button', { name: 'Salvar preferências' }).click();
+    await expect(appPage.getByText('Preferências salvas com sucesso.')).toBeVisible();
     await expect
       .poll(async () => appPage.evaluate(() => document.documentElement.classList.contains('dark')))
       .toBe(true);

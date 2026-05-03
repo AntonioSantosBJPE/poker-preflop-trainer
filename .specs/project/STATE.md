@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-03 (git-hooks-husky — implementado)
+**Última actualização:** 2026-05-03 (ui-design-refactoring — spec pronta)
 
 ## Decisões
 
@@ -19,6 +19,13 @@
 | D-11 | [test-coverage] Excluir ui/ shadcn, bootstrap, register.ts e db/client.ts do coverage                                                                                 | Código gerado e bootstrap não representam lógica de domínio testável                                  | 2026-05-02 |
 | D-12 | [session-history] Paginação server-side com pageSize=10 fixo; grid read-only na revisão via prop `readOnly` sem alterar `RangeGrid13` existente                       | Simplicidade de implementação; consistência com o padrão StatsPage                                    | 2026-05-02 |
 | D-13 | [git-hooks] Husky v9 com pre-commit (lint+format:check+typecheck), pre-push (typecheck+test), post-merge (auto install+rebuild), commit-msg (commitlint conventional) | Proteger commits/push e automatizar pós-pull                                                          | 2026-05-03 |
+| D-14 | [ui-design-refactoring] `max-w-6xl` em todas as páginas (herdado do Layout)                                                                                           | Consistência visual; LoginPage é exceção standalone                                                   | 2026-05-03 |
+| D-15 | [ui-design-refactoring] `gap-6` em todas as páginas (nunca `gap-8` ou `space-y-6`)                                                                                    | Espaçamento uniforme entre secções                                                                    | 2026-05-03 |
+| D-16 | [ui-design-refactoring] `ConfirmActionDialog.variant` prop (`'destructive' \| 'default'`)                                                                             | Suporta confirmações não-destrutivas sem quebrar API existente                                        | 2026-05-03 |
+| D-17 | [ui-design-refactoring] Filtros de lista usam `useSearchParams` (padrão do sistema)                                                                                   | Consistência com HistoryPage; URLs partilháveis                                                       | 2026-05-03 |
+| D-18 | [ui-design-refactoring] Loading: `Skeleton` (nunca texto); Error: `EmptyState` (nunca redirect)                                                                       | UX polida e previsível                                                                                | 2026-05-03 |
+| D-19 | [ui-design-refactoring] Terminologia: "Salvar" (não "Guardar"), "Posição" (não "Pos.")                                                                                | Consistência de linguagem                                                                             | 2026-05-03 |
+| D-20 | [ui-design-refactoring] Hooks partilhados em `src/renderer/src/hooks/`; timer usa `requestAnimationFrame`                                                             | Elimina duplicação; timer eficiente                                                                   | 2026-05-03 |
 
 ## Features em Progresso
 
@@ -27,6 +34,10 @@
 | session-history | 2026-05-02 | Tasks |
 
 ## Features Concluídas
+
+| Feature               | Data       | Notas                                                                 |
+| --------------------- | ---------- | --------------------------------------------------------------------- |
+| ui-design-refactoring | 2026-05-03 | 9/12 tasks executadas (D2/D5/D7/E3 diferidas) — 455 unit + 102 E2E ✅ |
 
 | Feature                                     | Data       | Notas                                                                                                                                                        |
 | ------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
