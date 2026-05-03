@@ -30,6 +30,7 @@ export function DeleteSessionsDialog({
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const prevOpen = useRef(open);
+  const deleteCompleted = useRef(false);
 
   useEffect(() => {
     const wasOpen = prevOpen.current;
@@ -76,6 +77,7 @@ export function DeleteSessionsDialog({
     setError('');
     try {
       await window.api.training.deleteSessionsByIds({ ids: sessionIds });
+      deleteCompleted.current = true;
       setConfirmOpen(false);
       onComplete();
     } catch (e) {
@@ -143,7 +145,7 @@ export function DeleteSessionsDialog({
         open={confirmOpen}
         onOpenChange={(open) => {
           setConfirmOpen(open);
-          if (!open) onOpenChange(true);
+          if (!open && !deleteCompleted.current) onOpenChange(true);
         }}
         title="Tem a certeza?"
         description={`Esta ação irá remover permanentemente ${estimate?.sessionCount ?? 0} sessões e ${estimate?.handCount ?? 0} mãos. Não é possível desfazer esta operação.`}

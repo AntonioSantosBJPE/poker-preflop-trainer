@@ -722,11 +722,14 @@ describe('registerHistoryIpc', () => {
 
   describe('training:deleteSessionsByIds', () => {
     function createDeleteSessionsDbMock(opts: { matchedIds: number[]; handCount: number }) {
-      const matchedWhere = vi.fn().mockResolvedValue(opts.matchedIds.map((id) => ({ id })));
+      const matchedAll = vi.fn(() => opts.matchedIds.map((id) => ({ id })));
+      const matchedWhere = vi.fn(() => ({ all: matchedAll }));
       const matchedFrom = vi.fn(() => ({ where: matchedWhere }));
-      const handCountWhere = vi.fn().mockResolvedValue([{ count: opts.handCount }]);
+      const handCountAll = vi.fn(() => [{ count: opts.handCount }]);
+      const handCountWhere = vi.fn(() => ({ all: handCountAll }));
       const handCountFrom = vi.fn(() => ({ where: handCountWhere }));
-      const deleteWhere = vi.fn().mockResolvedValue(undefined);
+      const deleteRun = vi.fn();
+      const deleteWhere = vi.fn(() => ({ run: deleteRun }));
 
       const tx = {
         select: vi

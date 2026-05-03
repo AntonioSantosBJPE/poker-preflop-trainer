@@ -351,11 +351,12 @@ export function registerHistoryIpc(): void {
     const userId = await requireUserId();
     const db = getDb();
 
-    return await db.transaction(async (tx) => {
-      const matched = await tx
+    return db.transaction((tx) => {
+      const matched = tx
         .select({ id: trainingSessions.id })
         .from(trainingSessions)
-        .where(and(inArray(trainingSessions.id, ids), eq(trainingSessions.userId, userId)));
+        .where(and(inArray(trainingSessions.id, ids), eq(trainingSessions.userId, userId)))
+        .all();
 
       if (!matched.length) {
         throw new Error('Nenhuma sessão encontrada');
@@ -363,14 +364,15 @@ export function registerHistoryIpc(): void {
 
       const matchedIds = matched.map((m) => m.id);
 
-      const [handCountRow] = await tx
+      const [handCountRow] = tx
         .select({ count: sql<number>`count(*)`.mapWith(Number) })
         .from(sessionHands)
-        .where(inArray(sessionHands.sessionId, matchedIds));
+        .where(inArray(sessionHands.sessionId, matchedIds))
+        .all();
 
-      await tx
-        .delete(trainingSessions)
-        .where(and(inArray(trainingSessions.id, matchedIds), eq(trainingSessions.userId, userId)));
+      tx.delete(trainingSessions)
+        .where(and(inArray(trainingSessions.id, matchedIds), eq(trainingSessions.userId, userId)))
+        .run();
 
       return {
         sessionCount: matchedIds.length,
