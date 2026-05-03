@@ -204,6 +204,27 @@ test.describe('Treino', () => {
     await expect(appPage.getByRole('heading', { name: 'Configurar treino' })).toBeVisible();
   });
 
+  test('resultado da sessão oferece rever sessão', async ({ appPage }) => {
+    const user = uniqueUserCredentials();
+    const situationName = uniqueSituationName();
+    const groupName = uniqueGroupName();
+    await registerAccount(appPage, user);
+    await createGroup(appPage, groupName);
+    await createSituationMinimal(appPage, situationName, groupName);
+
+    await openTrainingConfig(appPage);
+    await selectGroupForTraining(appPage, groupName);
+    await selectSituationsForTraining(appPage, [situationName]);
+    await setTrainingHands(appPage, 1);
+    await startTrainingSession(appPage);
+    await answerFoldImmediate(appPage);
+
+    await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
+    await expect(appPage.getByRole('link', { name: 'Rever sessão' })).toBeVisible();
+    await appPage.getByRole('link', { name: 'Rever sessão' }).click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+  });
+
   test('pausar continua sessão — timer congela e retoma', async ({ appPage }) => {
     const user = uniqueUserCredentials();
     const situationName = uniqueSituationName();

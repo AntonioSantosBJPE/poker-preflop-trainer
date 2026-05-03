@@ -68,6 +68,9 @@ export function TrainingResultPage(): ReactElement {
         </ResponsiveContainer>
       </div>
       <div className="flex flex-wrap gap-3">
+        <Button variant="secondary" asChild>
+          <Link to={`/history/${sessionId}`}>Rever sessão</Link>
+        </Button>
         <Button variant="outline" asChild>
           <Link to="/training">Nova sessão</Link>
         </Button>

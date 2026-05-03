@@ -64,10 +64,16 @@ export function SimultaneousTrainingSummaryPage(): React.ReactElement {
             <p className="text-sm text-muted-foreground">
               {table.correct}/{table.total} acertos ({table.accuracyPct}%)
             </p>
+            <Button variant="outline" size="sm" asChild className="mt-2">
+              <Link to={`/history/${table.sessionId}`}>Revisão individual</Link>
+            </Button>
           </div>
         ))}
       </div>
       <div className="flex flex-wrap gap-3">
+        <Button variant="secondary" asChild>
+          <Link to={`/history/review-multi?ids=${sessionIds.join(',')}`}>Revisão múltipla</Link>
+        </Button>
         <Button asChild>
           <Link to="/training/simultaneous">Novo treino simultâneo</Link>
         </Button>
