@@ -67,3 +67,31 @@ export function parseSessionHistoryFilters(raw: unknown): SessionHistoryFiltersI
   }
   return r.data;
 }
+
+export const deleteSessionsByIdsSchema = z.object({
+  ids: z.array(z.number().int().positive()).nonempty(),
+});
+
+export type DeleteSessionsByIdsInput = z.infer<typeof deleteSessionsByIdsSchema>;
+
+export function parseDeleteSessionsByIds(raw: unknown): DeleteSessionsByIdsInput {
+  const r = deleteSessionsByIdsSchema.safeParse(raw);
+  if (!r.success) {
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
+  }
+  return r.data;
+}
+
+export const multiSessionDetailSchema = z.object({
+  ids: z.array(z.number().int().positive()).nonempty(),
+});
+
+export type MultiSessionDetailInput = z.infer<typeof multiSessionDetailSchema>;
+
+export function parseMultiSessionDetail(raw: unknown): MultiSessionDetailInput {
+  const r = multiSessionDetailSchema.safeParse(raw);
+  if (!r.success) {
+    throw new Error(r.error.issues[0]?.message ?? 'Dados inválidos');
+  }
+  return r.data;
+}

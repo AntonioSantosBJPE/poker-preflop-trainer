@@ -137,6 +137,10 @@ export type DeleteEstimateDto = {
   handCount: number;
 };
 
+export type DeleteSessionsByIdsInput = {
+  ids: number[];
+};
+
 export type DeletePeriodInput = {
   fromTs?: number;
   toTs?: number;
@@ -201,6 +205,28 @@ export type SessionDetailDto = {
       rangeCells: RangeCellDto[];
     }
   >;
+};
+
+export type MultiSessionDetailDto = {
+  sessions: SessionHistoryItemDto[];
+  hands: SessionHandDetailDto[];
+  handSessionMap: { sessionIndex: number; sessionId: number }[];
+  situationActionsMap: Record<
+    number,
+    {
+      name: string;
+      position: Position;
+      actions: {
+        id: number;
+        name: string;
+        actionType: ActionType;
+        colorHex: string;
+        sortOrder: number;
+      }[];
+      rangeCells: RangeCellDto[];
+    }
+  >;
+  omittedIds?: number[];
 };
 
 export type SessionListResponse = {

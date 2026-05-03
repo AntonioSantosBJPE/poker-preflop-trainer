@@ -72,6 +72,9 @@ function createWindowApiMock(): Window['api'] {
         .fn()
         .mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 0 }),
       getSessionDetail: vi.fn(),
+      estimateDeleteSessionsByIds: vi.fn(),
+      deleteSessionsByIds: vi.fn(),
+      getMultiSessionDetail: vi.fn(),
     },
     simultaneousTraining: {
       startSession: vi.fn(),

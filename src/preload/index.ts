@@ -85,6 +85,12 @@ const api = {
     listSessions: (filters: unknown) => ipcRenderer.invoke('training:listSessions', filters),
     getSessionDetail: (sessionId: number) =>
       ipcRenderer.invoke('training:getSessionDetail', sessionId),
+    estimateDeleteSessionsByIds: (payload: unknown) =>
+      ipcRenderer.invoke('training:estimateDeleteSessionsByIds', payload),
+    deleteSessionsByIds: (payload: unknown) =>
+      ipcRenderer.invoke('training:deleteSessionsByIds', payload),
+    getMultiSessionDetail: (payload: unknown) =>
+      ipcRenderer.invoke('training:getMultiSessionDetail', payload),
   },
   simultaneousTraining: {
     startSession: (config: unknown) =>

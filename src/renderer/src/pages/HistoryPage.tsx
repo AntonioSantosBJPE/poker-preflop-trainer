@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type {
   GroupSummaryDto,
@@ -35,6 +35,9 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import type { SessionListResponse } from '@shared/ipc/types';
+import { toast } from 'sonner';
+import { SelectionToolbar } from '@/components/history/SelectionToolbar';
+import { DeleteSessionsDialog } from '@/components/history/DeleteSessionsDialog';
 
 function getPageNumbers(current: number, total: number): number[] {
   const pages: number[] = [];
@@ -60,6 +63,10 @@ export function HistoryPage(): React.ReactElement {
   const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
   const [data, setData] = useState<SessionListResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const selectedRef = useRef<Set<number>>(new Set());
+  const [, forceRender] = useReducer((x: number) => x + 1, 0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const activeGroupId = searchParams.get('groupId') ? Number(searchParams.get('groupId')) : null;
@@ -128,7 +135,7 @@ export function HistoryPage(): React.ReactElement {
       setData(res);
       setLoading(false);
     });
-  }, [page, activeGroupId, sessionType, tableCount, fromTs, toTs]);
+  }, [page, activeGroupId, sessionType, tableCount, fromTs, toTs, refreshCounter]);
 
   const groupTabValue = activeGroupId === null ? 'all' : String(activeGroupId);
 
@@ -176,6 +183,41 @@ export function HistoryPage(): React.ReactElement {
     },
     [updateParams],
   );
+
+  const handleSelectionChange = useCallback((keys: Set<number | string>) => {
+    selectedRef.current = new Set(Array.from(keys, Number));
+    forceRender();
+  }, []);
+
+  const handleClearSelection = useCallback(() => {
+    selectedRef.current = new Set();
+    forceRender();
+  }, []);
+
+  const handleReviewMultiple = useCallback(() => {
+    const ids = Array.from(selectedRef.current);
+    if (ids.length === 1) {
+      navigate(`/history/${ids[0]}${location.search}`, {
+        state: { search: location.search },
+      });
+    } else {
+      navigate(`/history/review-multi?ids=${ids.join(',')}`);
+    }
+  }, [navigate, location.search]);
+
+  const handleDeleteComplete = useCallback(() => {
+    selectedRef.current = new Set();
+    forceRender();
+    setRefreshCounter((c) => c + 1);
+    toast.success('Sessões removidas com sucesso.');
+  }, []);
+
+  useEffect(() => {
+    if (selectedRef.current.size > 0) {
+      selectedRef.current = new Set();
+      forceRender();
+    }
+  }, [activeGroupId, sessionType, fromTs, toTs]);
 
   const columns = useMemo<EntityTableColumn<SessionHistoryItemDto>[]>(
     () => [
@@ -285,6 +327,22 @@ export function HistoryPage(): React.ReactElement {
         </FilterToolbarRow>
       </FilterToolbar>
 
+      {selectedRef.current.size > 0 && (
+        <SelectionToolbar
+          selectedCount={selectedRef.current.size}
+          onRemove={() => setDeleteDialogOpen(true)}
+          onReviewMultiple={handleReviewMultiple}
+          onClearSelection={handleClearSelection}
+        />
+      )}
+
+      <DeleteSessionsDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        sessionIds={Array.from(selectedRef.current)}
+        onComplete={handleDeleteComplete}
+      />
+
       {loading ? (
         <div className="flex flex-col gap-2">
           <Skeleton className="h-10 w-full" />
@@ -300,6 +358,9 @@ export function HistoryPage(): React.ReactElement {
           onRowClick={(row) =>
             navigate(`/history/${row.id}${location.search}`, { state: { search: location.search } })
           }
+          selectable={true}
+          selectedKeys={selectedRef.current as Set<number | string>}
+          onSelectionChange={handleSelectionChange}
           tableTestId="history-sessions-table"
           emptyState={
             <EmptyState

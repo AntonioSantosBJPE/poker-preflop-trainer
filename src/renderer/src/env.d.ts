@@ -1,7 +1,9 @@
 import type {
   AuthSessionDto,
   DeleteEstimateDto,
+  DeleteSessionsByIdsInput,
   GroupSummaryDto,
+  MultiSessionDetailDto,
   SessionDetailDto,
   SessionHistoryFilters,
   SessionListResponse,
@@ -78,6 +80,9 @@ export type Api = {
     getSessionResult: (sessionId: number) => Promise<unknown>;
     listSessions: (filters: SessionHistoryFilters) => Promise<SessionListResponse>;
     getSessionDetail: (sessionId: number) => Promise<SessionDetailDto>;
+    estimateDeleteSessionsByIds: (payload: DeleteSessionsByIdsInput) => Promise<DeleteEstimateDto>;
+    deleteSessionsByIds: (payload: DeleteSessionsByIdsInput) => Promise<DeleteEstimateDto>;
+    getMultiSessionDetail: (payload: DeleteSessionsByIdsInput) => Promise<MultiSessionDetailDto>;
   };
   simultaneousTraining: {
     startSession: (config: {

@@ -12,7 +12,7 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
-  workers: process.env.CI ? 1 : 2,
+  workers: process.env.CI ? 1 : 6,
   timeout: 120_000,
   expect: { timeout: 35_000 },
   forbidOnly: !!process.env.CI,
