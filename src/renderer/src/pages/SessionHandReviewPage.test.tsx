@@ -28,7 +28,12 @@ const sampleDetail = {
       card2: { rank: 'K' as const, suit: 'h' as const },
       situationName: 'BTN Open',
       situationPosition: 'BTN' as const,
-      chosenAction: { id: 1, name: 'RAISE_OPEN', actionType: 'RAISE_OPEN' as const, colorHex: '#ff0000' },
+      chosenAction: {
+        id: 1,
+        name: 'RAISE_OPEN',
+        actionType: 'RAISE_OPEN' as const,
+        colorHex: '#ff0000',
+      },
       isCorrect: true,
       responseMs: 1500,
       gridCell: { rowIndex: 0, colIndex: 1 },
@@ -66,7 +71,13 @@ const sampleDetail = {
       name: 'BTN Open',
       position: 'BTN' as const,
       actions: [
-        { id: 1, name: 'RAISE_OPEN', actionType: 'RAISE_OPEN' as const, colorHex: '#ff0000', sortOrder: 1 },
+        {
+          id: 1,
+          name: 'RAISE_OPEN',
+          actionType: 'RAISE_OPEN' as const,
+          colorHex: '#ff0000',
+          sortOrder: 1,
+        },
         { id: 2, name: 'CALL', actionType: 'CALL' as const, colorHex: '#00ff00', sortOrder: 2 },
         { id: 3, name: 'FOLD', actionType: 'FOLD' as const, colorHex: '#0000ff', sortOrder: 3 },
       ],
@@ -91,11 +102,15 @@ describe('SessionHandReviewPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getAllByText('', { selector: '[data-slot="skeleton"]' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('', { selector: '[data-slot="skeleton"]' }).length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('shows error message when session not found', async () => {
-    vi.mocked(window.api.training.getSessionDetail).mockRejectedValueOnce(new Error('Sessão não encontrada'));
+    vi.mocked(window.api.training.getSessionDetail).mockRejectedValueOnce(
+      new Error('Sessão não encontrada'),
+    );
 
     render(
       <MemoryRouter initialEntries={['/history/1']}>

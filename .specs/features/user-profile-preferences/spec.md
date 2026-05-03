@@ -29,13 +29,13 @@ Além disso, o tema claro/escuro vive apenas em persistência local do renderer 
 
 Explicitamente fora do MVP desta feature.
 
-| Item | Razão |
-| --- | --- |
-| Alteração de e-mail | Exige impacto adicional em auth, unicidade e comunicação ao utilizador |
-| Recuperação de senha / "esqueci minha senha" | Produto é local/offline; fluxo não existe hoje |
-| Avatar, foto de perfil ou preferências cosméticas extras | Não resolve o problema central do pedido |
-| Preferências por grupo de situações | Complexidade adicional; o pedido é por defaults globais do utilizador |
-| Sync/cloud de perfil entre máquinas | Fora do escopo da arquitetura local atual |
+| Item                                                     | Razão                                                                  |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Alteração de e-mail                                      | Exige impacto adicional em auth, unicidade e comunicação ao utilizador |
+| Recuperação de senha / "esqueci minha senha"             | Produto é local/offline; fluxo não existe hoje                         |
+| Avatar, foto de perfil ou preferências cosméticas extras | Não resolve o problema central do pedido                               |
+| Preferências por grupo de situações                      | Complexidade adicional; o pedido é por defaults globais do utilizador  |
+| Sync/cloud de perfil entre máquinas                      | Fora do escopo da arquitetura local atual                              |
 
 ---
 
@@ -150,49 +150,49 @@ Esta feature cruza segurança, persistência, preload/IPC e experiência do util
 
 ### E2E (Playwright + Electron) — Cobertura obrigatória
 
-| Test ID | Critério coberto | Ficheiro sugerido |
-| --- | --- | --- |
-| E2E-PROF-01 | Navegação para `/profile` e carregamento das secções de conta/senha/preferências | `e2e/profile/navigation.spec.ts` |
-| E2E-PROF-02 | Alterar nome e refletir atualização imediata no shell | `e2e/profile/update-name.spec.ts` |
-| E2E-PROF-03 | Alteração de senha com senha atual inválida é rejeitada | `e2e/profile/change-password.spec.ts` |
-| E2E-PROF-04 | Alteração de senha bem-sucedida exige nova senha em login subsequente | `e2e/profile/change-password.spec.ts` |
-| E2E-PROF-05 | Guardar defaults de treino individual e verificar pré-preenchimento | `e2e/profile/training-defaults.spec.ts` |
-| E2E-PROF-06 | Guardar defaults de treino simultâneo e verificar pré-preenchimento | `e2e/profile/training-defaults.spec.ts` |
-| E2E-PROF-07 | Alterar tema no perfil e via toggle do shell mantendo sincronização persistida | `e2e/profile/theme-preference.spec.ts` |
+| Test ID     | Critério coberto                                                                 | Ficheiro sugerido                       |
+| ----------- | -------------------------------------------------------------------------------- | --------------------------------------- |
+| E2E-PROF-01 | Navegação para `/profile` e carregamento das secções de conta/senha/preferências | `e2e/profile/navigation.spec.ts`        |
+| E2E-PROF-02 | Alterar nome e refletir atualização imediata no shell                            | `e2e/profile/update-name.spec.ts`       |
+| E2E-PROF-03 | Alteração de senha com senha atual inválida é rejeitada                          | `e2e/profile/change-password.spec.ts`   |
+| E2E-PROF-04 | Alteração de senha bem-sucedida exige nova senha em login subsequente            | `e2e/profile/change-password.spec.ts`   |
+| E2E-PROF-05 | Guardar defaults de treino individual e verificar pré-preenchimento              | `e2e/profile/training-defaults.spec.ts` |
+| E2E-PROF-06 | Guardar defaults de treino simultâneo e verificar pré-preenchimento              | `e2e/profile/training-defaults.spec.ts` |
+| E2E-PROF-07 | Alterar tema no perfil e via toggle do shell mantendo sincronização persistida   | `e2e/profile/theme-preference.spec.ts`  |
 
 ### Unit / Integration
 
-| Camada | O que validar | Prioridade |
-| --- | --- | --- |
-| `src/shared/forms/profileSchemas.ts` | validação de nome, senha atual/nova e preferências | P1 |
-| `src/main/db/profile.ts` | leitura, upsert parcial de preferências, update de nome e troca de hash | P1 |
-| `src/main/ipc/profile.ts` | validação de payload, erros claros, delegação para DB | P1 |
-| `src/main/ipc/auth.ts` | `login` e `me` devolvem snapshot com preferências | P1 |
-| Renderer store de preferências | hidratação, fallbacks e sincronização de tema | P1 |
-| Componentes de formulário | `PasswordInput` / `PasswordField` e `ProfilePage` | P2 |
+| Camada                               | O que validar                                                           | Prioridade |
+| ------------------------------------ | ----------------------------------------------------------------------- | ---------- |
+| `src/shared/forms/profileSchemas.ts` | validação de nome, senha atual/nova e preferências                      | P1         |
+| `src/main/db/profile.ts`             | leitura, upsert parcial de preferências, update de nome e troca de hash | P1         |
+| `src/main/ipc/profile.ts`            | validação de payload, erros claros, delegação para DB                   | P1         |
+| `src/main/ipc/auth.ts`               | `login` e `me` devolvem snapshot com preferências                       | P1         |
+| Renderer store de preferências       | hidratação, fallbacks e sincronização de tema                           | P1         |
+| Componentes de formulário            | `PasswordInput` / `PasswordField` e `ProfilePage`                       | P2         |
 
 ---
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
-| --- | --- | --- | --- |
-| PROF-01 | P1: Expor rota e ponto de acesso para página de perfil autenticada | Design | Done (T-08) |
-| PROF-02 | P1: Carregar dados atuais da conta e preferências na página de perfil | Design | Done (T-08) |
-| PROF-03 | P1: Mostrar e-mail como campo read-only no MVP | Design | Done (T-08) |
-| PROF-04 | P1: Persistir alteração de `users.name` | Design | Done (T-09) |
-| PROF-05 | P1: Refletir novo nome imediatamente na UI autenticada | Design | Done (T-09) |
-| PROF-06 | P1: Exigir senha atual para alteração de senha | Design | Done (T-09) |
-| PROF-07 | P1: Rejeitar senha atual inválida sem alterar credenciais | Design | Done (T-09) |
-| PROF-08 | P1: Persistir novo hash bcrypt para a nova senha válida | Design | Done (T-09) |
-| PROF-09 | P1: Manter sessão atual utilizável após trocar senha | Design | Done (T-09) |
-| PROF-10 | P1: Disponibilizar componente reutilizável de input de senha com mostrar/esconder | Design | Done (T-07) |
-| PROF-11 | P1: Persistir preferências padrão por utilizador autenticado | Design | Done (T-10) |
-| PROF-12 | P1: Aplicar defaults guardados no treino individual | Design | Done (T-11) |
-| PROF-13 | P1: Aplicar defaults guardados no treino simultâneo | Design | Done (T-11) |
-| PROF-14 | P1: Aplicar e persistir preferência de tema de forma sincronizada entre perfil e shell | Design | Done (T-10, T-12) |
-| PROF-15 | P1: Manter fallbacks atuais quando preferências ainda não existirem | Design | Done (T-10) |
-| PROF-16 | P1: Hidratar preferências da conta autenticada no arranque da app | Design | Done (T-11) |
+| Requirement ID | Story                                                                                  | Phase  | Status            |
+| -------------- | -------------------------------------------------------------------------------------- | ------ | ----------------- |
+| PROF-01        | P1: Expor rota e ponto de acesso para página de perfil autenticada                     | Design | Done (T-08)       |
+| PROF-02        | P1: Carregar dados atuais da conta e preferências na página de perfil                  | Design | Done (T-08)       |
+| PROF-03        | P1: Mostrar e-mail como campo read-only no MVP                                         | Design | Done (T-08)       |
+| PROF-04        | P1: Persistir alteração de `users.name`                                                | Design | Done (T-09)       |
+| PROF-05        | P1: Refletir novo nome imediatamente na UI autenticada                                 | Design | Done (T-09)       |
+| PROF-06        | P1: Exigir senha atual para alteração de senha                                         | Design | Done (T-09)       |
+| PROF-07        | P1: Rejeitar senha atual inválida sem alterar credenciais                              | Design | Done (T-09)       |
+| PROF-08        | P1: Persistir novo hash bcrypt para a nova senha válida                                | Design | Done (T-09)       |
+| PROF-09        | P1: Manter sessão atual utilizável após trocar senha                                   | Design | Done (T-09)       |
+| PROF-10        | P1: Disponibilizar componente reutilizável de input de senha com mostrar/esconder      | Design | Done (T-07)       |
+| PROF-11        | P1: Persistir preferências padrão por utilizador autenticado                           | Design | Done (T-10)       |
+| PROF-12        | P1: Aplicar defaults guardados no treino individual                                    | Design | Done (T-11)       |
+| PROF-13        | P1: Aplicar defaults guardados no treino simultâneo                                    | Design | Done (T-11)       |
+| PROF-14        | P1: Aplicar e persistir preferência de tema de forma sincronizada entre perfil e shell | Design | Done (T-10, T-12) |
+| PROF-15        | P1: Manter fallbacks atuais quando preferências ainda não existirem                    | Design | Done (T-10)       |
+| PROF-16        | P1: Hidratar preferências da conta autenticada no arranque da app                      | Design | Done (T-11)       |
 
 **Coverage:** 16 requisitos totais, 16 mapeados, 0 não mapeados.
 

@@ -36,25 +36,25 @@ profile:updateName / profile:changePassword / profile:updatePreferences
 
 ### Componentes e padrões a reutilizar
 
-| Reuso | Local | Como será aproveitado |
-| --- | --- | --- |
-| Store de auth | `src/renderer/src/stores/auth.ts` | Continuar como fonte do utilizador autenticado; hidratação passa a aceitar snapshot enriquecido |
-| Store de tema atual | `src/renderer/src/stores/theme.ts` | Servirá de referência para migração da responsabilidade de tema para a nova store de preferências |
-| Form fields | `src/renderer/src/components/forms/*` | Reutilizar `FormField`, `FormNumberField`, `FormSelectField`, `FieldError` e padrões de layout |
-| Sessão de treino | `src/renderer/src/components/training/SingleTrainingConfigForm.tsx` | Substituir defaults hardcoded pelos defaults efetivos da conta |
-| Sessão simultânea | `src/renderer/src/components/training/SimultaneousTrainingConfigForm.tsx` | Idem, incluindo `tableCount` |
-| Auth schemas | `src/shared/forms/authSchemas.ts` | Reaproveitar regras de nome e senha mínima para consistência |
-| Auth IPC | `src/main/ipc/auth.ts` | Estender `login` e `me` para devolver snapshot com preferências |
-| Registo IPC | `src/main/ipc/register.ts` | Adicionar registo do novo módulo `profile.ts` |
+| Reuso               | Local                                                                     | Como será aproveitado                                                                             |
+| ------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Store de auth       | `src/renderer/src/stores/auth.ts`                                         | Continuar como fonte do utilizador autenticado; hidratação passa a aceitar snapshot enriquecido   |
+| Store de tema atual | `src/renderer/src/stores/theme.ts`                                        | Servirá de referência para migração da responsabilidade de tema para a nova store de preferências |
+| Form fields         | `src/renderer/src/components/forms/*`                                     | Reutilizar `FormField`, `FormNumberField`, `FormSelectField`, `FieldError` e padrões de layout    |
+| Sessão de treino    | `src/renderer/src/components/training/SingleTrainingConfigForm.tsx`       | Substituir defaults hardcoded pelos defaults efetivos da conta                                    |
+| Sessão simultânea   | `src/renderer/src/components/training/SimultaneousTrainingConfigForm.tsx` | Idem, incluindo `tableCount`                                                                      |
+| Auth schemas        | `src/shared/forms/authSchemas.ts`                                         | Reaproveitar regras de nome e senha mínima para consistência                                      |
+| Auth IPC            | `src/main/ipc/auth.ts`                                                    | Estender `login` e `me` para devolver snapshot com preferências                                   |
+| Registo IPC         | `src/main/ipc/register.ts`                                                | Adicionar registo do novo módulo `profile.ts`                                                     |
 
 ### Pontos de integração
 
-| Sistema | Integração |
-| --- | --- |
-| `users` | Update de `name` e `passwordHash` |
-| Novo armazenamento de preferências | Leitura/upsert por `userId` |
-| Shell autenticado | Link/atalho para `/profile` e sincronização do toggle de tema |
-| Formulários de treino | Consumo dos defaults efetivos via store |
+| Sistema                            | Integração                                                    |
+| ---------------------------------- | ------------------------------------------------------------- |
+| `users`                            | Update de `name` e `passwordHash`                             |
+| Novo armazenamento de preferências | Leitura/upsert por `userId`                                   |
+| Shell autenticado                  | Link/atalho para `/profile` e sincronização do toggle de tema |
+| Formulários de treino              | Consumo dos defaults efetivos via store                       |
 
 ---
 
@@ -168,13 +168,13 @@ Novo módulo: `src/main/db/profile.ts`
 
 Funções previstas:
 
-| Função | Responsabilidade |
-| --- | --- |
-| `getUserPreferences(db, userId)` | Retorna preferências cruas do utilizador ou `null`/objeto vazio |
-| `buildAuthSessionSnapshot(db, userId)` | Lê `users` + `user_preferences` e monta `AuthSessionDto` |
-| `updateUserName(db, userId, name)` | Atualiza `users.name` |
-| `changeUserPassword(db, userId, currentPassword, newPassword)` | Valida hash atual e grava novo hash bcrypt |
-| `upsertUserPreferences(db, userId, payload)` | Faz upsert parcial de preferências |
+| Função                                                         | Responsabilidade                                                |
+| -------------------------------------------------------------- | --------------------------------------------------------------- |
+| `getUserPreferences(db, userId)`                               | Retorna preferências cruas do utilizador ou `null`/objeto vazio |
+| `buildAuthSessionSnapshot(db, userId)`                         | Lê `users` + `user_preferences` e monta `AuthSessionDto`        |
+| `updateUserName(db, userId, name)`                             | Atualiza `users.name`                                           |
+| `changeUserPassword(db, userId, currentPassword, newPassword)` | Valida hash atual e grava novo hash bcrypt                      |
+| `upsertUserPreferences(db, userId, payload)`                   | Faz upsert parcial de preferências                              |
 
 ### 5.2 Estratégia de password change
 
@@ -191,11 +191,11 @@ Novo módulo: `src/main/ipc/profile.ts`
 
 Canais:
 
-| Canal | Payload | Retorno |
-| --- | --- | --- |
-| `profile:updateName` | `{ name: string }` | `AuthSessionDto` |
-| `profile:changePassword` | `{ currentPassword: string; newPassword: string }` | `void` |
-| `profile:updatePreferences` | `UserPreferencesDto-like` | `AuthSessionDto` |
+| Canal                       | Payload                                            | Retorno          |
+| --------------------------- | -------------------------------------------------- | ---------------- |
+| `profile:updateName`        | `{ name: string }`                                 | `AuthSessionDto` |
+| `profile:changePassword`    | `{ currentPassword: string; newPassword: string }` | `void`           |
+| `profile:updatePreferences` | `UserPreferencesDto-like`                          | `AuthSessionDto` |
 
 ### 5.4 Ajustes em `auth.ts`
 
@@ -342,25 +342,25 @@ O toggle atual do `AppSidebar` não deve desaparecer. Ele passa a:
 
 ## 8. Error Handling Strategy
 
-| Cenário | Tratamento | Impacto no utilizador |
-| --- | --- | --- |
-| Senha atual inválida | erro explícito no IPC (`Senha atual inválida`) | feedback claro sem logout |
-| Preferência inválida por bypass | validação Zod no main | dados não corrompem a DB |
-| Utilizador sem linha em `user_preferences` | fallback efetivo em memória | app continua funcional |
-| Hidratação tardia das preferências | `reset` guardado por `isDirty`/flag de init | evita sobrescrever inputs |
-| Falha ao persistir tema pelo toggle | manter erro visível e opcionalmente reverter estado | evita divergência silenciosa |
+| Cenário                                    | Tratamento                                          | Impacto no utilizador        |
+| ------------------------------------------ | --------------------------------------------------- | ---------------------------- |
+| Senha atual inválida                       | erro explícito no IPC (`Senha atual inválida`)      | feedback claro sem logout    |
+| Preferência inválida por bypass            | validação Zod no main                               | dados não corrompem a DB     |
+| Utilizador sem linha em `user_preferences` | fallback efetivo em memória                         | app continua funcional       |
+| Hidratação tardia das preferências         | `reset` guardado por `isDirty`/flag de init         | evita sobrescrever inputs    |
+| Falha ao persistir tema pelo toggle        | manter erro visível e opcionalmente reverter estado | evita divergência silenciosa |
 
 ---
 
 ## 9. Tech Decisions
 
-| Decisão | Escolha | Racional |
-| --- | --- | --- |
-| Armazenamento de preferências | tabela `user_preferences` separada | melhor extensibilidade e semântica de valores nulos |
-| Hidratação inicial | enriquecer `auth:login` e `auth:me` com preferências | menos round-trips e bootstrap mais consistente |
-| Tema | store unificada de preferências + aplicação imediata no DOM | evita fontes duplas de verdade |
-| Reuso de senha | `password-input` + `PasswordField` | reutilização em auth e perfil sem copiar lógica |
-| Outras preferências a incluir no MVP | `defaultTotalHands` além de timer/feedback/mesas/tema | já existe no fluxo de treino, hoje hardcoded e faz sentido como default global |
+| Decisão                              | Escolha                                                     | Racional                                                                       |
+| ------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Armazenamento de preferências        | tabela `user_preferences` separada                          | melhor extensibilidade e semântica de valores nulos                            |
+| Hidratação inicial                   | enriquecer `auth:login` e `auth:me` com preferências        | menos round-trips e bootstrap mais consistente                                 |
+| Tema                                 | store unificada de preferências + aplicação imediata no DOM | evita fontes duplas de verdade                                                 |
+| Reuso de senha                       | `password-input` + `PasswordField`                          | reutilização em auth e perfil sem copiar lógica                                |
+| Outras preferências a incluir no MVP | `defaultTotalHands` além de timer/feedback/mesas/tema       | já existe no fluxo de treino, hoje hardcoded e faz sentido como default global |
 
 ---
 

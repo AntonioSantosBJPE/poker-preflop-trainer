@@ -299,8 +299,12 @@ describe('registerTrainingIpc', () => {
 
       expect(res.situationId).toBe(10);
       expect(res.actions.length).toBeGreaterThan(0);
-      expect(res.card1).toEqual(expect.objectContaining({ rank: expect.any(String), suit: expect.any(String) }));
-      expect(res.card2).toEqual(expect.objectContaining({ rank: expect.any(String), suit: expect.any(String) }));
+      expect(res.card1).toEqual(
+        expect.objectContaining({ rank: expect.any(String), suit: expect.any(String) }),
+      );
+      expect(res.card2).toEqual(
+        expect.objectContaining({ rank: expect.any(String), suit: expect.any(String) }),
+      );
     });
 
     it('rejeita com erro adequado quando não há acções na situação (mock retorna [])', async () => {
@@ -373,11 +377,14 @@ describe('registerTrainingIpc', () => {
       });
       vi.mocked(getDb).mockReturnValue(submitDb as unknown as ReturnType<typeof getDb>);
 
-      const out = (await getHandler('training:submitAnswer')({}, {
-        sessionId,
-        chosenActionId: 1,
-        timedOut: false,
-      })) as { isCorrect: boolean; correctActions: number[] };
+      const out = (await getHandler('training:submitAnswer')(
+        {},
+        {
+          sessionId,
+          chosenActionId: 1,
+          timedOut: false,
+        },
+      )) as { isCorrect: boolean; correctActions: number[] };
 
       expect(out.isCorrect).toBe(true);
       expect(submitDb.insertValues).toHaveBeenCalledWith(
@@ -411,11 +418,14 @@ describe('registerTrainingIpc', () => {
       });
       vi.mocked(getDb).mockReturnValue(submitDb as unknown as ReturnType<typeof getDb>);
 
-      const out = (await getHandler('training:submitAnswer')({}, {
-        sessionId,
-        chosenActionId: 2,
-        timedOut: false,
-      })) as { isCorrect: boolean; correctActions: number[] };
+      const out = (await getHandler('training:submitAnswer')(
+        {},
+        {
+          sessionId,
+          chosenActionId: 2,
+          timedOut: false,
+        },
+      )) as { isCorrect: boolean; correctActions: number[] };
 
       expect(out.isCorrect).toBe(false);
       expect(out.correctActions).toEqual([1]);
@@ -433,11 +443,14 @@ describe('registerTrainingIpc', () => {
       vi.mocked(getDb).mockReturnValue(db as unknown as ReturnType<typeof getDb>);
 
       await expect(
-        getHandler('training:submitAnswer')({}, {
-          sessionId,
-          chosenActionId: 1,
-          timedOut: false,
-        }),
+        getHandler('training:submitAnswer')(
+          {},
+          {
+            sessionId,
+            chosenActionId: 1,
+            timedOut: false,
+          },
+        ),
       ).rejects.toThrow('Nenhuma mão pendente — chame dealHand antes');
     });
 
@@ -454,11 +467,14 @@ describe('registerTrainingIpc', () => {
       });
       vi.mocked(getDb).mockReturnValue(submitDb as unknown as ReturnType<typeof getDb>);
 
-      const out = (await getHandler('training:submitAnswer')({}, {
-        sessionId,
-        chosenActionId: 1,
-        timedOut: true,
-      })) as { isCorrect: boolean };
+      const out = (await getHandler('training:submitAnswer')(
+        {},
+        {
+          sessionId,
+          chosenActionId: 1,
+          timedOut: true,
+        },
+      )) as { isCorrect: boolean };
 
       expect(out.isCorrect).toBe(false);
       expect(submitDb.insertValues).toHaveBeenCalledWith(
@@ -508,7 +524,9 @@ describe('registerTrainingIpc', () => {
       });
       vi.mocked(getDb).mockReturnValue(db as unknown as ReturnType<typeof getDb>);
 
-      await expect(getHandler('training:finishSession')({}, sessionId)).rejects.toThrow('Sessão não encontrada');
+      await expect(getHandler('training:finishSession')({}, sessionId)).rejects.toThrow(
+        'Sessão não encontrada',
+      );
     });
   });
 });

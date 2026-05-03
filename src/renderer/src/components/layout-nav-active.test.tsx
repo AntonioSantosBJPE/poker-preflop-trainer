@@ -82,4 +82,3 @@ describe('AppLayout navigation active states', () => {
     expectTrainingNavHighlight('simultaneous');
   });
 });
-

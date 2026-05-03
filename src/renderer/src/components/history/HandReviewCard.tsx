@@ -19,7 +19,14 @@ const ACTION_ICONS: Record<string, string> = {
   CALL: '↻',
 };
 
-export function HandReviewCard({ hand, situationData, handIndex, totalHands, onPrev, onNext }: Props): React.ReactElement {
+export function HandReviewCard({
+  hand,
+  situationData,
+  handIndex,
+  totalHands,
+  onPrev,
+  onNext,
+}: Props): React.ReactElement {
   const gridActions = (situationData?.actions ?? []).map((a) => ({
     clientKey: String(a.id),
     colorHex: a.colorHex,
@@ -66,9 +73,7 @@ export function HandReviewCard({ hand, situationData, handIndex, totalHands, onP
             </Badge>
           ) : (
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="destructive">
-                ✗ {hand.chosenAction?.name}
-              </Badge>
+              <Badge variant="destructive">✗ {hand.chosenAction?.name}</Badge>
               {correctActionNames.length > 0 && (
                 <span className="text-xs text-muted-foreground">
                   Correto: {correctActionNames.join(', ')}
@@ -94,11 +99,21 @@ export function HandReviewCard({ hand, situationData, handIndex, totalHands, onP
             />
             <div className="flex flex-wrap gap-3">
               {gridActions.map((a) => {
-                const icon = ACTION_ICONS[situationData?.actions.find((sa) => String(sa.id) === a.clientKey)?.actionType ?? ''] ?? '';
+                const icon =
+                  ACTION_ICONS[
+                    situationData?.actions.find((sa) => String(sa.id) === a.clientKey)
+                      ?.actionType ?? ''
+                  ] ?? '';
                 return (
                   <div key={a.clientKey} className="flex items-center gap-1.5 text-xs">
-                    <span className="inline-block h-3 w-3 rounded-sm" style={{ background: a.colorHex }} />
-                    <span>{icon ? `${icon} ` : ''}{a.name}</span>
+                    <span
+                      className="inline-block h-3 w-3 rounded-sm"
+                      style={{ background: a.colorHex }}
+                    />
+                    <span>
+                      {icon ? `${icon} ` : ''}
+                      {a.name}
+                    </span>
                   </div>
                 );
               })}

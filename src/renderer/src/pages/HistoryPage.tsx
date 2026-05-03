@@ -1,14 +1,38 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import type { GroupSummaryDto, SessionHistoryItemDto, SimultaneousTableCount } from '@shared/ipc/types';
+import type {
+  GroupSummaryDto,
+  SessionHistoryItemDto,
+  SimultaneousTableCount,
+} from '@shared/ipc/types';
 import { formatDuration } from '@shared/utils/format';
-import { EmptyState, EntityTable, FilterToolbar, FilterToolbarRow, PageHeader, type EntityTableColumn } from '@/components/app';
+import {
+  EmptyState,
+  EntityTable,
+  FilterToolbar,
+  FilterToolbarRow,
+  PageHeader,
+  type EntityTableColumn,
+} from '@/components/app';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import type { SessionListResponse } from '@shared/ipc/types';
 
 function getPageNumbers(current: number, total: number): number[] {
@@ -43,7 +67,9 @@ export function HistoryPage(): React.ReactElement {
     sessionTypeRaw === 'single' || sessionTypeRaw === 'simultaneous' ? sessionTypeRaw : 'all';
   const tableCountRaw = searchParams.get('tableCount');
   const tableCount: '__all__' | '2' | '3' | '4' =
-    tableCountRaw === '2' || tableCountRaw === '3' || tableCountRaw === '4' ? tableCountRaw : '__all__';
+    tableCountRaw === '2' || tableCountRaw === '3' || tableCountRaw === '4'
+      ? tableCountRaw
+      : '__all__';
 
   useEffect(() => {
     void (async () => {
@@ -54,17 +80,20 @@ export function HistoryPage(): React.ReactElement {
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        for (const [key, value] of Object.entries(updates)) {
-          if (value === null || value === '' || (key === 'page' && value === '1')) {
-            next.delete(key);
-          } else {
-            next.set(key, value);
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [key, value] of Object.entries(updates)) {
+            if (value === null || value === '' || (key === 'page' && value === '1')) {
+              next.delete(key);
+            } else {
+              next.set(key, value);
+            }
           }
-        }
-        return next;
-      }, { replace: true });
+          return next;
+        },
+        { replace: true },
+      );
     },
     [setSearchParams],
   );
@@ -76,10 +105,16 @@ export function HistoryPage(): React.ReactElement {
 
   useEffect(() => {
     setLoading(true);
-    const filters: { page: number; groupId?: number; sessionType?: 'single' | 'simultaneous'; simultaneousTableCount?: SimultaneousTableCount } = { page };
+    const filters: {
+      page: number;
+      groupId?: number;
+      sessionType?: 'single' | 'simultaneous';
+      simultaneousTableCount?: SimultaneousTableCount;
+    } = { page };
     if (activeGroupId !== null) filters.groupId = activeGroupId;
     if (sessionType !== 'all') filters.sessionType = sessionType;
-    if (tableCount !== '__all__') filters.simultaneousTableCount = Number(tableCount) as SimultaneousTableCount;
+    if (tableCount !== '__all__')
+      filters.simultaneousTableCount = Number(tableCount) as SimultaneousTableCount;
     void window.api.training.listSessions(filters).then((res) => {
       setData(res);
       setLoading(false);
@@ -101,7 +136,10 @@ export function HistoryPage(): React.ReactElement {
 
   const handleSessionTypeChange = useCallback(
     (value: string) => {
-      const updates: Record<string, string | null> = { sessionType: value === 'all' ? null : value, page: null };
+      const updates: Record<string, string | null> = {
+        sessionType: value === 'all' ? null : value,
+        page: null,
+      };
       if (value !== 'simultaneous') updates.tableCount = null;
       updateParams(updates);
     },
@@ -149,7 +187,9 @@ export function HistoryPage(): React.ReactElement {
         header: 'Tipo',
         cell: (row) => (
           <Badge variant="secondary">
-            {row.sessionType === 'simultaneous' ? `Simultâneo (${row.simultaneousTableCount})` : 'Individual'}
+            {row.sessionType === 'simultaneous'
+              ? `Simultâneo (${row.simultaneousTableCount})`
+              : 'Individual'}
           </Badge>
         ),
       },
@@ -229,7 +269,9 @@ export function HistoryPage(): React.ReactElement {
           rows={data?.items ?? []}
           columns={columns}
           getRowKey={(row) => row.id}
-          onRowClick={(row) => navigate(`/history/${row.id}${location.search}`, { state: { search: location.search } })}
+          onRowClick={(row) =>
+            navigate(`/history/${row.id}${location.search}`, { state: { search: location.search } })
+          }
           tableTestId="history-sessions-table"
           emptyState={
             <EmptyState
@@ -244,33 +286,25 @@ export function HistoryPage(): React.ReactElement {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-              />
+              <PaginationPrevious onClick={() => setPage(page - 1)} disabled={page === 1} />
             </PaginationItem>
             {pageNumbers.map((p, i) =>
               p === -1 ? (
                 <PaginationItem key={`ellipsis-${i}`}>
-                  <span className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground">…</span>
+                  <span className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground">
+                    …
+                  </span>
                 </PaginationItem>
               ) : (
                 <PaginationItem key={p}>
-                  <PaginationLink
-                    isActive={p === page}
-                    onClick={() => setPage(p)}
-                    size="default"
-                  >
+                  <PaginationLink isActive={p === page} onClick={() => setPage(p)} size="default">
                     {p}
                   </PaginationLink>
                 </PaginationItem>
               ),
             )}
             <PaginationItem>
-              <PaginationNext
-                onClick={() => setPage(page + 1)}
-                disabled={page >= totalPages}
-              />
+              <PaginationNext onClick={() => setPage(page + 1)} disabled={page >= totalPages} />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

@@ -1,0 +1,11 @@
+changed="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null || true)"
+
+if echo "$changed" | grep -q "pnpm-lock.yaml"; then
+  echo "--- pnpm-lock.yaml changed — running pnpm install..."
+  pnpm install
+fi
+
+if echo "$changed" | grep -q "package.json"; then
+  echo "--- package.json changed — running build..."
+  pnpm build:app
+fi

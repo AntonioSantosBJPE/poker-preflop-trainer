@@ -8,7 +8,7 @@
   "author": "Preflop Trainer <preflop-trainer@example.com>",
   "main": "out/main/index.js",
   "scripts": {
-    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "postinstall": "husky || true && electron-rebuild -f -w better-sqlite3",
     "dev": "electron-vite dev",
     "dev:gpu-safe": "electron-vite dev -- --disable-gpu",
     "build": "electron-vite build && mkdir -p out/main/db && cp -r src/main/db/migrations out/main/db/migrations && electron-builder",
@@ -56,6 +56,8 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
     "@electron/rebuild": "^4.0.4",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.2.4",
@@ -79,6 +81,7 @@
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.13",
     "prettier": "^3.8.3",

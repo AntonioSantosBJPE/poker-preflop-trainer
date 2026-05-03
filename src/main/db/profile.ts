@@ -1,7 +1,13 @@
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
-import { BCRYPT_ROUNDS, FEEDBACK_MODES, THEME_MODES, type FeedbackMode, type ThemeMode } from '@shared/constants';
+import {
+  BCRYPT_ROUNDS,
+  FEEDBACK_MODES,
+  THEME_MODES,
+  type FeedbackMode,
+  type ThemeMode,
+} from '@shared/constants';
 import type {
   AuthSessionDto,
   SimultaneousTableCount,

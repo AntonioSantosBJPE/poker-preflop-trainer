@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { AuthSessionDto, UserPreferencesDto, UserPreferencesPatchDto } from '@shared/ipc/types';
+import type {
+  AuthSessionDto,
+  UserPreferencesDto,
+  UserPreferencesPatchDto,
+} from '@shared/ipc/types';
 
 type AuthLoginResult = {
   token: string;
@@ -38,12 +42,10 @@ const api = {
     },
     logout: () => ipcRenderer.invoke('auth:logout'),
     me: async () => {
-      const result = (await ipcRenderer.invoke('auth:me')) as
-        | {
-            user: AuthSessionDto['user'];
-            preferences?: Partial<UserPreferencesDto> | null;
-          }
-        | null;
+      const result = (await ipcRenderer.invoke('auth:me')) as {
+        user: AuthSessionDto['user'];
+        preferences?: Partial<UserPreferencesDto> | null;
+      } | null;
       if (!result) return null;
       return {
         user: result.user,

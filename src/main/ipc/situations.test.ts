@@ -319,10 +319,12 @@ describe('registerSituationsIpc', () => {
         };
       });
       const mockTx = { insert: txInsert };
-      const transaction = vi.fn().mockImplementation((fn: (tx: typeof mockTx) => number) =>
-        fn(mockTx),
-      );
-      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<typeof getDb>);
+      const transaction = vi
+        .fn()
+        .mockImplementation((fn: (tx: typeof mockTx) => number) => fn(mockTx));
+      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
       const handler = getHandler('situations:create');
 
       const id = await handler({}, {});
@@ -491,9 +493,7 @@ describe('registerSituationsIpc', () => {
         sortOrder: 0,
       },
     ];
-    const dupCells = [
-      { id: 100, actionId: 10, rowIndex: 0, colIndex: 0, frequency: 1 as number },
-    ];
+    const dupCells = [{ id: 100, actionId: 10, rowIndex: 0, colIndex: 0, frequency: 1 as number }];
 
     it('situação não encontrada → rejeita com Situação não encontrada', async () => {
       const select = vi.fn(() => ({
@@ -540,19 +540,19 @@ describe('registerSituationsIpc', () => {
         };
       });
       const mockTx = { insert: txInsert };
-      const transaction = vi.fn().mockImplementation((fn: (tx: typeof mockTx) => number) =>
-        fn(mockTx),
-      );
-      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<typeof getDb>);
+      const transaction = vi
+        .fn()
+        .mockImplementation((fn: (tx: typeof mockTx) => number) => fn(mockTx));
+      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
       const handler = getHandler('situations:duplicate');
 
       const newId = await handler({}, 1);
 
       expect(transaction).toHaveBeenCalledTimes(1);
       expect(newId).toBe(600);
-      expect(situationValuesPayload).toEqual(
-        expect.objectContaining({ name: 'Cópia de Test' }),
-      );
+      expect(situationValuesPayload).toEqual(expect.objectContaining({ name: 'Cópia de Test' }));
     });
 
     it("nome 'Cópia de Test' já existe → gera 'Cópia de Test (2)'", async () => {
@@ -587,10 +587,12 @@ describe('registerSituationsIpc', () => {
         };
       });
       const mockTx = { insert: txInsert };
-      const transaction = vi.fn().mockImplementation((fn: (tx: typeof mockTx) => number) =>
-        fn(mockTx),
-      );
-      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<typeof getDb>);
+      const transaction = vi
+        .fn()
+        .mockImplementation((fn: (tx: typeof mockTx) => number) => fn(mockTx));
+      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
       const handler = getHandler('situations:duplicate');
 
       const newId = await handler({}, 1);

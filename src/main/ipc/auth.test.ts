@@ -158,7 +158,9 @@ describe('registerAuthIpc', () => {
     it('user não encontrado → Credenciais inválidas', async () => {
       selectLimitResult = [];
       const handler = getHandler('auth:login');
-      await expect(handler({}, 'ghost@test.com', '12345678')).rejects.toThrow('Credenciais inválidas');
+      await expect(handler({}, 'ghost@test.com', '12345678')).rejects.toThrow(
+        'Credenciais inválidas',
+      );
       expect(bcrypt.compare).not.toHaveBeenCalled();
       expect(sessionService.saveToken).not.toHaveBeenCalled();
     });

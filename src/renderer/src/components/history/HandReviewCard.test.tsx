@@ -14,9 +14,7 @@ const situationData: SessionDetailDto['situationActionsMap'][number] = {
     { id: 2, name: 'CALL', actionType: 'CALL', colorHex: '#00ff00', sortOrder: 2 },
     { id: 3, name: 'FOLD', actionType: 'FOLD', colorHex: '#0000ff', sortOrder: 3 },
   ],
-  rangeCells: [
-    { actionId: 1, rowIndex: 0, colIndex: 1, frequency: 1 },
-  ],
+  rangeCells: [{ actionId: 1, rowIndex: 0, colIndex: 1, frequency: 1 }],
 };
 
 function makeHand(overrides: Partial<SessionHandDetailDto> = {}): SessionHandDetailDto {
@@ -56,7 +54,11 @@ describe('HandReviewCard', () => {
   it('renders error badge with cross for wrong answer', () => {
     render(
       <HandReviewCard
-        hand={makeHand({ isCorrect: false, chosenAction: { id: 2, name: 'CALL', actionType: 'CALL', colorHex: '#00ff00' }, correctActionIds: [1] })}
+        hand={makeHand({
+          isCorrect: false,
+          chosenAction: { id: 2, name: 'CALL', actionType: 'CALL', colorHex: '#00ff00' },
+          correctActionIds: [1],
+        })}
         situationData={situationData}
         handIndex={1}
         totalHands={3}
@@ -187,7 +189,11 @@ describe('HandReviewCard', () => {
   it('shows correct action names for wrong answer', () => {
     render(
       <HandReviewCard
-        hand={makeHand({ isCorrect: false, chosenAction: { id: 2, name: 'CALL', actionType: 'CALL', colorHex: '#00ff00' }, correctActionIds: [1] })}
+        hand={makeHand({
+          isCorrect: false,
+          chosenAction: { id: 2, name: 'CALL', actionType: 'CALL', colorHex: '#00ff00' },
+          correctActionIds: [1],
+        })}
         situationData={situationData}
         handIndex={1}
         totalHands={3}

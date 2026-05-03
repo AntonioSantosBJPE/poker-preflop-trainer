@@ -55,11 +55,7 @@ export function SituationForm({
           ))}
         </select>
         {errors.groupId && (
-          <p
-            className="text-sm text-destructive"
-            role="alert"
-            data-testid="situation-group-error"
-          >
+          <p className="text-sm text-destructive" role="alert" data-testid="situation-group-error">
             {errors.groupId.message}
           </p>
         )}

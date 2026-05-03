@@ -43,8 +43,6 @@ test.describe('Edição de situação', () => {
     const rangeGrid = appPage.locator('[data-testid="range-grid-13"]');
     await rangeGrid.locator('button[title]').first().click();
     await appPage.getByRole('button', { name: 'Salvar' }).click();
-    await expect(
-      appPage.getByText(/já existe|Nome de situação/i),
-    ).toBeVisible();
+    await expect(appPage.getByText(/já existe|Nome de situação/i)).toBeVisible();
   });
 });

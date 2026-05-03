@@ -18,9 +18,7 @@ function makeGroup(overrides: Partial<GroupSummaryDto> = {}): GroupSummaryDto {
   };
 }
 
-function renderWithRouter(
-  ui: React.ReactElement,
-): ReturnType<typeof render> {
+function renderWithRouter(ui: React.ReactElement): ReturnType<typeof render> {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
 }
 
@@ -40,9 +38,7 @@ describe('GroupCard', () => {
     );
 
     expect(screen.getByTestId('group-card')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Estudos UTG' }),
-    ).toHaveAttribute('href', '/groups/1');
+    expect(screen.getByRole('link', { name: 'Estudos UTG' })).toHaveAttribute('href', '/groups/1');
     expect(screen.getByText('5 situações')).toBeInTheDocument();
     expect(screen.getByTestId('group-rename-btn')).toHaveTextContent('Renomear');
     expect(screen.getByTestId('group-archive-btn')).toHaveTextContent('Arquivar');

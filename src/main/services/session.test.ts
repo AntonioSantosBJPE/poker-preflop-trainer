@@ -101,7 +101,7 @@ describe('requireUserId', () => {
     await expect(requireUserId()).resolves.toBe(5);
   });
 
-  it('sem token → rejeita com \'Não autenticado\'', async () => {
+  it("sem token → rejeita com 'Não autenticado'", async () => {
     vi.mocked(keytar.getPassword).mockResolvedValue(null);
 
     await expect(requireUserId()).rejects.toThrow('Não autenticado');
