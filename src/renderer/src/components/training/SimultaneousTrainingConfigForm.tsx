@@ -150,7 +150,7 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
 
   if (step === 1) {
     return (
-      <div className="max-w-xl space-y-6" data-testid="sim-training-step-1">
+      <div className="flex flex-col gap-6" data-testid="sim-training-step-1">
         <PageHeader title="Treino simultâneo" description="Escolha um grupo" />
         <GroupSelectionStep
           groups={groups}
@@ -162,20 +162,25 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
   }
 
   return (
-    <div className="max-w-xl space-y-6" data-testid="sim-training-step-2">
+    <div className="flex flex-col gap-6" data-testid="sim-training-step-2">
       <PageHeader
         title="Configurar treino simultâneo"
         actions={
-          <button
+          <Button
             type="button"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            variant="outline"
+            data-testid="sim-training-back-btn"
             onClick={handleBack}
           >
             Voltar
-          </button>
+          </Button>
         }
       />
-      <form className="space-y-6" onSubmit={(e) => void handleSubmit(onValid)(e)} noValidate>
+      <form
+        className="flex flex-col gap-6"
+        onSubmit={(e) => void handleSubmit(onValid)(e)}
+        noValidate
+      >
         <Controller
           control={control}
           name="tableCount"

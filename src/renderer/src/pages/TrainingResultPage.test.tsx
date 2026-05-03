@@ -34,18 +34,18 @@ function renderPage(sessionId = '1') {
 }
 
 describe('TrainingResultPage', () => {
-  it('renders "Rever sessão", "Nova sessão" e "Ver estatísticas" buttons', async () => {
+  it('renders "Revisão da sessão", "Nova sessão" e "Ver estatísticas" buttons', async () => {
     renderPage();
 
-    expect(await screen.findByRole('link', { name: 'Rever sessão' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Revisão da sessão' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Nova sessão' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Ver estatísticas' })).toBeInTheDocument();
   });
 
-  it('clique em "Rever sessão" navega para /history/{sessionId}', async () => {
+  it('clique em "Revisão da sessão" navega para /history/{sessionId}', async () => {
     renderPage('1');
 
-    const link = await screen.findByRole('link', { name: 'Rever sessão' });
+    const link = await screen.findByRole('link', { name: 'Revisão da sessão' });
     expect(link).toHaveAttribute('href', '/history/1');
   });
 

@@ -3,18 +3,22 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState, PageHeader, SectionCard } from '@/components/app';
 import { GroupCard } from '../components/groups/GroupCard';
 
 export function GroupsPage(): React.ReactElement {
   const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newError, setNewError] = useState('');
 
   async function load(): Promise<void> {
+    setLoading(true);
     const list = await window.api.groups.list();
     setGroups(list);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -91,7 +95,13 @@ export function GroupsPage(): React.ReactElement {
         </SectionCard>
       )}
 
-      {!groups.length && (
+      {loading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
+        </div>
+      ) : !groups.length ? (
         <EmptyState
           title="Nenhum grupo cadastrado"
           description="Crie seu primeiro grupo para organizar as situações de treino."
@@ -101,21 +111,18 @@ export function GroupsPage(): React.ReactElement {
             </Button>
           }
         />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="groups-list">
+          {groups.map((g) => (
+            <GroupCard
+              key={g.id}
+              group={g}
+              onRenamed={() => void load()}
+              onArchived={() => void load()}
+            />
+          ))}
+        </div>
       )}
-
-      <div
-        className={groups.length ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : ''}
-        data-testid="groups-list"
-      >
-        {groups.map((g) => (
-          <GroupCard
-            key={g.id}
-            group={g}
-            onRenamed={() => void load()}
-            onArchived={() => void load()}
-          />
-        ))}
-      </div>
     </div>
   );
 }

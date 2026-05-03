@@ -2,11 +2,15 @@ import type { ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { Act } from '@/components/training/TrainingActionButtons';
+import { EmptyState, PageHeader } from '@/components/app';
 import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
 import { TrainingActionButtons } from '@/components/training/TrainingActionButtons';
 import { TrainingFeedbackPanel } from '@/components/training/TrainingFeedbackPanel';
 import { TrainingSessionHeader } from '@/components/training/TrainingSessionHeader';
+import { Button } from '@/components/ui/button';
 import { PlayingCard } from '@/components/PlayingCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSessionTimer } from '@/hooks/useSessionTimer';
 import type { FeedbackMode } from '../env';
 
 type Card = { rank: string; suit: string };
@@ -34,21 +38,14 @@ export function TrainingSessionPage(): ReactElement {
   const [situationName, setSituationName] = useState('');
   const [feedback, setFeedback] = useState<{ ok: boolean; ms: number } | null>(null);
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
-  const deadlineRef = useRef<number | null>(null);
-  const pausedRemainingMsRef = useRef<number | null>(null);
-  const [tick, setTick] = useState(0);
   const answeredRef = useRef(false);
-  const timerSecondsRef = useRef(timerSeconds);
   const feedbackRef = useRef(feedback);
   const handRef = useRef(hand);
   const showAbandonDialogRef = useRef(showAbandonDialog);
-  const pausedRef = useRef(paused);
-
-  useEffect(() => {
-    timerSecondsRef.current = timerSeconds;
-  }, [timerSeconds]);
+  const submitRef =
+    useRef<(actionId: number | null, timedOut: boolean) => Promise<void>>(undefined);
 
   useEffect(() => {
     feedbackRef.current = feedback;
@@ -62,9 +59,13 @@ export function TrainingSessionPage(): ReactElement {
     showAbandonDialogRef.current = showAbandonDialog;
   }, [showAbandonDialog]);
 
-  useEffect(() => {
-    pausedRef.current = paused;
-  }, [paused]);
+  const { remainingSec, isPaused, pause, resume } = useSessionTimer({
+    timerSeconds,
+    active: !!(hand && !showAbandonDialog),
+    onTimeout: () => {
+      void submitRef.current?.(null, true);
+    },
+  });
 
   const dealNextHand = useCallback(async () => {
     answeredRef.current = false;
@@ -80,8 +81,6 @@ export function TrainingSessionPage(): ReactElement {
     setSituationName(detail.name);
     setFeedback(null);
     feedbackRef.current = null;
-    deadlineRef.current =
-      timerSecondsRef.current > 0 ? Date.now() + timerSecondsRef.current * 1000 : null;
   }, [sessionId]);
 
   useEffect(() => {
@@ -96,13 +95,12 @@ export function TrainingSessionPage(): ReactElement {
         }
         setTotalHands(meta.totalHands);
         setTimerSeconds(meta.timerSeconds);
-        timerSecondsRef.current = meta.timerSeconds;
         setFeedbackMode(meta.feedbackMode as FeedbackMode);
         setIndex(meta.handsPlayed);
         await dealNextHand();
       } catch {
         if (!cancelled) {
-          navigate('/training', { replace: true });
+          setSessionError('Erro ao carregar sessão');
         }
       }
     })();
@@ -110,17 +108,6 @@ export function TrainingSessionPage(): ReactElement {
       cancelled = true;
     };
   }, [sessionId, navigate, dealNextHand]);
-
-  useEffect(() => {
-    if (!hand || showAbandonDialog || paused) return;
-    const t = setInterval(() => setTick((x) => x + 1), 200);
-    return () => clearInterval(t);
-  }, [hand, showAbandonDialog, paused]);
-
-  const remainingSec =
-    timerSecondsRef.current && deadlineRef.current
-      ? Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000))
-      : null;
 
   async function finishSession(): Promise<void> {
     await window.api.training.finishSession(Number(sessionId));
@@ -151,50 +138,16 @@ export function TrainingSessionPage(): ReactElement {
       await proceedAfterHand();
     }
   }
+  submitRef.current = submit;
 
-  useEffect(() => {
-    if (
-      pausedRef.current ||
-      !timerSecondsRef.current ||
-      !handRef.current ||
-      feedbackRef.current ||
-      answeredRef.current ||
-      showAbandonDialogRef.current
-    )
-      return;
-    if (remainingSec === 0) {
-      void submit(null, true);
-    }
-  }, [tick]);
-
-  function handlePause(): void {
-    if (deadlineRef.current === null) return;
-    pausedRemainingMsRef.current = Math.max(0, deadlineRef.current - Date.now());
-    deadlineRef.current = null;
-    setPaused(true);
-  }
-
-  function handleContinue(): void {
-    if (pausedRemainingMsRef.current === null) return;
-    deadlineRef.current = Date.now() + pausedRemainingMsRef.current;
-    pausedRemainingMsRef.current = null;
-    setPaused(false);
-  }
-
-  function openAbandonDialog(): void {
-    if (!paused && deadlineRef.current !== null) {
-      pausedRemainingMsRef.current = Math.max(0, deadlineRef.current - Date.now());
-      deadlineRef.current = null;
-    }
+  function handleAbandonDialogOpen(): void {
+    pause();
     setShowAbandonDialog(true);
   }
 
-  function closeAbandonDialog(): void {
-    if (!paused && pausedRemainingMsRef.current !== null) {
-      deadlineRef.current = Date.now() + pausedRemainingMsRef.current;
-      pausedRemainingMsRef.current = null;
-    }
+  function handleAbandonDialogClose(): void {
     setShowAbandonDialog(false);
+    resume();
   }
 
   async function onNextHand(): Promise<void> {
@@ -202,37 +155,64 @@ export function TrainingSessionPage(): ReactElement {
     await proceedAfterHand();
   }
 
+  if (sessionError) {
+    return (
+      <div className="flex flex-col gap-6">
+        <PageHeader title="Sessão de treino" />
+        <EmptyState
+          title="Erro ao carregar sessão"
+          description={sessionError}
+          action={
+            <Button variant="outline" onClick={() => navigate('/training')}>
+              Voltar ao treino
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
   if (!hand) {
-    return <p className="text-muted-foreground">Carregando mão…</p>;
+    return (
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-32 w-full rounded-xl" />
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-28 rounded-md" />
+          <Skeleton className="h-10 w-28 rounded-md" />
+          <Skeleton className="h-10 w-28 rounded-md" />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="flex flex-col gap-6">
       <TrainingSessionHeader
         index={index}
         totalHands={totalHands}
         remainingSec={remainingSec}
-        onAbandon={() => openAbandonDialog()}
-        isPaused={paused}
-        onPause={handlePause}
-        onContinue={handleContinue}
+        onAbandon={() => handleAbandonDialogOpen()}
+        isPaused={isPaused}
+        onPause={pause}
+        onContinue={resume}
       />
 
       <LeaveTrainingDialog
         open={showAbandonDialog}
         onOpenChange={(open) => {
-          if (!open) closeAbandonDialog();
+          if (!open) handleAbandonDialogClose();
         }}
         onConfirm={finishSession}
       />
 
       <div className="relative">
-        {paused ? (
+        {isPaused ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-card/80 backdrop-blur-sm">
             <span className="text-sm font-medium text-foreground">Pausada</span>
           </div>
         ) : null}
-        <div className={paused ? 'pointer-events-none select-none' : ''}>
+        <div className={isPaused ? 'pointer-events-none select-none' : ''}>
           <div className="space-y-2 rounded-xl border border-border bg-card p-6">
             <p className="text-sm text-muted-foreground">{situationName}</p>
             <div className="flex gap-4">
@@ -243,7 +223,7 @@ export function TrainingSessionPage(): ReactElement {
 
           <TrainingActionButtons
             actions={hand.actions}
-            disabled={Boolean(feedback) || paused}
+            disabled={Boolean(feedback) || isPaused}
             onAction={(id) => void submit(id, false)}
           />
         </div>

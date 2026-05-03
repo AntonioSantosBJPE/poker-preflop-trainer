@@ -101,12 +101,10 @@ export function MultiSessionReviewPage(): React.ReactElement {
 
   return (
     <div className="flex flex-col gap-6" data-testid="multi-session-review-page">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageHeader title="Revisão Múltipla" />
-        <Button variant="outline" onClick={() => navigate(`/history${search}`)}>
-          ← Voltar ao histórico
-        </Button>
-      </div>
+      <PageHeader
+        title="Revisão Múltipla"
+        backLink={{ to: `/history${search}`, label: '← Voltar ao histórico' }}
+      />
 
       <MultiSessionReviewHeader
         sessions={detail.sessions}

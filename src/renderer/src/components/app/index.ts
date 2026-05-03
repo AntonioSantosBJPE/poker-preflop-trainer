@@ -1,4 +1,5 @@
 export * from '@/components/app/AppSidebar';
+export * from '@/components/app/Breadcrumbs';
 export * from '@/components/app/ConfirmActionDialog';
 export * from '@/components/app/DatePeriodFilter';
 export * from '@/components/app/EmptyState';

@@ -220,9 +220,9 @@ test.describe('Treino', () => {
     await answerFoldImmediate(appPage);
 
     await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
-    await expect(appPage.getByRole('link', { name: 'Rever sessão' })).toBeVisible();
-    await appPage.getByRole('link', { name: 'Rever sessão' }).click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await expect(appPage.getByRole('link', { name: 'Revisão da sessão' })).toBeVisible();
+    await appPage.getByRole('link', { name: 'Revisão da sessão' }).click();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
   });
 
   test('pausar continua sessão — timer congela e retoma', async ({ appPage }) => {

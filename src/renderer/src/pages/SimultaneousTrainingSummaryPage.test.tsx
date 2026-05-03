@@ -40,7 +40,7 @@ describe('SimultaneousTrainingSummaryPage', () => {
     vi.clearAllMocks();
   });
 
-  it('UT-SRN-04: Cada card de mesa exibe botão "Revisão individual"', async () => {
+  it('UT-SRN-04: Cada card de mesa exibe botão "Revisão da sessão"', async () => {
     vi.mocked(window.api.training.getSessionResult)
       .mockResolvedValueOnce(mockResult1)
       .mockResolvedValueOnce(mockResult2)
@@ -48,18 +48,18 @@ describe('SimultaneousTrainingSummaryPage', () => {
 
     renderPage([1, 2, 3]);
 
-    const links = await screen.findAllByText('Revisão individual');
+    const links = await screen.findAllByText('Revisão da sessão');
     expect(links).toHaveLength(3);
   });
 
-  it('UT-SRN-05: "Revisão individual" navega para /history/{sessionId} correto', async () => {
+  it('UT-SRN-05: "Revisão da sessão" navega para /history/{sessionId} correto', async () => {
     vi.mocked(window.api.training.getSessionResult)
       .mockResolvedValueOnce(mockResult1)
       .mockResolvedValueOnce(mockResult2);
 
     renderPage([1, 2]);
 
-    const links = await screen.findAllByRole('link', { name: 'Revisão individual' });
+    const links = await screen.findAllByRole('link', { name: 'Revisão da sessão' });
     expect(links[0]).toHaveAttribute('href', '/history/1');
     expect(links[1]).toHaveAttribute('href', '/history/2');
   });
@@ -121,7 +121,7 @@ describe('SimultaneousTrainingSummaryPage', () => {
       expect(screen.getByTestId('redirected')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('Revisão individual')).not.toBeInTheDocument();
+    expect(screen.queryByText('Revisão da sessão')).not.toBeInTheDocument();
     expect(screen.queryByText('Revisão múltipla')).not.toBeInTheDocument();
   });
 });

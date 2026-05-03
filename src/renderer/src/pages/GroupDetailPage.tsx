@@ -9,6 +9,7 @@ import {
   type EntityTableColumn,
 } from '@/components/app';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type SituationRow = {
   id: number;
@@ -126,8 +127,11 @@ export function GroupDetailPage(): React.ReactElement {
 
   if (group === undefined) {
     return (
-      <div className="flex flex-col gap-4">
-        <p className="text-muted-foreground">Carregando…</p>
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-10 w-48" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
       </div>
     );
   }

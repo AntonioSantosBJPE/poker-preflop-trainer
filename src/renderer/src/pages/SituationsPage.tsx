@@ -5,11 +5,14 @@ import {
   ConfirmActionDialog,
   EmptyState,
   EntityTable,
+  FilterToolbar,
+  FilterToolbarRow,
   PageHeader,
   type EntityTableColumn,
 } from '@/components/app';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -26,13 +29,16 @@ export function SituationsPage(): React.ReactElement {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [archivingId, setArchivingId] = useState<number | null>(null);
   const [pendingArchive, setPendingArchive] = useState<Row | null>(null);
+  const [situationsLoading, setSituationsLoading] = useState(true);
   const navigate = useNavigate();
 
   async function load(groupId?: number): Promise<void> {
+    setSituationsLoading(true);
     const list = (await window.api.situations.list(
       groupId != null ? { groupId } : undefined,
     )) as Row[];
     setRows(list);
+    setSituationsLoading(false);
   }
 
   const reload = useCallback(() => load(selectedGroupId ?? undefined), [selectedGroupId]);
@@ -135,60 +141,65 @@ export function SituationsPage(): React.ReactElement {
           </Button>
         }
       />
-      <div className="flex flex-col gap-2">
-        <div className="max-w-xs">
-          <Label htmlFor="situations-group-filter-input">Filtrar por grupo</Label>
-          <Select
-            value={selectedGroupId != null ? String(selectedGroupId) : '__all__'}
-            onValueChange={(value) => {
-              if (value === '__all__') {
-                setSelectedGroupId(null);
-                return;
-              }
-              setSelectedGroupId(Number(value));
-            }}
-          >
-            <SelectTrigger
-              id="situations-group-filter-input"
-              data-testid="situations-group-filter"
-              className="w-full"
+      <FilterToolbar>
+        <FilterToolbarRow>
+          <div className="flex min-w-52 flex-col gap-1">
+            <Label htmlFor="situations-group-filter-input">Filtrar por grupo</Label>
+            <Select
+              value={selectedGroupId != null ? String(selectedGroupId) : '__all__'}
+              onValueChange={(value) => {
+                if (value === '__all__') {
+                  setSelectedGroupId(null);
+                  return;
+                }
+                setSelectedGroupId(Number(value));
+              }}
             >
-              <SelectValue placeholder="Todos os grupos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">Todos os grupos</SelectItem>
-              {groups.map((group) => (
-                <SelectItem key={group.id} value={String(group.id)}>
-                  {group.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <SelectTrigger
+                id="situations-group-filter-input"
+                data-testid="situations-group-filter"
+                className="w-full"
+              >
+                <SelectValue placeholder="Todos os grupos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">Todos os grupos</SelectItem>
+                {groups.map((group) => (
+                  <SelectItem key={group.id} value={String(group.id)}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </FilterToolbarRow>
+      </FilterToolbar>
+      {situationsLoading ? (
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
         </div>
-        {selectedGroupId != null && (
-          <p className="text-sm text-muted-foreground">
-            Grupo: {groups.find((g) => g.id === selectedGroupId)?.name ?? '—'}
-          </p>
-        )}
-      </div>
-      <EntityTable
-        rows={rows}
-        columns={columns}
-        getRowKey={(row) => row.id}
-        tableTestId="situations-list-table"
-        emptyState={
-          <EmptyState
-            title="Nenhuma situação"
-            description="Crie sua primeira situação para começar os treinos."
-            action={
-              <Button asChild>
-                <Link to="/situations/new">Criar a primeira</Link>
-              </Button>
-            }
-            className="border-0 bg-transparent"
-          />
-        }
-      />
+      ) : (
+        <EntityTable
+          rows={rows}
+          columns={columns}
+          getRowKey={(row) => row.id}
+          tableTestId="situations-list-table"
+          emptyState={
+            <EmptyState
+              title="Nenhuma situação"
+              description="Crie sua primeira situação para começar os treinos."
+              action={
+                <Button asChild>
+                  <Link to="/situations/new">Criar a primeira</Link>
+                </Button>
+              }
+              className="border-0 bg-transparent"
+            />
+          }
+        />
+      )}
       <ConfirmActionDialog
         open={pendingArchive != null}
         onOpenChange={(open) => {

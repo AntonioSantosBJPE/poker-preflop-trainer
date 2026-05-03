@@ -69,7 +69,7 @@ describe('ProfilePage', () => {
     const nameInput = screen.getByLabelText('Nome');
     await user.clear(nameInput);
     await user.type(nameInput, 'Alice Cooper');
-    await user.click(screen.getByRole('button', { name: 'Guardar nome' }));
+    await user.click(screen.getByRole('button', { name: 'Salvar nome' }));
 
     expect(window.api.profile.updateName).toHaveBeenCalledWith('Alice Cooper');
     expect(useAuthStore.getState().user?.name).toBe('Alice Cooper');
@@ -125,7 +125,7 @@ describe('ProfilePage', () => {
     await user.click(screen.getByLabelText('Mesas simultâneas padrão'));
     await user.click(screen.getByRole('option', { name: '4 mesas' }));
 
-    await user.click(screen.getByRole('button', { name: 'Guardar preferências' }));
+    await user.click(screen.getByRole('button', { name: 'Salvar preferências' }));
 
     expect(window.api.profile.updatePreferences).toHaveBeenCalledWith({
       theme: 'light',
@@ -135,7 +135,7 @@ describe('ProfilePage', () => {
       defaultSimultaneousTableCount: 4,
     });
     expect(usePreferencesStore.getState().raw?.theme).toBe('light');
-    expect(await screen.findByText('Preferências guardadas com sucesso.')).toBeInTheDocument();
+    expect(await screen.findByText('Preferências salvas com sucesso.')).toBeInTheDocument();
   });
 });
 

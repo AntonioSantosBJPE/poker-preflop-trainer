@@ -13,13 +13,7 @@ type AuthTab = 'login' | 'register';
 
 type FormValues = AuthFormFields;
 
-function ipcErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  if (typeof err === 'object' && err !== null && 'message' in err) {
-    return String((err as { message: unknown }).message);
-  }
-  return 'Erro';
-}
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 
 export function LoginPage(): React.ReactElement {
   const [tab, setTab] = useState<AuthTab>('login');

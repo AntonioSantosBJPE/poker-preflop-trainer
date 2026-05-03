@@ -1,6 +1,7 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { DEFAULT_USER_PREFERENCES, type ThemeMode } from '@shared/constants';
-import { AppSidebar } from '@/components/app';
+import { AppSidebar, Breadcrumbs, type BreadcrumbItem } from '@/components/app';
 import { useAuthStore } from '../stores/auth';
 import { usePreferencesStore } from '../stores/preferences';
 
@@ -12,6 +13,27 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
       : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
   ].join(' ');
 
+const routeBreadcrumbs: Record<string, BreadcrumbItem> = {
+  '/': { label: 'Dashboard' },
+  '/groups': { label: 'Grupos' },
+  '/situations': { label: 'Situações' },
+  '/training': { label: 'Treino' },
+  '/training/simultaneous': { label: 'Treino Simultâneo' },
+  '/history': { label: 'Histórico' },
+  '/stats': { label: 'Estatísticas' },
+  '/profile': { label: 'Perfil' },
+};
+
+const routeSuffixLabels: Record<string, string> = {
+  new: 'Nova',
+  edit: 'Editar',
+  result: 'Resultado',
+  session: 'Sessão',
+  review: 'Revisão',
+  'review-multi': 'Revisão Múltipla',
+  summary: 'Resumo',
+};
+
 export function AppLayout(): React.ReactElement {
   const user = useAuthStore((s) => s.user);
   const applySessionSnapshot = useAuthStore((s) => s.applySessionSnapshot);
@@ -19,6 +41,33 @@ export function AppLayout(): React.ReactElement {
   const persistedTheme = usePreferencesStore((s) => s.raw?.theme);
   const setThemeLocally = usePreferencesStore((s) => s.setThemeLocally);
   const navigate = useNavigate();
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    mainRef.current?.focus();
+  }, [location.pathname]);
+
+  const breadcrumbItems = useMemo(() => {
+    const items: BreadcrumbItem[] = [{ label: 'Dashboard' }];
+    const pathParts = location.pathname.split('/').filter(Boolean);
+
+    if (pathParts.length === 0) return items;
+
+    let accumulated = '';
+    for (let i = 0; i < pathParts.length; i++) {
+      accumulated += '/' + pathParts[i];
+      const entry = routeBreadcrumbs[accumulated];
+      if (entry) {
+        const exists = items.some((x) => x.label === entry.label);
+        if (!exists) items.push(entry);
+      } else {
+        const label = routeSuffixLabels[pathParts[i]] ?? pathParts[i];
+        items.push({ label });
+      }
+    }
+    return items;
+  }, [location.pathname]);
 
   const theme = persistedTheme ?? DEFAULT_USER_PREFERENCES.theme;
   const toggleTheme = () => {
@@ -77,8 +126,13 @@ export function AppLayout(): React.ReactElement {
           Perfil
         </NavLink>
       </AppSidebar>
-      <main className="min-h-0 flex-1 overflow-y-auto">
+      <main
+        ref={mainRef}
+        tabIndex={-1}
+        className="min-h-0 flex-1 overflow-y-auto focus:outline-none"
+      >
         <div className="mx-auto w-full max-w-6xl px-6 py-8">
+          <Breadcrumbs items={breadcrumbItems} className="mb-4" />
           <Outlet />
         </div>
       </main>

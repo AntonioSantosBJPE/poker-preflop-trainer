@@ -113,7 +113,7 @@ test.describe('Histórico - revisão múltipla', () => {
 
     await appPage.getByTestId('selection-review-btn').click();
 
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
     await expect(appPage.getByTestId('hand-review-card')).toBeVisible();
     await expect(appPage.getByText(/Mão 1 de 2/)).toBeVisible();
   });

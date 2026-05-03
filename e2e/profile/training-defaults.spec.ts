@@ -26,9 +26,9 @@ test.describe('Profile - training defaults', () => {
     await appPage.getByLabel('Timer padrão (s)').fill('12');
     await selectShadcnOption(appPage, 'Feedback padrão', 'Ao final');
     await selectShadcnOption(appPage, 'Mesas simultâneas padrão', '4 mesas');
-    await appPage.getByRole('button', { name: 'Guardar preferências' }).click();
+    await appPage.getByRole('button', { name: 'Salvar preferências' }).click();
 
-    await expect(appPage.getByText('Preferências guardadas com sucesso.')).toBeVisible();
+    await expect(appPage.getByText('Preferências salvas com sucesso.')).toBeVisible();
 
     await appPage.getByRole('link', { name: 'Treino', exact: true }).click();
     await expect(appPage.getByRole('heading', { name: 'Configurar treino' })).toBeVisible();

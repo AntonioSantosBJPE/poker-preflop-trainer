@@ -136,7 +136,7 @@ export function SingleTrainingConfigForm(): React.ReactElement {
 
   if (step === 1) {
     return (
-      <div className="max-w-xl space-y-6" data-testid="training-step-1">
+      <div className="flex flex-col gap-6" data-testid="training-step-1">
         <PageHeader title="Configurar treino" description="Escolha um grupo" />
         <GroupSelectionStep
           groups={groups}
@@ -148,21 +148,25 @@ export function SingleTrainingConfigForm(): React.ReactElement {
   }
 
   return (
-    <div className="max-w-xl space-y-6" data-testid="training-step-2">
+    <div className="flex flex-col gap-6" data-testid="training-step-2">
       <PageHeader
         title="Configurar treino"
         actions={
-          <button
+          <Button
             type="button"
+            variant="outline"
             data-testid="training-back-btn"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             onClick={handleBack}
           >
             Voltar
-          </button>
+          </Button>
         }
       />
-      <form className="space-y-6" onSubmit={(e) => void handleSubmit(onValid)(e)} noValidate>
+      <form
+        className="flex flex-col gap-6"
+        onSubmit={(e) => void handleSubmit(onValid)(e)}
+        noValidate
+      >
         <SituationChecklist
           situations={sits}
           selected={situationIds}

@@ -47,7 +47,7 @@ test.describe('Treino simultâneo — fluxo completo', () => {
     await expect(appPage.getByText(/^Mesa 2$/)).toBeVisible();
     await expect(appPage.getByText(/^Mesa 3$/)).toBeVisible();
 
-    const individualReviewLinks = appPage.getByRole('link', { name: 'Revisão individual' });
+    const individualReviewLinks = appPage.getByRole('link', { name: 'Revisão da sessão' });
     await expect(individualReviewLinks).toHaveCount(3);
 
     await expect(appPage.getByRole('link', { name: 'Revisão múltipla' })).toBeVisible();
@@ -56,6 +56,6 @@ test.describe('Treino simultâneo — fluxo completo', () => {
     await expect(appPage.getByRole('link', { name: 'Treino normal' })).toBeVisible();
 
     await individualReviewLinks.first().click();
-    await expect(appPage.getByRole('heading', { name: 'Revisão da Sessão' })).toBeVisible();
+    await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
   });
 });
