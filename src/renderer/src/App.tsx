@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
+import { HistoryPage } from './pages/HistoryPage';
+import { SessionHandReviewPage } from './pages/SessionHandReviewPage';
 import { GroupDetailPage } from './pages/GroupDetailPage';
 import { GroupsPage } from './pages/GroupsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -67,6 +69,8 @@ export function App(): React.ReactElement {
           />
           <Route path="training/:sessionId" element={<TrainingSessionPage />} />
           <Route path="training/:sessionId/result" element={<TrainingResultPage />} />
+          <Route path="history" element={<HistoryPage />} />
+          <Route path="history/:sessionId" element={<SessionHandReviewPage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>

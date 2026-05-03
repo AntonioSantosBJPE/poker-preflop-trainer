@@ -131,3 +131,72 @@ export type StatsWorstHandRowDto = {
   situationId: number;
   chosenActionId: number | null;
 };
+
+export type SessionHistoryItemDto = {
+  id: number;
+  startedAt: number;
+  finishedAt: number | null;
+  groupName: string | null;
+  situationCount: number;
+  totalHands: number;
+  handsPlayed: number;
+  correct: number;
+  accuracy: number;
+  durationMs: number | null;
+  sessionType: SessionType;
+  simultaneousTableCount: number | null;
+};
+
+export type SessionHandDetailDto = {
+  handIndex: number;
+  situationId: number;
+  card1: CardDto;
+  card2: CardDto;
+  situationName: string;
+  situationPosition: Position;
+  chosenAction: {
+    id: number;
+    name: string;
+    actionType: ActionType;
+    colorHex: string;
+  } | null;
+  isCorrect: boolean;
+  responseMs: number;
+  gridCell: { rowIndex: number; colIndex: number };
+  correctActionIds: number[];
+};
+
+export type SessionDetailDto = {
+  session: SessionHistoryItemDto;
+  hands: SessionHandDetailDto[];
+  situationActionsMap: Record<
+    number,
+    {
+      name: string;
+      position: Position;
+      actions: {
+        id: number;
+        name: string;
+        actionType: ActionType;
+        colorHex: string;
+        sortOrder: number;
+      }[];
+      rangeCells: RangeCellDto[];
+    }
+  >;
+};
+
+export type SessionListResponse = {
+  items: SessionHistoryItemDto[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export type SessionHistoryFilters = {
+  page?: number;
+  groupId?: number;
+  sessionType?: SessionType;
+  simultaneousTableCount?: SimultaneousTableCount;
+};

@@ -1,6 +1,9 @@
 import type {
   AuthSessionDto,
   GroupSummaryDto,
+  SessionDetailDto,
+  SessionHistoryFilters,
+  SessionListResponse,
   SituationSummaryDto,
   StatsBySituationRowDto,
   StatsFilters,
@@ -72,6 +75,8 @@ export type Api = {
     }) => Promise<{ isCorrect: boolean; correctActions: number[]; responseMs: number }>;
     finishSession: (sessionId: number) => Promise<unknown>;
     getSessionResult: (sessionId: number) => Promise<unknown>;
+    listSessions: (filters: SessionHistoryFilters) => Promise<SessionListResponse>;
+    getSessionDetail: (sessionId: number) => Promise<SessionDetailDto>;
   };
   simultaneousTraining: {
     startSession: (config: {

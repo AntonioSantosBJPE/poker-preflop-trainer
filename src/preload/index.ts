@@ -80,6 +80,9 @@ const api = {
     finishSession: (sessionId: number) => ipcRenderer.invoke('training:finishSession', sessionId),
     getSessionResult: (sessionId: number) =>
       ipcRenderer.invoke('training:getSessionResult', sessionId),
+    listSessions: (filters: unknown) => ipcRenderer.invoke('training:listSessions', filters),
+    getSessionDetail: (sessionId: number) =>
+      ipcRenderer.invoke('training:getSessionDetail', sessionId),
   },
   simultaneousTraining: {
     startSession: (config: unknown) =>

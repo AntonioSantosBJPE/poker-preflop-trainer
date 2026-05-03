@@ -19,6 +19,8 @@ export interface EntityTableProps<T> {
   rows: T[];
   columns: EntityTableColumn<T>[];
   getRowKey: (row: T) => number | string;
+  onRowClick?: (row: T) => void;
+  rowTestId?: (row: T) => string;
   emptyState?: React.ReactNode;
   tableTestId?: string;
 }
@@ -27,6 +29,8 @@ export function EntityTable<T>({
   rows,
   columns,
   getRowKey,
+  onRowClick,
+  rowTestId,
   emptyState,
   tableTestId,
 }: EntityTableProps<T>): React.ReactElement {
@@ -47,7 +51,12 @@ export function EntityTable<T>({
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={getRowKey(row)}>
+            <TableRow
+              key={getRowKey(row)}
+              className={onRowClick ? 'cursor-pointer' : undefined}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              data-testid={rowTestId?.(row)}
+            >
               {columns.map((column) => (
                 <TableCell key={column.key} className={column.cellClassName}>
                   {column.cell(row)}

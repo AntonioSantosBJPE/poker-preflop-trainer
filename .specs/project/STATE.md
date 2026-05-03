@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-02 (test-coverage-improvement P2 concluído — 248 unit tests, stmts 94%, branches 86%, funcs 93%, lines 96%; pnpm test 57 E2E verdes)
+**Última actualização:** 2026-05-02 (session-history — spec criada)
 
 ## Decisões
 
@@ -20,7 +20,9 @@
 
 ## Features em Progresso
 
-Nenhuma.
+| Feature          | Data       | Fase     |
+| ---------------- | ---------- | -------- |
+| session-history  | 2026-05-02 | Tasks    |
 
 ## Features Concluídas
 
@@ -30,6 +32,8 @@ Nenhuma.
 | situation-range-editor (SRANGE-01..04) | 2026-05-01 | T1 fold implícito shared; T2 N/A (parse no main); T3 `RangeGrid13` min 36px + scroll |
 | shadcn-ui-migration (blocos 0, 1, 2, 3 e 4) | 2026-05-02 | Fundação shadcn + CRUD/editor modularizados + treino/simultâneo + stats + remoção .pt-* + gates E2E e `pnpm test` verdes |
 | test-coverage-improvement (T01–T11 + P2) | 2026-05-02 | 129 novos testes (119→248); stmts 65%→94%, branches 56%→86%, funcs 74%→93%, lines 67%→96%; thresholds vitest activos; 2 specs E2E novas; pnpm test 57 E2E ✅ |
+
+| D-12 | [session-history] Paginação server-side com pageSize=10 fixo; grid read-only na revisão via prop `readOnly` sem alterar `RangeGrid13` existente | Simplicidade de implementação; consistência com o padrão StatsPage | 2026-05-02 |
 
 ## Blockers Activos
 

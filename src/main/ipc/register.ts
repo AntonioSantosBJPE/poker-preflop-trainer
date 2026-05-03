@@ -1,5 +1,6 @@
 import { registerAuthIpc } from './auth';
 import { registerGroupsIpc } from './groups';
+import { registerHistoryIpc } from './history';
 import { registerProfileIpc } from './profile';
 import { registerSituationsIpc } from './situations';
 import { registerTrainingIpc } from './training';
@@ -14,4 +15,5 @@ export function registerAllIpc(): void {
   registerTrainingIpc();
   registerSimultaneousTrainingIpc();
   registerStatsIpc();
+  registerHistoryIpc();
 }

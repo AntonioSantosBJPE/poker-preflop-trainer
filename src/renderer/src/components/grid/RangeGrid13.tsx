@@ -13,6 +13,8 @@ type Props = {
   activeActionKey: string;
   cells: RangeCellEdit[];
   onChange: (cells: RangeCellEdit[]) => void;
+  readOnly?: boolean;
+  highlightCell?: { rowIndex: number; colIndex: number } | null;
 };
 
 function label(row: number, col: number): string {
@@ -28,6 +30,8 @@ export function RangeGrid13({
   activeActionKey,
   cells,
   onChange,
+  readOnly = false,
+  highlightCell = null,
 }: Props): React.ReactElement {
   const [painting, setPainting] = useState(false);
   const paintRef = useRef<'add' | 'erase'>('add');
@@ -60,6 +64,7 @@ export function RangeGrid13({
   );
 
   function onDown(row: number, col: number, ev: React.MouseEvent): void {
+    if (readOnly) return;
     ev.preventDefault();
     const erase = ev.button === 2 || ev.altKey;
     paintRef.current = erase ? 'erase' : 'add';
@@ -68,7 +73,7 @@ export function RangeGrid13({
   }
 
   function onEnter(row: number, col: number): void {
-    if (!painting) return;
+    if (readOnly || !painting) return;
     applyPaint(row, col, paintRef.current);
   }
 
@@ -94,13 +99,17 @@ export function RangeGrid13({
     return { background: `linear-gradient(90deg, ${parts.join(', ')})` };
   }
 
+  const CellTag = readOnly ? 'div' : 'button';
+
   return (
     <div
       data-testid="range-grid-13"
       className="inline-block max-w-full select-none rounded-xl border border-border bg-card p-2"
-      onMouseLeave={() => setPainting(false)}
-      onMouseUp={() => setPainting(false)}
-      onContextMenu={(e) => e.preventDefault()}
+      {...(!readOnly && {
+        onMouseLeave: () => setPainting(false),
+        onMouseUp: () => setPainting(false),
+        onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+      })}
     >
       <div className="overflow-x-auto">
         <div
@@ -121,26 +130,37 @@ export function RangeGrid13({
               <div className="flex min-h-9 items-center justify-end pr-1 text-xs font-medium text-muted-foreground">
                 {rRow}
               </div>
-              {RANK_CHARS.map((rCol, col) => (
-                <button
-                  type="button"
-                  key={`${row}-${col}`}
-                  className="min-h-9 w-full min-w-[2.25rem] rounded-sm border border-border px-0.5 text-xs font-semibold leading-tight text-foreground/80 hover:outline hover:outline-2 hover:outline-primary/40"
-                  style={cellStyle(row, col)}
-                  title={label(row, col)}
-                  onMouseDown={(e) => onDown(row, col, e)}
-                  onMouseEnter={() => onEnter(row, col)}
-                >
-                  {label(row, col)}
-                </button>
-              ))}
+              {RANK_CHARS.map((rCol, col) => {
+                const isHighlighted =
+                  highlightCell?.rowIndex === row && highlightCell?.colIndex === col;
+                const highlightClass = isHighlighted ? 'ring-2 ring-inset ring-amber-400' : '';
+                return (
+                  <CellTag
+                    type={readOnly ? undefined : 'button'}
+                    key={`${row}-${col}`}
+                    className={`min-h-9 w-full min-w-[2.25rem] rounded-sm border border-border px-0.5 text-xs font-semibold leading-tight text-foreground/80 ${
+                      readOnly ? '' : 'hover:outline hover:outline-2 hover:outline-primary/40'
+                    } ${highlightClass}`}
+                    style={cellStyle(row, col)}
+                    title={label(row, col)}
+                    {...(!readOnly && {
+                      onMouseDown: (e: React.MouseEvent) => onDown(row, col, e),
+                      onMouseEnter: () => onEnter(row, col),
+                    })}
+                  >
+                    {label(row, col)}
+                  </CellTag>
+                );
+              })}
             </Fragment>
           ))}
         </div>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Clique esquerdo: selecionar a ação ativa. Alt+clique ou botão direito: apagar célula.
-      </p>
+      {!readOnly && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Clique esquerdo: selecionar a ação ativa. Alt+clique ou botão direito: apagar célula.
+        </p>
+      )}
     </div>
   );
 }
