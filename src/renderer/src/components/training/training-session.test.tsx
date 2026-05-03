@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
 import { TrainingActionButtons, type Act } from '@/components/training/TrainingActionButtons';
 import { TrainingFeedbackPanel } from '@/components/training/TrainingFeedbackPanel';
+import { TrainingSessionHeader } from '@/components/training/TrainingSessionHeader';
 import { TrainingSummaryCards } from '@/components/training/TrainingSummaryCards';
 
 describe('training session presentation', () => {
@@ -77,6 +78,117 @@ describe('training session presentation', () => {
     rerender(<TrainingActionButtons actions={actions} disabled onAction={onAction} />);
     await user.click(screen.getByRole('button', { name: 'Raise' }));
     expect(onAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('TrainingSessionHeader pause/continue button calls onPause/onContinue', async () => {
+    const user = userEvent.setup();
+    const onPause = vi.fn();
+    const onContinue = vi.fn();
+
+    const { rerender } = render(
+      <TrainingSessionHeader
+        index={0}
+        totalHands={20}
+        remainingSec={null}
+        onAbandon={vi.fn()}
+        isPaused={false}
+        onPause={onPause}
+        onContinue={onContinue}
+      />,
+    );
+
+    expect(screen.getByText('Pausar')).toBeInTheDocument();
+    await user.click(screen.getByTestId('pause-continue-btn'));
+    expect(onPause).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TrainingSessionHeader
+        index={0}
+        totalHands={20}
+        remainingSec={null}
+        onAbandon={vi.fn()}
+        isPaused
+        onPause={onPause}
+        onContinue={onContinue}
+      />,
+    );
+
+    expect(screen.getByText('Continuar')).toBeInTheDocument();
+    await user.click(screen.getByTestId('pause-continue-btn'));
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it('TrainingSessionHeader progress bar width reflects index/totalHands', () => {
+    const { rerender } = render(
+      <TrainingSessionHeader
+        index={0}
+        totalHands={20}
+        remainingSec={null}
+        onAbandon={vi.fn()}
+        isPaused={false}
+        onPause={vi.fn()}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('progress-filler')).toHaveStyle({ width: '5%' });
+
+    rerender(
+      <TrainingSessionHeader
+        index={9}
+        totalHands={20}
+        remainingSec={null}
+        onAbandon={vi.fn()}
+        isPaused={false}
+        onPause={vi.fn()}
+        onContinue={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('progress-filler')).toHaveStyle({ width: '50%' });
+
+    rerender(
+      <TrainingSessionHeader
+        index={19}
+        totalHands={20}
+        remainingSec={null}
+        onAbandon={vi.fn()}
+        isPaused={false}
+        onPause={vi.fn()}
+        onContinue={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('progress-filler')).toHaveStyle({ width: '100%' });
+  });
+
+  it('TrainingSessionHeader timer icon rendered with remainingSec, hidden when null', () => {
+    const { rerender } = render(
+      <TrainingSessionHeader
+        index={0}
+        totalHands={20}
+        remainingSec={42}
+        onAbandon={vi.fn()}
+        isPaused={false}
+        onPause={vi.fn()}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('timer-icon')).toBeInTheDocument();
+    expect(screen.getByText('42s')).toBeInTheDocument();
+
+    rerender(
+      <TrainingSessionHeader
+        index={0}
+        totalHands={20}
+        remainingSec={null}
+        onAbandon={vi.fn()}
+        isPaused={false}
+        onPause={vi.fn()}
+        onContinue={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId('timer-icon')).not.toBeInTheDocument();
+    expect(screen.queryByText('42s')).not.toBeInTheDocument();
   });
 
   it('TrainingSummaryCards renders summary values', () => {

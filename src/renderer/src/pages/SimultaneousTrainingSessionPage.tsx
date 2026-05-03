@@ -38,6 +38,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
   const feedbackMode = location.state?.feedbackMode ?? 'IMMEDIATE';
   const [tables, setTables] = useState<TableState[]>([]);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (!sessionIds.length || !totalHands) {
@@ -76,18 +77,19 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
   }
 
   useEffect(() => {
-    if (!tables.length) return;
+    if (!tables.length || isPaused) return;
     for (const table of tables) {
       if (!table.hand && !table.finished) {
         void dealNext(table.sessionId);
       }
     }
-  }, [tables]);
+  }, [tables, isPaused]);
 
   useEffect(() => {
     if (!tables.length || timerSeconds <= 0) return;
     const timer = setInterval(() => {
       setTables((current) => [...current]);
+      if (isPaused) return;
       const now = Date.now();
       for (const table of tables) {
         if (
@@ -101,7 +103,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
       }
     }, 200);
     return () => clearInterval(timer);
-  }, [tables, timerSeconds]);
+  }, [tables, timerSeconds, isPaused]);
 
   const isCompleted = useMemo(() => tables.length > 0 && tables.every((t) => t.finished), [tables]);
 
@@ -180,14 +182,24 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
       <PageHeader
         title="Treino simultâneo"
         actions={
-          <Button
-            type="button"
-            variant="outline"
-            data-testid="sim-training-leave-btn"
-            onClick={() => setShowLeaveConfirm(true)}
-          >
-            Encerrar
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="sim-training-pause-btn"
+              onClick={() => setIsPaused((p) => !p)}
+            >
+              {isPaused ? 'Continuar' : 'Pausar'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="sim-training-leave-btn"
+              onClick={() => setShowLeaveConfirm(true)}
+            >
+              Encerrar
+            </Button>
+          </div>
         }
       />
 
@@ -213,6 +225,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
             timerSeconds={timerSeconds}
             deadlineMs={table.deadlineMs}
             finished={table.finished}
+            isPaused={isPaused}
             feedbackMode={feedbackMode}
             onAction={(sessionId, actionId) => void submit(sessionId, actionId, false)}
             onNextHand={(sessionId) => void advance(sessionId)}

@@ -34,6 +34,7 @@ export function TrainingSessionPage(): ReactElement {
   const [situationName, setSituationName] = useState('');
   const [feedback, setFeedback] = useState<{ ok: boolean; ms: number } | null>(null);
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const deadlineRef = useRef<number | null>(null);
   const pausedRemainingMsRef = useRef<number | null>(null);
@@ -43,6 +44,7 @@ export function TrainingSessionPage(): ReactElement {
   const feedbackRef = useRef(feedback);
   const handRef = useRef(hand);
   const showAbandonDialogRef = useRef(showAbandonDialog);
+  const pausedRef = useRef(paused);
 
   useEffect(() => {
     timerSecondsRef.current = timerSeconds;
@@ -59,6 +61,10 @@ export function TrainingSessionPage(): ReactElement {
   useEffect(() => {
     showAbandonDialogRef.current = showAbandonDialog;
   }, [showAbandonDialog]);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   const dealNextHand = useCallback(async () => {
     answeredRef.current = false;
@@ -106,10 +112,10 @@ export function TrainingSessionPage(): ReactElement {
   }, [sessionId, navigate, dealNextHand]);
 
   useEffect(() => {
-    if (!hand || showAbandonDialog) return;
+    if (!hand || showAbandonDialog || paused) return;
     const t = setInterval(() => setTick((x) => x + 1), 200);
     return () => clearInterval(t);
-  }, [hand, showAbandonDialog]);
+  }, [hand, showAbandonDialog, paused]);
 
   const remainingSec =
     timerSecondsRef.current && deadlineRef.current
@@ -148,6 +154,7 @@ export function TrainingSessionPage(): ReactElement {
 
   useEffect(() => {
     if (
+      pausedRef.current ||
       !timerSecondsRef.current ||
       !handRef.current ||
       feedbackRef.current ||
@@ -160,8 +167,22 @@ export function TrainingSessionPage(): ReactElement {
     }
   }, [tick]);
 
+  function handlePause(): void {
+    if (deadlineRef.current === null) return;
+    pausedRemainingMsRef.current = Math.max(0, deadlineRef.current - Date.now());
+    deadlineRef.current = null;
+    setPaused(true);
+  }
+
+  function handleContinue(): void {
+    if (pausedRemainingMsRef.current === null) return;
+    deadlineRef.current = Date.now() + pausedRemainingMsRef.current;
+    pausedRemainingMsRef.current = null;
+    setPaused(false);
+  }
+
   function openAbandonDialog(): void {
-    if (deadlineRef.current !== null) {
+    if (!paused && deadlineRef.current !== null) {
       pausedRemainingMsRef.current = Math.max(0, deadlineRef.current - Date.now());
       deadlineRef.current = null;
     }
@@ -169,7 +190,7 @@ export function TrainingSessionPage(): ReactElement {
   }
 
   function closeAbandonDialog(): void {
-    if (pausedRemainingMsRef.current !== null) {
+    if (!paused && pausedRemainingMsRef.current !== null) {
       deadlineRef.current = Date.now() + pausedRemainingMsRef.current;
       pausedRemainingMsRef.current = null;
     }
@@ -192,6 +213,9 @@ export function TrainingSessionPage(): ReactElement {
         totalHands={totalHands}
         remainingSec={remainingSec}
         onAbandon={() => openAbandonDialog()}
+        isPaused={paused}
+        onPause={handlePause}
+        onContinue={handleContinue}
       />
 
       <LeaveTrainingDialog
@@ -202,19 +226,28 @@ export function TrainingSessionPage(): ReactElement {
         onConfirm={finishSession}
       />
 
-      <div className="space-y-2 rounded-xl border border-border bg-card p-6">
-        <p className="text-sm text-muted-foreground">{situationName}</p>
-        <div className="flex gap-4">
-          <PlayingCard rank={hand.card1.rank} suit={hand.card1.suit} />
-          <PlayingCard rank={hand.card2.rank} suit={hand.card2.suit} />
+      <div className="relative">
+        {paused ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-card/80 backdrop-blur-sm">
+            <span className="text-sm font-medium text-foreground">Pausada</span>
+          </div>
+        ) : null}
+        <div className={paused ? 'pointer-events-none select-none' : ''}>
+          <div className="space-y-2 rounded-xl border border-border bg-card p-6">
+            <p className="text-sm text-muted-foreground">{situationName}</p>
+            <div className="flex gap-4">
+              <PlayingCard rank={hand.card1.rank} suit={hand.card1.suit} />
+              <PlayingCard rank={hand.card2.rank} suit={hand.card2.suit} />
+            </div>
+          </div>
+
+          <TrainingActionButtons
+            actions={hand.actions}
+            disabled={Boolean(feedback) || paused}
+            onAction={(id) => void submit(id, false)}
+          />
         </div>
       </div>
-
-      <TrainingActionButtons
-        actions={hand.actions}
-        disabled={Boolean(feedback)}
-        onAction={(id) => void submit(id, false)}
-      />
 
       {feedback && feedbackMode === 'IMMEDIATE' ? (
         <TrainingFeedbackPanel feedback={feedback} onNextHand={() => void onNextHand()} />

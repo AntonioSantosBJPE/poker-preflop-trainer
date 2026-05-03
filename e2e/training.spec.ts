@@ -8,6 +8,7 @@ import {
   answerFoldImmediate,
   cancelAbandon,
   clickAbandon,
+  clickPause,
   confirmAbandon,
   openTrainingConfig,
   selectGroupForTraining,
@@ -201,5 +202,82 @@ test.describe('Treino', () => {
     await expect(appPage.getByRole('heading', { name: 'Resultado da sessão' })).toBeVisible();
     await appPage.getByRole('link', { name: 'Nova sessão' }).click();
     await expect(appPage.getByRole('heading', { name: 'Configurar treino' })).toBeVisible();
+  });
+
+  test('pausar continua sessão — timer congela e retoma', async ({ appPage }) => {
+    const user = uniqueUserCredentials();
+    const situationName = uniqueSituationName();
+    const groupName = uniqueGroupName();
+    await registerAccount(appPage, user);
+    await createGroup(appPage, groupName);
+    await createSituationMinimal(appPage, situationName, groupName);
+
+    await openTrainingConfig(appPage);
+    await selectGroupForTraining(appPage, groupName);
+    await selectSituationsForTraining(appPage, [situationName]);
+    await setTrainingHands(appPage, 1);
+    await setTrainingTimer(appPage, 3);
+    await startTrainingSession(appPage);
+
+    await expect(appPage.getByText(/Mão 1 \/ 1/)).toBeVisible();
+    await expect(appPage.getByTestId('pause-continue-btn')).toHaveText('Pausar');
+    await clickPause(appPage);
+    await expect(appPage.getByTestId('pause-continue-btn')).toHaveText('Continuar');
+    await expect(appPage.getByText('Pausada')).toBeVisible();
+
+    // Timer de 3s teria expirado em 3s; esperamos 5s para confirmar que pause congelou
+    await appPage.waitForTimeout(5000);
+
+    // Feedback não deve ter aparecido (timer congelado)
+    await expect(appPage.getByText(/Correto|Incorreto/)).not.toBeVisible();
+
+    // Continua — timer retoma
+    await clickPause(appPage);
+    await expect(appPage.getByTestId('pause-continue-btn')).toHaveText('Pausar');
+
+    // Aguarda timeout disparar
+    await expect(
+      appPage
+        .getByText(/Correto|Incorreto/)
+        .or(appPage.getByRole('heading', { name: 'Resultado da sessão' })),
+    ).toBeVisible({ timeout: 10000 });
+  });
+
+  test('barra de progresso visível no cabeçalho da sessão', async ({ appPage }) => {
+    const user = uniqueUserCredentials();
+    const situationName = uniqueSituationName();
+    const groupName = uniqueGroupName();
+    await registerAccount(appPage, user);
+    await createGroup(appPage, groupName);
+    await createSituationMinimal(appPage, situationName, groupName);
+
+    await openTrainingConfig(appPage);
+    await selectGroupForTraining(appPage, groupName);
+    await selectSituationsForTraining(appPage, [situationName]);
+    await setTrainingHands(appPage, 3);
+    await startTrainingSession(appPage);
+
+    await expect(appPage.getByTestId('progress-track')).toBeVisible();
+
+    // Mão 1/3 — filler deve estar visível
+    await expect(appPage.getByTestId('progress-filler')).toBeVisible();
+  });
+
+  test('ícone de cronômetro visível com timer ativo', async ({ appPage }) => {
+    const user = uniqueUserCredentials();
+    const situationName = uniqueSituationName();
+    const groupName = uniqueGroupName();
+    await registerAccount(appPage, user);
+    await createGroup(appPage, groupName);
+    await createSituationMinimal(appPage, situationName, groupName);
+
+    await openTrainingConfig(appPage);
+    await selectGroupForTraining(appPage, groupName);
+    await selectSituationsForTraining(appPage, [situationName]);
+    await setTrainingHands(appPage, 1);
+    await setTrainingTimer(appPage, 10);
+    await startTrainingSession(appPage);
+
+    await expect(appPage.getByTestId('timer-icon')).toBeVisible();
   });
 });

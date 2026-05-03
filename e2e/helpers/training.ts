@@ -65,3 +65,11 @@ export async function confirmAbandon(page: Page): Promise<void> {
 export async function cancelAbandon(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Continuar treinando' }).click();
 }
+
+export async function clickPause(page: Page): Promise<void> {
+  await page.getByTestId('pause-continue-btn').click();
+}
+
+export async function clickSimultaneousPause(page: Page): Promise<void> {
+  await page.getByTestId('sim-training-pause-btn').click();
+}

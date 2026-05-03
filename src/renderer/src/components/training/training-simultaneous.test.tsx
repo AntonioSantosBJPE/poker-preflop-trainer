@@ -31,6 +31,7 @@ describe('SimultaneousTablePanel', () => {
         deadlineMs={null}
         finished
         feedbackMode="IMMEDIATE"
+        isPaused={false}
         onAction={vi.fn()}
         onNextHand={vi.fn()}
       />,
@@ -57,6 +58,7 @@ describe('SimultaneousTablePanel', () => {
         deadlineMs={null}
         finished={false}
         feedbackMode="IMMEDIATE"
+        isPaused={false}
         onAction={onAction}
         onNextHand={vi.fn()}
       />,
@@ -84,6 +86,7 @@ describe('SimultaneousTablePanel', () => {
         deadlineMs={null}
         finished={false}
         feedbackMode="IMMEDIATE"
+        isPaused={false}
         onAction={onAction}
         onNextHand={vi.fn()}
       />,
@@ -107,6 +110,7 @@ describe('SimultaneousTablePanel', () => {
         deadlineMs={null}
         finished={false}
         feedbackMode="IMMEDIATE"
+        isPaused={false}
         onAction={vi.fn()}
         onNextHand={vi.fn()}
       />,
@@ -133,6 +137,7 @@ describe('SimultaneousTablePanel', () => {
         deadlineMs={null}
         finished={false}
         feedbackMode="IMMEDIATE"
+        isPaused={false}
         onAction={vi.fn()}
         onNextHand={onNextHand}
       />,
