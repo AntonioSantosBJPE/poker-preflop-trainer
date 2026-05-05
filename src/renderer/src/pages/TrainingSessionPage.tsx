@@ -206,32 +206,56 @@ export function TrainingSessionPage(): ReactElement {
         onConfirm={finishSession}
       />
 
-      <div className="relative">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card/60 p-4 shadow-sm">
         {isPaused ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-card/80 backdrop-blur-sm">
-            <span className="text-sm font-medium text-foreground">Pausada</span>
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-sm">
+            <div className="rounded-2xl border border-primary/30 bg-background/90 px-6 py-4 text-center shadow-lg">
+              <span className="block text-lg font-semibold text-foreground">Pausada</span>
+              <span className="mt-1 block text-sm text-muted-foreground">
+                Continue quando estiver pronto para responder.
+              </span>
+            </div>
           </div>
         ) : null}
         <div className={isPaused ? 'pointer-events-none select-none' : ''}>
-          <div className="space-y-2 rounded-xl border border-border bg-card p-6">
-            <p className="text-sm text-muted-foreground">{situationName}</p>
-            <div className="flex gap-4">
-              <PlayingCard rank={hand.card1.rank} suit={hand.card1.suit} />
-              <PlayingCard rank={hand.card2.rank} suit={hand.card2.suit} />
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+            <div className="flex min-h-72 flex-col justify-between gap-8 rounded-2xl border border-border bg-background/70 p-6">
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                  Spot atual
+                </span>
+                <p className="text-xl font-semibold text-foreground">{situationName}</p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-5 py-4">
+                <PlayingCard rank={hand.card1.rank} suit={hand.card1.suit} />
+                <PlayingCard rank={hand.card2.rank} suit={hand.card2.suit} />
+              </div>
+              <p className="text-center text-sm text-muted-foreground">
+                Escolha a ação pré-flop correta para esta combinação.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/70 p-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                  Decisão
+                </span>
+                <p className="text-sm text-muted-foreground">
+                  Ações disponíveis para o range desta situação.
+                </p>
+              </div>
+              <TrainingActionButtons
+                actions={hand.actions}
+                disabled={Boolean(feedback) || isPaused}
+                onAction={(id) => void submit(id, false)}
+              />
+              {feedback && feedbackMode === 'IMMEDIATE' ? (
+                <TrainingFeedbackPanel feedback={feedback} onNextHand={() => void onNextHand()} />
+              ) : null}
             </div>
           </div>
-
-          <TrainingActionButtons
-            actions={hand.actions}
-            disabled={Boolean(feedback) || isPaused}
-            onAction={(id) => void submit(id, false)}
-          />
         </div>
       </div>
-
-      {feedback && feedbackMode === 'IMMEDIATE' ? (
-        <TrainingFeedbackPanel feedback={feedback} onNextHand={() => void onNextHand()} />
-      ) : null}
     </div>
   );
 }

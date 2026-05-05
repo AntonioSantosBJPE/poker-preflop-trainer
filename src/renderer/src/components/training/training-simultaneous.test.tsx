@@ -120,6 +120,32 @@ describe('SimultaneousTablePanel', () => {
     expect(screen.getByText(/150 ms/)).toBeInTheDocument();
   });
 
+  it('renders paused state and disables table actions', () => {
+    render(
+      <SimultaneousTablePanel
+        tableIndex={0}
+        sessionId={1}
+        hand={sampleHand}
+        situationName="Spot"
+        feedback={null}
+        handsPlayed={1}
+        totalHands={10}
+        timerSeconds={0}
+        deadlineMs={null}
+        finished={false}
+        feedbackMode="IMMEDIATE"
+        isPaused
+        onAction={vi.fn()}
+        onNextHand={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Em pausa')).toBeInTheDocument();
+    expect(screen.getByText('Pausada')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Fold' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Raise' })).toBeDisabled();
+  });
+
   it('invokes onNextHand when Próxima mão is clicked', async () => {
     const user = userEvent.setup();
     const onNextHand = vi.fn();

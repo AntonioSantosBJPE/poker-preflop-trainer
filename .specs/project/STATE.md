@@ -32,10 +32,10 @@
 
 ## Features em Progresso
 
-| Feature              | Data       | Fase                 |
-| -------------------- | ---------- | -------------------- |
-| session-history      | 2026-05-02 | Tasks                |
-| app-visual-ux-system | 2026-05-05 | T1-T9 done; next T10 |
+| Feature              | Data       | Fase                  |
+| -------------------- | ---------- | --------------------- |
+| session-history      | 2026-05-02 | Tasks                 |
+| app-visual-ux-system | 2026-05-05 | T1-T12 done; next T13 |
 
 ## Features Concluídas
 

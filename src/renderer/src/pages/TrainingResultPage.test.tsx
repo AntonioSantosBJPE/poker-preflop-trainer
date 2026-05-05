@@ -55,4 +55,13 @@ describe('TrainingResultPage', () => {
     expect(await screen.findByRole('link', { name: 'Nova sessão' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Ver estatísticas' })).toBeInTheDocument();
   });
+
+  it('exibe interpretação e erros/acertos no score da sessão', async () => {
+    renderPage('3');
+
+    expect(await screen.findByText('Base em evolução')).toBeInTheDocument();
+    expect(screen.getByText('2 acertos')).toBeInTheDocument();
+    expect(screen.getByText('1 erros')).toBeInTheDocument();
+    expect(screen.getByText('3 mãos')).toBeInTheDocument();
+  });
 });

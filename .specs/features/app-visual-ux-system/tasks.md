@@ -313,11 +313,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Cards, position/situation, progress/timer and action buttons are visually distinct zones
-- [ ] Action buttons retain accessible names for Fold/Call/Raise/etc.
-- [ ] Immediate and end-of-session feedback modes keep current behavior
-- [ ] Pause overlay blocks interaction and communicates state without losing context
-- [ ] Timer, abandon guard, timeout and result navigation still pass E2E
+- [x] Cards, position/situation, progress/timer and action buttons are visually distinct zones
+- [x] Action buttons retain accessible names for Fold/Call/Raise/etc.
+- [x] Immediate and end-of-session feedback modes keep current behavior
+- [x] Pause overlay blocks interaction and communicates state without losing context
+- [x] Timer, abandon guard, timeout and result navigation still pass E2E
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/components/training/training-session.test.tsx src/renderer/src/components/training/training-feedback.test.tsx && pnpm build:app && pnpm playwright test e2e/training.spec.ts e2e/simultaneous-training/regression-single-flow.spec.ts`
@@ -339,11 +339,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Each table exposes clear active/paused/completed state
-- [ ] Actions in one table do not visually or functionally affect other tables
-- [ ] Pause/leave guards keep existing behavior
-- [ ] Summary navigation after completion is preserved
-- [ ] New status rendering has unit coverage if state branches are added
+- [x] Each table exposes clear active/paused/completed state
+- [x] Actions in one table do not visually or functionally affect other tables
+- [x] Pause/leave guards keep existing behavior
+- [x] Summary navigation after completion is preserved
+- [x] New status rendering has unit coverage if state branches are added
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/components/training/training-simultaneous.test.tsx && pnpm build:app && pnpm playwright test e2e/simultaneous-training/full-flow.spec.ts e2e/simultaneous-training/isolated-state.spec.ts e2e/simultaneous-training/pause-guard.spec.ts e2e/simultaneous-training/leave-guard.spec.ts`
@@ -365,10 +365,10 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Result page highlights score, acertos/erros and next step
-- [ ] Simultaneous summary shows aggregate first and per-table breakdown second
-- [ ] Review/session/stat buttons keep correct navigation by `sessionId`/query ids
-- [ ] CTA text/role changes are reflected in unit and E2E tests
+- [x] Result page highlights score, acertos/erros and next step
+- [x] Simultaneous summary shows aggregate first and per-table breakdown second
+- [x] Review/session/stat buttons keep correct navigation by `sessionId`/query ids
+- [x] CTA text/role changes are reflected in unit and E2E tests
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/pages/TrainingResultPage.test.tsx src/renderer/src/pages/SimultaneousTrainingSummaryPage.test.tsx && pnpm build:app && pnpm playwright test e2e/training.spec.ts e2e/simultaneous-training/full-flow.spec.ts`
@@ -832,4 +832,52 @@ Gate run: `pnpm test:unit -- src/renderer/src/components/training/training-confi
 Gate run: `pnpm build:app` -> pass
 Gate run: `xvfb-run -a pnpm playwright test e2e/simultaneous-training/session-config.spec.ts e2e/simultaneous-training/navigation.spec.ts --workers=1` outside sandbox with approval -> pass (7 tests)
 Manual checks: simultaneous config now distinguishes multi-table mode with numbered Mesas -> Spots -> Ritmo sections and reviewable table/spot/settings controls without changing validation or session start behavior
+SPEC_DEVIATION: none
+
+### T10: Redesign Single Training Session Cockpit
+
+Task: T10 - Redesign Single Training Session Cockpit
+Status: Complete
+Requirements covered: VUX-06, VUX-07, VUX-08, VUX-09, VUX-26, VUX-27, VUX-30, VUX-31, VUX-32, VUX-33
+Files changed: `src/renderer/src/pages/TrainingSessionPage.tsx`, `src/renderer/src/components/training/TrainingSessionHeader.tsx`, `src/renderer/src/components/training/TrainingActionButtons.tsx`, `src/renderer/src/components/training/TrainingFeedbackPanel.tsx`
+Existing unit tests reviewed: `src/renderer/src/components/training/training-session.test.tsx`, `src/renderer/src/components/training/training-feedback.test.tsx`
+Existing E2E tests reviewed: `e2e/training.spec.ts`, `e2e/simultaneous-training/regression-single-flow.spec.ts`
+Tests adjusted: none; action accessible names, `pause-continue-btn`, `progress-track`, `progress-filler`, `timer-icon`, feedback copy and navigation labels preserved
+New tests added: none; existing tests cover feedback, action disabled state, pause/continue, progress width, timer icon, timeout, abandon guard and result navigation
+Gate run: `pnpm test:unit -- src/renderer/src/components/training/training-session.test.tsx src/renderer/src/components/training/training-feedback.test.tsx` -> pass (50 files, 458 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `xvfb-run -a pnpm playwright test e2e/training.spec.ts e2e/simultaneous-training/regression-single-flow.spec.ts --workers=1` outside sandbox with approval -> pass (14 tests)
+Manual checks: single training now uses a study cockpit layout with distinct active-session header, spot/card zone, decision zone, inline feedback and stronger pause overlay without changing training state transitions
+SPEC_DEVIATION: none
+
+### T11: Redesign Simultaneous Training Session Panels
+
+Task: T11 - Redesign Simultaneous Training Session Panels
+Status: Complete
+Requirements covered: VUX-10, VUX-26, VUX-27, VUX-30, VUX-31, VUX-32, VUX-33
+Files changed: `src/renderer/src/pages/SimultaneousTrainingSessionPage.tsx`, `src/renderer/src/components/training/SimultaneousTablePanel.tsx`, `src/renderer/src/components/training/training-simultaneous.test.tsx`
+Existing unit tests reviewed: `src/renderer/src/components/training/training-simultaneous.test.tsx`, `src/renderer/src/components/training/training-session.test.tsx`, `src/renderer/src/components/training/training-feedback.test.tsx`
+Existing E2E tests reviewed: `e2e/simultaneous-training/full-flow.spec.ts`, `e2e/simultaneous-training/isolated-state.spec.ts`, `e2e/simultaneous-training/pause-guard.spec.ts`, `e2e/simultaneous-training/leave-guard.spec.ts`
+Tests adjusted: `training-simultaneous.test.tsx`
+New tests added: paused-state rendering and disabled table actions for `SimultaneousTablePanel`
+Gate run: `pnpm test:unit -- src/renderer/src/components/training/training-simultaneous.test.tsx src/renderer/src/components/training/training-session.test.tsx src/renderer/src/components/training/training-feedback.test.tsx` -> pass (50 files, 459 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `xvfb-run -a pnpm playwright test e2e/simultaneous-training/full-flow.spec.ts e2e/simultaneous-training/isolated-state.spec.ts e2e/simultaneous-training/pause-guard.spec.ts e2e/simultaneous-training/leave-guard.spec.ts --workers=1` outside sandbox with approval -> pass (4 tests)
+Manual checks: simultaneous training now has page-level session summary and per-table cards with status, progress, timer, spot/cards, isolated actions, inline feedback and clearer pause overlay
+SPEC_DEVIATION: none
+
+### T12: Redesign Result and Simultaneous Summary Pages
+
+Task: T12 - Redesign Result and Simultaneous Summary Pages
+Status: Complete
+Requirements covered: VUX-16, VUX-18, VUX-22, VUX-23, VUX-34, VUX-37
+Files changed: `src/renderer/src/pages/TrainingResultPage.tsx`, `src/renderer/src/pages/SimultaneousTrainingSummaryPage.tsx`, `src/renderer/src/pages/TrainingResultPage.test.tsx`, `src/renderer/src/pages/SimultaneousTrainingSummaryPage.test.tsx`
+Existing unit tests reviewed: `TrainingResultPage.test.tsx`, `SimultaneousTrainingSummaryPage.test.tsx`
+Existing E2E tests reviewed: `e2e/training.spec.ts`, `e2e/simultaneous-training/full-flow.spec.ts`
+Tests adjusted: `TrainingResultPage.test.tsx`, `SimultaneousTrainingSummaryPage.test.tsx`
+New tests added: result interpretation/acertos-erros summary; simultaneous aggregate-first summary assertions
+Gate run: `pnpm test:unit -- src/renderer/src/pages/TrainingResultPage.test.tsx src/renderer/src/pages/SimultaneousTrainingSummaryPage.test.tsx` -> pass (50 files, 461 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `xvfb-run -a pnpm playwright test e2e/training.spec.ts e2e/simultaneous-training/full-flow.spec.ts --workers=1` outside sandbox with approval -> pass (14 tests)
+Manual checks: result screens now emphasize score, interpretation, acertos/erros, situation/table breakdowns and next-step CTAs while preserving `Revisão da sessão`, `Nova sessão`, `Ver estatísticas`, `Revisão múltipla`, `Novo treino simultâneo` and `Treino normal` routes
 SPEC_DEVIATION: none
