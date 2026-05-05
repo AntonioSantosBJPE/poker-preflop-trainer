@@ -8,3 +8,4 @@ export * from '@/components/app/FilterToolbar';
 export * from '@/components/app/PageHeader';
 export * from '@/components/app/SectionCard';
 export * from '@/components/app/StatCard';
+export * from '@/components/app/StatusMessage';

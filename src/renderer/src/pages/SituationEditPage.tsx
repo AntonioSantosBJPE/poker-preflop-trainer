@@ -10,7 +10,7 @@ import {
 import { countCombosForCell } from '@shared/poker/grid';
 import type { RangeCellEdit } from '../components/grid/RangeGrid13';
 import type { GroupSummaryDto } from '@shared/ipc/types';
-import { PageHeader } from '@/components/app';
+import { PageHeader, SectionCard, StatusMessage } from '@/components/app';
 import { RangeEditorPanel, SituationActionsEditor, SituationForm } from '@/components/situations';
 import { Button } from '@/components/ui/button';
 
@@ -250,15 +250,17 @@ export function SituationEditPage(): React.ReactElement {
     >
       <PageHeader
         title={isNew ? 'Nova situação' : 'Editar situação'}
+        description="Defina o spot, configure ações válidas e pinte o range 13×13."
         backLink={{ to: '/situations', label: '← Situações' }}
         actions={<Button type="submit">Salvar</Button>}
       />
-      {errors.root?.message && (
-        <p className="text-sm text-destructive" role="alert">
-          {errors.root.message}
-        </p>
-      )}
-      <SituationForm register={register} errors={errors} groups={groups} />
+      {errors.root?.message && <StatusMessage tone="error">{errors.root.message}</StatusMessage>}
+      <SectionCard
+        title="1. Spot"
+        description="Nome, grupo, posição e stack efetivo que descrevem esta situação."
+      >
+        <SituationForm register={register} errors={errors} groups={groups} />
+      </SectionCard>
 
       <SituationActionsEditor
         fields={fields}

@@ -12,6 +12,7 @@ import {
 import { DEFAULT_USER_PREFERENCES } from '@shared/constants';
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { PageHeader } from '@/components/app/PageHeader';
+import { SectionCard } from '@/components/app/SectionCard';
 import { Button } from '@/components/ui/button';
 import { FormSelectField } from '@/components/forms/FormSelectField';
 import { GroupSelectionStep } from '@/components/training/GroupSelectionStep';
@@ -151,7 +152,10 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
   if (step === 1) {
     return (
       <div className="flex flex-col gap-6" data-testid="sim-training-step-1">
-        <PageHeader title="Treino simultâneo" description="Escolha um grupo" />
+        <PageHeader
+          title="Treino simultâneo"
+          description="Escolha um grupo para treinar tomada de decisão em múltiplas mesas."
+        />
         <GroupSelectionStep
           groups={groups}
           onSelectGroup={(g) => void handleSelectGroup(g)}
@@ -165,6 +169,7 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
     <div className="flex flex-col gap-6" data-testid="sim-training-step-2">
       <PageHeader
         title="Configurar treino simultâneo"
+        description="Distribua o volume por mesa e ajuste o ritmo da sessão."
         actions={
           <Button
             type="button"
@@ -181,38 +186,57 @@ export function SimultaneousTrainingConfigForm(): React.ReactElement {
         onSubmit={(e) => void handleSubmit(onValid)(e)}
         noValidate
       >
-        <Controller
-          control={control}
-          name="tableCount"
-          render={({ field }) => (
-            <FormSelectField
-              id="sim-training-table-count"
-              label="Mesas simultâneas"
-              value={String(field.value)}
-              onValueChange={(v) => field.onChange(Number(v))}
-              options={TABLE_COUNT_OPTIONS}
-              error={errors.tableCount?.message}
+        <SectionCard
+          title="1. Mesas"
+          description="Escolha quantas mesas serão abertas em paralelo nesta sessão."
+        >
+          <div className="rounded-2xl border border-border bg-background/70 p-4">
+            <Controller
+              control={control}
+              name="tableCount"
+              render={({ field }) => (
+                <FormSelectField
+                  id="sim-training-table-count"
+                  label="Mesas simultâneas"
+                  value={String(field.value)}
+                  onValueChange={(v) => field.onChange(Number(v))}
+                  options={TABLE_COUNT_OPTIONS}
+                  error={errors.tableCount?.message}
+                />
+              )}
             />
-          )}
-        />
-        <SituationChecklist
-          situations={sits}
-          selected={situationIds}
-          onToggle={toggleSituation}
-          onSelectAll={selectAllSituations}
-          error={errors.situationIds?.message}
-          testIdPrefix="sim-training"
-        />
-        <SessionSettingsForm
-          control={control as unknown as Control<TrainingStartFormValues>}
-          errors={errors as FieldErrors<TrainingStartFormValues>}
-          registerTotalHands={register('totalHands', { valueAsNumber: true })}
-          registerTimerSeconds={register('timerSeconds', { valueAsNumber: true })}
-          totalHandsLabel="Número de mãos por mesa"
-        />
-        <Button type="submit" disabled={!situationIds.length} className="w-full py-3">
-          Iniciar treino simultâneo
-        </Button>
+          </div>
+        </SectionCard>
+        <SectionCard
+          title="2. Escolha dos spots"
+          description="Selecione o conjunto de situações que será distribuído entre as mesas."
+        >
+          <SituationChecklist
+            situations={sits}
+            selected={situationIds}
+            onToggle={toggleSituation}
+            onSelectAll={selectAllSituations}
+            error={errors.situationIds?.message}
+            testIdPrefix="sim-training"
+          />
+        </SectionCard>
+        <SectionCard
+          title="3. Ritmo da sessão"
+          description="O volume é aplicado por mesa; timer e feedback seguem o padrão do treino."
+        >
+          <SessionSettingsForm
+            control={control as unknown as Control<TrainingStartFormValues>}
+            errors={errors as FieldErrors<TrainingStartFormValues>}
+            registerTotalHands={register('totalHands', { valueAsNumber: true })}
+            registerTimerSeconds={register('timerSeconds', { valueAsNumber: true })}
+            totalHandsLabel="Número de mãos por mesa"
+          />
+        </SectionCard>
+        <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
+          <Button type="submit" disabled={!situationIds.length} className="w-full py-3">
+            Iniciar treino simultâneo
+          </Button>
+        </div>
       </form>
     </div>
   );

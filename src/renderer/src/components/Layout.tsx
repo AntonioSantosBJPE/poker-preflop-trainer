@@ -7,9 +7,9 @@ import { usePreferencesStore } from '../stores/preferences';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   [
-    'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+    'relative flex items-center rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-colors',
     isActive
-      ? 'bg-muted text-primary shadow-sm'
+      ? 'border-primary/20 bg-primary/10 text-primary shadow-sm'
       : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
   ].join(' ');
 
@@ -129,7 +129,7 @@ export function AppLayout(): React.ReactElement {
       <main
         ref={mainRef}
         tabIndex={-1}
-        className="min-h-0 flex-1 overflow-y-auto focus:outline-none"
+        className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_left,rgb(var(--primary)/0.10),transparent_28rem),linear-gradient(180deg,rgb(var(--background)),rgb(var(--muted)/0.28))] focus:outline-none"
       >
         <div className="mx-auto w-full max-w-6xl px-6 py-8">
           <Breadcrumbs items={breadcrumbItems} className="mb-4" />

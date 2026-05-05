@@ -8,6 +8,7 @@ import {
 } from '@shared/forms/trainingSchemas';
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { PageHeader } from '@/components/app/PageHeader';
+import { SectionCard } from '@/components/app/SectionCard';
 import { Button } from '@/components/ui/button';
 import { GroupSelectionStep } from '@/components/training/GroupSelectionStep';
 import { SituationChecklist } from '@/components/training/SituationChecklist';
@@ -137,7 +138,10 @@ export function SingleTrainingConfigForm(): React.ReactElement {
   if (step === 1) {
     return (
       <div className="flex flex-col gap-6" data-testid="training-step-1">
-        <PageHeader title="Configurar treino" description="Escolha um grupo" />
+        <PageHeader
+          title="Configurar treino"
+          description="Monte uma sessão focada a partir dos grupos de spots cadastrados."
+        />
         <GroupSelectionStep
           groups={groups}
           onSelectGroup={(g) => void handleSelectGroup(g)}
@@ -151,6 +155,7 @@ export function SingleTrainingConfigForm(): React.ReactElement {
     <div className="flex flex-col gap-6" data-testid="training-step-2">
       <PageHeader
         title="Configurar treino"
+        description="Selecione os spots e defina o ritmo antes de iniciar."
         actions={
           <Button
             type="button"
@@ -167,23 +172,35 @@ export function SingleTrainingConfigForm(): React.ReactElement {
         onSubmit={(e) => void handleSubmit(onValid)(e)}
         noValidate
       >
-        <SituationChecklist
-          situations={sits}
-          selected={situationIds}
-          onToggle={toggleSituation}
-          onSelectAll={selectAllSituations}
-          error={errors.situationIds?.message}
-          testIdPrefix="training"
-        />
-        <SessionSettingsForm
-          control={control}
-          errors={errors}
-          registerTotalHands={register('totalHands', { valueAsNumber: true })}
-          registerTimerSeconds={register('timerSeconds', { valueAsNumber: true })}
-        />
-        <Button type="submit" disabled={!situationIds.length} className="w-full py-3">
-          Iniciar
-        </Button>
+        <SectionCard
+          title="1. Escolha dos spots"
+          description="Use todos os spots do grupo ou refine a sessão manualmente."
+        >
+          <SituationChecklist
+            situations={sits}
+            selected={situationIds}
+            onToggle={toggleSituation}
+            onSelectAll={selectAllSituations}
+            error={errors.situationIds?.message}
+            testIdPrefix="training"
+          />
+        </SectionCard>
+        <SectionCard
+          title="2. Ritmo da sessão"
+          description="Defina volume, timer e momento do feedback."
+        >
+          <SessionSettingsForm
+            control={control}
+            errors={errors}
+            registerTotalHands={register('totalHands', { valueAsNumber: true })}
+            registerTimerSeconds={register('timerSeconds', { valueAsNumber: true })}
+          />
+        </SectionCard>
+        <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
+          <Button type="submit" disabled={!situationIds.length} className="w-full py-3">
+            Iniciar
+          </Button>
+        </div>
       </form>
     </div>
   );

@@ -11,6 +11,7 @@ import { EntityTable } from '@/components/app/EntityTable';
 import { PageHeader } from '@/components/app/PageHeader';
 import { SectionCard } from '@/components/app/SectionCard';
 import { StatCard } from '@/components/app/StatCard';
+import { StatusMessage } from '@/components/app/StatusMessage';
 
 describe('app shared components', () => {
   it('renders sidebar actions and callbacks', async () => {
@@ -54,10 +55,50 @@ describe('app shared components', () => {
     expect(screen.getByText('Últimos 7 dias')).toBeInTheDocument();
   });
 
+  it('StatCard supports description, icon and tone without requiring existing callers to change', () => {
+    render(
+      <StatCard
+        label="Acerto"
+        value="78%"
+        description="Sessão atual"
+        icon={<span data-testid="metric-icon">i</span>}
+        tone="success"
+        valueTestId="stat-accuracy"
+      />,
+    );
+
+    expect(screen.getByTestId('stat-accuracy')).toHaveTextContent('78%');
+    expect(screen.getByTestId('stat-accuracy')).toHaveClass('text-success');
+    expect(screen.getByText('Sessão atual')).toBeInTheDocument();
+    expect(screen.getByTestId('metric-icon')).toBeInTheDocument();
+  });
+
   it('StatCard omits helperText when not provided', () => {
     const { container } = render(<StatCard label="Taxa" value="50%" valueTestId="stat-rate" />);
     expect(screen.getByTestId('stat-rate')).toHaveTextContent('50%');
     expect(container.querySelectorAll('p')).toHaveLength(2);
+  });
+
+  it('StatusMessage renders semantic roles by tone', () => {
+    render(
+      <>
+        <StatusMessage tone="success">Salvo</StatusMessage>
+        <StatusMessage tone="error">Falhou</StatusMessage>
+      </>,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('Salvo');
+    expect(screen.getByRole('alert')).toHaveTextContent('Falhou');
+  });
+
+  it('StatusMessage allows explicit role override', () => {
+    render(
+      <StatusMessage tone="warning" role="alert">
+        Atenção
+      </StatusMessage>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Atenção');
   });
 
   it('EmptyState renders description and action when provided', () => {

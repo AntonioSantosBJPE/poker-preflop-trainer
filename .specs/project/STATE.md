@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-03 (ui-design-refactoring — spec pronta)
+**Última actualização:** 2026-05-05 (app-visual-ux-system — tasks criadas)
 
 ## Decisões
 
@@ -26,12 +26,16 @@
 | D-18 | [ui-design-refactoring] Loading: `Skeleton` (nunca texto); Error: `EmptyState` (nunca redirect)                                                                       | UX polida e previsível                                                                                | 2026-05-03 |
 | D-19 | [ui-design-refactoring] Terminologia: "Salvar" (não "Guardar"), "Posição" (não "Pos.")                                                                                | Consistência de linguagem                                                                             | 2026-05-03 |
 | D-20 | [ui-design-refactoring] Hooks partilhados em `src/renderer/src/hooks/`; timer usa `requestAnimationFrame`                                                             | Elimina duplicação; timer eficiente                                                                   | 2026-05-03 |
+| D-21 | [app-visual-ux-system] Redesign visual deve manter a direção Felt/âmbar e evoluir o app para metáfora de study cockpit, sem tocar domínio/IPC/DB                      | Preserva consistência já aprovada e limita risco técnico                                              | 2026-05-05 |
+| D-22 | [app-visual-ux-system] Cada task de redesign deve declarar testes unitários/E2E analisados, ajustes necessários, novos testes e gate executado                        | Redesign visual pode quebrar funcionalidade via locators, roles, CTAs, formulários e fluxos E2E       | 2026-05-05 |
+| D-23 | [app-visual-ux-system] Implementação será dividida em 18 tasks, com testes co-localizados e gate final `pnpm test`                                                    | Reduz risco de regressão e permite revisão incremental por fluxo visual                               | 2026-05-05 |
 
 ## Features em Progresso
 
-| Feature         | Data       | Fase  |
-| --------------- | ---------- | ----- |
-| session-history | 2026-05-02 | Tasks |
+| Feature              | Data       | Fase                 |
+| -------------------- | ---------- | -------------------- |
+| session-history      | 2026-05-02 | Tasks                |
+| app-visual-ux-system | 2026-05-05 | T1-T9 done; next T10 |
 
 ## Features Concluídas
 

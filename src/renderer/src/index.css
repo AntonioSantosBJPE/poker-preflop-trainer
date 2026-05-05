@@ -30,6 +30,8 @@
   --color-chart-1: rgb(var(--chart-1));
   --color-chart-2: rgb(var(--chart-2));
   --color-felt-empty: rgb(var(--felt-empty));
+  --color-success: rgb(var(--success));
+  --color-warning: rgb(var(--warning));
 }
 
 @layer base {
@@ -54,6 +56,8 @@
     --chart-1: 139 105 20;
     --chart-2: 74 92 84;
     --felt-empty: 221 216 206;
+    --success: 22 101 52;
+    --warning: 139 105 20;
   }
 
   .dark {
@@ -77,6 +81,8 @@
     --chart-1: 201 162 39;
     --chart-2: 127 182 170;
     --felt-empty: 30 53 48;
+    --success: 127 182 170;
+    --warning: 221 184 61;
   }
 
   body {

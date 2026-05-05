@@ -25,33 +25,39 @@ export function SessionSettingsForm({
   totalHandsLabel = 'Número de mãos',
 }: SessionSettingsFormProps): React.ReactElement {
   return (
-    <div className="flex flex-col gap-4">
-      <FormNumberField
-        id="training-total-hands"
-        label={totalHandsLabel}
-        register={registerTotalHands}
-        min={1}
-        error={errors.totalHands?.message}
-      />
-      <FormNumberField
-        id="training-timer"
-        label="Timer (s, 0 = desligado)"
-        register={registerTimerSeconds}
-        min={0}
-        error={errors.timerSeconds?.message}
-      />
+    <div className="grid gap-4 md:grid-cols-2">
+      <div className="rounded-2xl border border-border bg-background/70 p-4">
+        <FormNumberField
+          id="training-total-hands"
+          label={totalHandsLabel}
+          register={registerTotalHands}
+          min={1}
+          error={errors.totalHands?.message}
+        />
+      </div>
+      <div className="rounded-2xl border border-border bg-background/70 p-4">
+        <FormNumberField
+          id="training-timer"
+          label="Timer (s, 0 = desligado)"
+          register={registerTimerSeconds}
+          min={0}
+          error={errors.timerSeconds?.message}
+        />
+      </div>
       <Controller
         control={control}
         name="feedbackMode"
         render={({ field }) => (
-          <FormSelectField
-            id="training-feedback"
-            label="Feedback"
-            value={field.value}
-            onValueChange={field.onChange}
-            options={FEEDBACK_OPTIONS}
-            error={errors.feedbackMode?.message}
-          />
+          <div className="rounded-2xl border border-border bg-background/70 p-4 md:col-span-2">
+            <FormSelectField
+              id="training-feedback"
+              label="Feedback"
+              value={field.value}
+              onValueChange={field.onChange}
+              options={FEEDBACK_OPTIONS}
+              error={errors.feedbackMode?.message}
+            />
+          </div>
         )}
       />
     </div>

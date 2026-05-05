@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { MultiSessionDetailDto } from '@shared/ipc/types';
-import { PageHeader } from '@/components/app';
+import { PageHeader, StatusMessage } from '@/components/app';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -114,15 +114,12 @@ export function MultiSessionReviewPage(): React.ReactElement {
       />
 
       {detail.omittedIds && detail.omittedIds.length > 0 && (
-        <div
-          className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200"
-          data-testid="multi-session-omitted-warning"
-        >
+        <StatusMessage tone="warning" data-testid="multi-session-omitted-warning">
           {detail.omittedIds.length}{' '}
           {detail.omittedIds.length === 1
             ? 'sessão não está disponível.'
             : 'sessões não estão disponíveis.'}
-        </div>
+        </StatusMessage>
       )}
 
       {currentHand && currentSessionInfo && currentSession && (

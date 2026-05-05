@@ -68,7 +68,7 @@ export function HandReviewCard({
           {isTimeout ? (
             <Badge variant="destructive">⏱ Timeout</Badge>
           ) : hand.isCorrect ? (
-            <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Badge className="bg-success text-background hover:bg-success/90">
               ✓ {hand.chosenAction?.name}
             </Badge>
           ) : (

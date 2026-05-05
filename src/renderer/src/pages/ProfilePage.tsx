@@ -7,7 +7,7 @@ import {
 } from '@shared/constants';
 import { profileChangePasswordSchema, profileNameSchema } from '@shared/forms/profileSchemas';
 import type { ApiUserPreferences } from '@/env';
-import { PageHeader, SectionCard } from '@/components/app';
+import { PageHeader, SectionCard, StatusMessage } from '@/components/app';
 import { FormField, FormNumberField, FormSelectField, PasswordField } from '@/components/forms';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -268,11 +268,7 @@ export function ProfilePage(): React.ReactElement {
               {nameErrors.root.message}
             </p>
           ) : null}
-          {accountFeedback ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">
-              {accountFeedback}
-            </p>
-          ) : null}
+          {accountFeedback ? <StatusMessage tone="success">{accountFeedback}</StatusMessage> : null}
 
           <div className="md:col-span-2">
             <Button type="submit" disabled={isUpdatingName}>
@@ -311,9 +307,7 @@ export function ProfilePage(): React.ReactElement {
             </p>
           ) : null}
           {passwordFeedback ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">
-              {passwordFeedback}
-            </p>
+            <StatusMessage tone="success">{passwordFeedback}</StatusMessage>
           ) : null}
 
           <div className="md:col-span-2">
@@ -402,9 +396,7 @@ export function ProfilePage(): React.ReactElement {
             </p>
           ) : null}
           {preferencesFeedback ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">
-              {preferencesFeedback}
-            </p>
+            <StatusMessage tone="success">{preferencesFeedback}</StatusMessage>
           ) : null}
 
           <div className="md:col-span-2">

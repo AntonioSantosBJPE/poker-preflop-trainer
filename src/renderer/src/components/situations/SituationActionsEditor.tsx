@@ -4,6 +4,7 @@ import type { FieldArrayWithId } from 'react-hook-form';
 import type { SituationEditorFormValues } from '@shared/forms/situationSchemas';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { SectionCard, StatusMessage } from '@/components/app';
 
 type SituationActionField = FieldArrayWithId<SituationEditorFormValues, 'actions', 'id'>;
 
@@ -37,34 +38,31 @@ export function SituationActionsEditor({
   onRemoveAt,
 }: SituationActionsEditorProps): React.ReactElement {
   return (
-    <div
-      className="space-y-3 rounded-xl border border-border bg-card p-4"
-      data-testid="situation-actions-panel"
+    <SectionCard
+      title="2. Ações"
+      description="Configure as opções corretas e escolha qual ação está ativa para pintura."
+      contentClassName="gap-4"
+      testId="situation-actions-panel"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-baseline gap-3">
-          <h2 className="font-display text-lg font-semibold text-foreground">Ações</h2>
+        <div className="flex flex-wrap items-baseline gap-3">
           <span className="text-xs tabular-nums text-muted-foreground">
             Range total: {((totalCombos / 1326) * 100).toFixed(1)}%
           </span>
         </div>
         <div className="flex gap-3">
-          <button
-            type="button"
-            className="text-sm text-muted-foreground hover:text-foreground"
-            onClick={onClearAll}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={onClearAll}>
             Limpar tudo
-          </button>
+          </Button>
           <Button type="button" variant="link" size="sm" className="px-0" onClick={onAddAction}>
             + Adicionar
           </Button>
         </div>
       </div>
       {errors.actions && typeof errors.actions === 'object' && 'message' in errors.actions && (
-        <p className="text-sm text-destructive" role="alert">
+        <StatusMessage tone="error">
           {(errors.actions as { message?: string }).message}
-        </p>
+        </StatusMessage>
       )}
       <div className="space-y-2">
         {fields.map((field, index) => {
@@ -155,6 +153,6 @@ export function SituationActionsEditor({
           );
         })}
       </div>
-    </div>
+    </SectionCard>
   );
 }
