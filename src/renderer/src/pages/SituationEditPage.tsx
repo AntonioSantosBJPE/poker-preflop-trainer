@@ -261,12 +261,13 @@ export function SituationEditPage(): React.ReactElement {
         title="1. Spot"
         description="Nome, grupo, posição e stack efetivo que descrevem esta situação."
       >
-        <SituationForm register={register} errors={errors} groups={groups} />
+        <SituationForm register={register} control={control} errors={errors} groups={groups} />
       </SectionCard>
 
       <SituationActionsEditor
         fields={fields}
         register={register}
+        control={control}
         getValues={getValues}
         errors={errors}
         activeActionKey={activeActionKey}

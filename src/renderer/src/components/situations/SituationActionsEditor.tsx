@@ -1,16 +1,25 @@
 import { ACTION_TYPES } from '@shared/constants';
+import { Controller, type Control } from 'react-hook-form';
 import type { FieldErrors, UseFormGetValues, UseFormRegister } from 'react-hook-form';
 import type { FieldArrayWithId } from 'react-hook-form';
 import type { SituationEditorFormValues } from '@shared/forms/situationSchemas';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SectionCard, StatusMessage } from '@/components/app';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type SituationActionField = FieldArrayWithId<SituationEditorFormValues, 'actions', 'id'>;
 
 export interface SituationActionsEditorProps {
   fields: SituationActionField[];
   register: UseFormRegister<SituationEditorFormValues>;
+  control: Control<SituationEditorFormValues>;
   getValues: UseFormGetValues<SituationEditorFormValues>;
   errors: FieldErrors<SituationEditorFormValues>;
   activeActionKey: string;
@@ -26,6 +35,7 @@ export interface SituationActionsEditorProps {
 export function SituationActionsEditor({
   fields,
   register,
+  control,
   getValues,
   errors,
   activeActionKey,
@@ -87,16 +97,24 @@ export function SituationActionsEditor({
                 {...register(`actions.${index}.name`)}
               />
               <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-              <select
-                className="h-9 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                {...register(`actions.${index}.actionType`)}
-              >
-                {ACTION_TYPES.map((actionType) => (
-                  <option key={actionType} value={actionType}>
-                    {actionType}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name={`actions.${index}.actionType`}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="h-9 w-40 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ACTION_TYPES.map((actionType) => (
+                        <SelectItem key={actionType} value={actionType}>
+                          {actionType}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               <Input
                 type="number"
                 step="0.1"

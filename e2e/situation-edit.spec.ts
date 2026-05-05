@@ -3,6 +3,7 @@ import { registerAccount } from './helpers/auth';
 import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials';
 import { createGroup } from './helpers/group';
 import { createSituationMinimal } from './helpers/situation';
+import { selectShadcnOption } from './helpers/shadcn';
 import {
   openTrainingConfig,
   selectGroupForTraining,
@@ -77,7 +78,7 @@ test.describe('Edição de situação', () => {
     await appPage.getByRole('button', { name: 'Nova situação' }).click();
     await expect(appPage.getByRole('heading', { name: 'Nova situação' })).toBeVisible();
     await appPage.getByLabel('Nome').fill(name);
-    await appPage.getByTestId('situation-group-select').selectOption({ label: groupName });
+    await selectShadcnOption(appPage, 'Grupo', groupName);
     const rangeGrid = appPage.locator('[data-testid="range-grid-13"]');
     await rangeGrid.locator('button[title]').first().click();
     await appPage.getByRole('button', { name: 'Salvar' }).click();
