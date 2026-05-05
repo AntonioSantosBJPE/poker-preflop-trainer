@@ -132,6 +132,7 @@ export function SituationEditPage(): React.ReactElement {
       };
       if (cancelled) return;
       const mapped = s.actions.map((a) => ({
+        id: a.id,
         clientKey: `k-${a.id}`,
         name: a.name,
         actionType: a.actionType as SituationEditorFormValues['actions'][number]['actionType'],
@@ -193,6 +194,7 @@ export function SituationEditPage(): React.ReactElement {
       description: values.description?.trim() ? values.description.trim() : null,
       effectiveStack: values.effectiveStack,
       actions: values.actions.map((a, i) => ({
+        id: a.id,
         clientKey: a.clientKey,
         name: a.name,
         actionType: a.actionType,

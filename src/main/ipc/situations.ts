@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
-import { and, asc, eq, inArray, ne } from 'drizzle-orm';
-import { actions, rangeCells, situations } from '../db/schema';
+import { and, asc, eq, inArray, isNotNull, ne } from 'drizzle-orm';
+import { actions, rangeCells, sessionHands, situations } from '../db/schema';
 import { getDb } from '../db/client';
 import { requireUserId } from '../services/session';
 import { parseSituationPayload } from '@shared/forms/situationSchemas';
@@ -191,37 +191,79 @@ export function registerSituationsIpc(): void {
         .from(actions)
         .where(eq(actions.situationId, id))
         .all();
-      const oldIds = oldActs.map((x) => x.id);
-      if (oldIds.length) {
-        tx.delete(rangeCells).where(inArray(rangeCells.actionId, oldIds)).run();
-        tx.delete(actions).where(eq(actions.situationId, id)).run();
-      }
+      const oldIds = new Set(oldActs.map((x) => x.id));
+      const processedIds = new Set<number>();
       for (let i = 0; i < p.actions.length; i++) {
         const a = p.actions[i]!;
-        const insertedAct = tx
-          .insert(actions)
-          .values({
-            situationId: id,
-            name: a.name,
-            actionType: a.actionType,
-            sizeBb: a.sizeBb ?? null,
-            colorHex: a.colorHex,
-            sortOrder: a.sortOrder ?? i,
-          })
-          .returning({ id: actions.id })
-          .all();
-        const aid = insertedAct[0]?.id;
-        if (!aid) throw new Error('Falha ao criar ação');
-        const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
-        for (const c of cells) {
-          tx.insert(rangeCells)
-            .values({
-              actionId: aid,
-              rowIndex: c.rowIndex,
-              colIndex: c.colIndex,
-              frequency: c.frequency,
+        if (a.id !== undefined && oldIds.has(a.id)) {
+          processedIds.add(a.id);
+          tx.update(actions)
+            .set({
+              name: a.name,
+              actionType: a.actionType,
+              sizeBb: a.sizeBb ?? null,
+              colorHex: a.colorHex,
+              sortOrder: a.sortOrder ?? i,
             })
+            .where(eq(actions.id, a.id))
             .run();
+          tx.delete(rangeCells).where(eq(rangeCells.actionId, a.id)).run();
+          const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
+          for (const c of cells) {
+            tx.insert(rangeCells)
+              .values({
+                actionId: a.id,
+                rowIndex: c.rowIndex,
+                colIndex: c.colIndex,
+                frequency: c.frequency,
+              })
+              .run();
+          }
+        } else {
+          const insertedAct = tx
+            .insert(actions)
+            .values({
+              situationId: id,
+              name: a.name,
+              actionType: a.actionType,
+              sizeBb: a.sizeBb ?? null,
+              colorHex: a.colorHex,
+              sortOrder: a.sortOrder ?? i,
+            })
+            .returning({ id: actions.id })
+            .all();
+          const aid = insertedAct[0]?.id;
+          if (!aid) throw new Error('Falha ao criar ação');
+          const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
+          for (const c of cells) {
+            tx.insert(rangeCells)
+              .values({
+                actionId: aid,
+                rowIndex: c.rowIndex,
+                colIndex: c.colIndex,
+                frequency: c.frequency,
+              })
+              .run();
+          }
+        }
+      }
+      const toRemove = [...oldIds].filter((id) => !processedIds.has(id));
+      if (toRemove.length) {
+        const refs = tx
+          .select({ actionId: sessionHands.chosenActionId })
+          .from(sessionHands)
+          .where(
+            and(
+              inArray(sessionHands.chosenActionId, toRemove),
+              isNotNull(sessionHands.chosenActionId),
+            ),
+          )
+          .all();
+        const referencedIds = new Set(refs.map((r) => r.actionId));
+        const safeToRemove = toRemove.filter((id) => !referencedIds.has(id));
+        if (safeToRemove.length) {
+          tx.delete(rangeCells).where(inArray(rangeCells.actionId, safeToRemove)).run();
+          tx.delete(actions).where(inArray(actions.id, safeToRemove)).run();
         }
       }
     });

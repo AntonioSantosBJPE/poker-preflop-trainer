@@ -32,7 +32,7 @@ import { registerSituationsIpc } from './situations';
 import { getDb } from '../db/client';
 import { requireUserId } from '../services/session';
 import { parseSituationPayload } from '@shared/forms/situationSchemas';
-import { rangeCells, situations } from '../db/schema';
+import { actions, rangeCells, sessionHands, situations } from '../db/schema';
 
 function getHandler(channel: string) {
   const call = mockHandle.mock.calls.find(([ch]) => ch === channel);
@@ -444,7 +444,162 @@ describe('registerSituationsIpc', () => {
       expect(transaction).toHaveBeenCalledTimes(1);
       expect(id).toBe(3);
     });
+
+    it('com ações existentes e session_hands → faz update in-place, não lança FK error', async () => {
+      const payload = {
+        ...validParsed,
+        actions: [
+          {
+            id: 10,
+            clientKey: 'k1',
+            name: 'Fold',
+            actionType: 'FOLD',
+            colorHex: '#000',
+            sortOrder: 0,
+          },
+          { clientKey: 'k2', name: 'Call', actionType: 'CALL', colorHex: '#111', sortOrder: 1 },
+        ],
+        rangeCells: [
+          { actionClientKey: 'k1', rowIndex: 0, colIndex: 0, frequency: 1 },
+          { actionClientKey: 'k2', rowIndex: 0, colIndex: 1, frequency: 0.5 },
+        ],
+      };
+      vi.mocked(parseSituationPayload).mockReturnValue(payload as never);
+
+      const { select, transaction } = buildUpdateDbWithOldActions({
+        existingRow: true,
+        dupRows: [],
+        oldActionIds: [10, 11],
+        sessionHandsRefIds: [10],
+      });
+      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
+      const handler = getHandler('situations:update');
+
+      const id = await handler({}, 3, {});
+
+      expect(transaction).toHaveBeenCalledTimes(1);
+      expect(id).toBe(3);
+    });
+
+    it('com ações existentes e session_hands → ação referenciada não é deletada', async () => {
+      const payload = {
+        ...validParsed,
+        actions: [
+          {
+            id: 10,
+            clientKey: 'k1',
+            name: 'Fold',
+            actionType: 'FOLD',
+            colorHex: '#000',
+            sortOrder: 0,
+          },
+        ],
+        rangeCells: [{ actionClientKey: 'k1', rowIndex: 0, colIndex: 0, frequency: 1 }],
+      };
+      vi.mocked(parseSituationPayload).mockReturnValue(payload as never);
+
+      const { select, transaction, mockTx } = buildUpdateDbWithOldActions({
+        existingRow: true,
+        dupRows: [],
+        oldActionIds: [10, 11],
+        sessionHandsRefIds: [11],
+      });
+      vi.mocked(getDb).mockReturnValue({ select, transaction } as unknown as ReturnType<
+        typeof getDb
+      >);
+      const handler = getHandler('situations:update');
+
+      const id = await handler({}, 3, {});
+
+      expect(id).toBe(3);
+      expect(mockTx.update).toHaveBeenCalledWith(actions);
+      expect(mockTx.delete).not.toHaveBeenCalledWith(actions);
+    });
   });
+
+  function buildUpdateDbWithOldActions(opts: {
+    existingRow: boolean;
+    dupRows: unknown[];
+    oldActionIds: number[];
+    sessionHandsRefIds: number[];
+  }) {
+    let selectCall = 0;
+    const select = vi.fn(() => {
+      const c = selectCall++;
+      if (c === 0) {
+        return {
+          from: vi.fn(() => ({
+            where: vi.fn(() => ({
+              limit: vi.fn().mockResolvedValue(opts.existingRow ? [{ id: 3 }] : []),
+            })),
+          })),
+        };
+      }
+      return {
+        from: vi.fn(() => ({
+          where: vi.fn(() => ({
+            limit: vi.fn().mockResolvedValue(opts.dupRows),
+          })),
+        })),
+      };
+    });
+    const txInsert = vi.fn((table: unknown) => {
+      if (table === rangeCells) {
+        return {
+          values: vi.fn(() => ({ run: vi.fn() })),
+        };
+      }
+      return {
+        values: vi.fn(() => ({
+          returning: vi.fn(() => ({
+            all: vi.fn(() => [{ id: 888 }]),
+          })),
+        })),
+      };
+    });
+    const mockTx = {
+      insert: txInsert,
+      update: vi.fn(() => ({
+        set: vi.fn(() => ({
+          where: vi.fn(() => ({ run: vi.fn() })),
+        })),
+      })),
+      delete: vi.fn(() => ({
+        where: vi.fn(() => ({ run: vi.fn() })),
+      })),
+      select: vi.fn(() => ({
+        from: vi.fn((table: unknown) => {
+          if (table === actions) {
+            return {
+              where: vi.fn(() => ({
+                all: vi.fn().mockReturnValue(opts.oldActionIds.map((id) => ({ id }))),
+              })),
+            };
+          }
+          if (table === sessionHands) {
+            return {
+              where: vi.fn(() => ({
+                all: vi
+                  .fn()
+                  .mockReturnValue(opts.sessionHandsRefIds.map((id) => ({ actionId: id }))),
+              })),
+            };
+          }
+          return {
+            where: vi.fn(() => ({
+              all: vi.fn().mockReturnValue([]),
+            })),
+          };
+        }),
+      })),
+    };
+    const transaction = vi.fn().mockImplementation((fn: (tx: typeof mockTx) => void) => {
+      fn(mockTx);
+    });
+    return { select, transaction, mockTx };
+  }
 
   describe('situations:delete', () => {
     it('sucesso → db.update retorna [{id: 1}]; sem erro', async () => {
