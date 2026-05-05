@@ -14,12 +14,26 @@ O app deve transmitir a sensação de um cockpit de estudo: mesa de feltro, cont
 
 ## Goals
 
-- [ ] Definir um padrão visual único para todas as páginas baseado na identidade Felt/âmbar já existente
-- [ ] Melhorar hierarquia visual e densidade de informação em páginas de gestão, treino, revisão e estatísticas
-- [ ] Padronizar estados interativos, feedback, empty/loading/error e ações primárias/secundárias em toda a aplicação
-- [ ] Propor ajustes página por página sem alterar domínio poker, avaliação, IPC, DB ou autenticação
-- [ ] Criar critérios verificáveis para validar consistência visual, acessibilidade e responsividade desktop/mobile
-- [ ] Definir uma estratégia de testes unitários/E2E para evitar regressões funcionais durante o redesign
+- [x] Definir um padrão visual único para todas as páginas baseado na identidade Felt/âmbar já existente
+- [x] Melhorar hierarquia visual e densidade de informação em páginas de gestão, treino, revisão e estatísticas
+- [x] Padronizar estados interativos, feedback, empty/loading/error e ações primárias/secundárias em toda a aplicação
+- [x] Propor ajustes página por página sem alterar domínio poker, avaliação, IPC, DB ou autenticação
+- [x] Criar critérios verificáveis para validar consistência visual, acessibilidade e responsividade desktop/mobile
+- [x] Definir uma estratégia de testes unitários/E2E para evitar regressões funcionais durante o redesign
+
+## Implementation Status
+
+**Status**: Complete
+
+**Completed**: 2026-05-05
+
+**Summary**: Todas as 18 tasks planejadas foram executadas. A implementação preservou domínio poker, avaliação, IPC, preload, DB e autenticação, e concentrou mudanças na camada visual do renderer.
+
+**Final verification**:
+
+- `pnpm test` passou com 461 testes unitários e 102 E2E.
+- QA visual/teclado cobriu temas claro/escuro e larguras 1280px, 1024px e 768px.
+- Correção adicional de QA: assets de logo agora resolvem corretamente em rotas `file://` do Electron empacotado.
 
 ## Out of Scope
 
@@ -292,11 +306,11 @@ Toda task de implementação desta feature deve consultar `.specs/features/app-v
 
 ## Success Criteria
 
-- [ ] Todas as páginas seguem a mesma linguagem visual Felt/âmbar, com componentes e estados consistentes
-- [ ] Fluxos de treino normal e simultâneo destacam mão, situação, progresso, ação e feedback sem ambiguidade
-- [ ] Páginas de gestão deixam claro o próximo passo: criar grupo, criar situação, editar range ou iniciar treino
-- [ ] Resultado, histórico, revisão e estatísticas conduzem o usuário para aprendizado acionável
-- [ ] Nenhuma página usa cor hardcoded fora dos tokens/variantes aprovadas sem justificativa documentada
-- [ ] Layouts permanecem usáveis em 1280px, 1024px e 768px de largura
-- [ ] Estados hover, focus, disabled, loading, error e empty são consistentes em todos os fluxos principais
-- [ ] Cada bloco implementado declara testes existentes analisados, testes ajustados, testes novos e gate executado
+- [x] Todas as páginas seguem a mesma linguagem visual Felt/âmbar, com componentes e estados consistentes
+- [x] Fluxos de treino normal e simultâneo destacam mão, situação, progresso, ação e feedback sem ambiguidade
+- [x] Páginas de gestão deixam claro o próximo passo: criar grupo, criar situação, editar range ou iniciar treino
+- [x] Resultado, histórico, revisão e estatísticas conduzem o usuário para aprendizado acionável
+- [x] Nenhuma página usa cor hardcoded fora dos tokens/variantes aprovadas sem justificativa documentada
+- [x] Layouts permanecem usáveis em 1280px, 1024px e 768px de largura
+- [x] Estados hover, focus, disabled, loading, error e empty são consistentes em todos os fluxos principais
+- [x] Cada bloco implementado declara testes existentes analisados, testes ajustados, testes novos e gate executado

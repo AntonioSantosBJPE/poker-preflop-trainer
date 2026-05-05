@@ -80,11 +80,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Any new token has at least two planned usages and is semantic, not page-specific
-- [ ] Raw success/warning colors are either replaced by semantic tokens/components or documented as intentionally deferred
-- [ ] Existing dark/light theme still uses Felt/paper visual language
-- [ ] No domain, IPC, preload, DB or auth logic is changed
-- [ ] Test impact is documented per `test-plan.md`
+- [x] Any new token has at least two planned usages and is semantic, not page-specific
+- [x] Raw success/warning colors are either replaced by semantic tokens/components or documented as intentionally deferred
+- [x] Existing dark/light theme still uses Felt/paper visual language
+- [x] No domain, IPC, preload, DB or auth logic is changed
+- [x] Test impact is documented per `test-plan.md`
 
 **Tests**: unit where token changes affect components; no E2E unless shell/theme behavior changes
 **Gate**: `pnpm test:unit`
@@ -106,11 +106,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] `StatusMessage` supports `success`, `warning`, `error`, `info` with appropriate ARIA role defaults
-- [ ] Optional `SurfacePanel` exists only if it avoids repeated page-local surface markup
-- [ ] Components are exported through `components/app/index.ts`
-- [ ] Unit tests cover tone rendering, roles, class merging and backward compatibility of existing app exports
-- [ ] No existing `EmptyState` or `SectionCard` API is broken
+- [x] `StatusMessage` supports `success`, `warning`, `error`, `info` with appropriate ARIA role defaults
+- [x] Optional `SurfacePanel` exists only if it avoids repeated page-local surface markup
+- [x] Components are exported through `components/app/index.ts`
+- [x] Unit tests cover tone rendering, roles, class merging and backward compatibility of existing app exports
+- [x] No existing `EmptyState` or `SectionCard` API is broken
 
 **Tests**: unit
 **Gate**: `pnpm test:unit -- src/renderer/src/components/app/app-shared.test.tsx`
@@ -132,12 +132,12 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Existing `StatCard` usages continue to compile without prop changes
-- [ ] Optional metric detail/tone/icon support has unit coverage if added
-- [ ] Sidebar active state and theme toggle remain accessible
-- [ ] Breadcrumbs remain secondary to `PageHeader`
-- [ ] Shell does not introduce horizontal overflow at common desktop widths
-- [ ] E2E locator impact is reviewed for sidebar/theme labels
+- [x] Existing `StatCard` usages continue to compile without prop changes
+- [x] Optional metric detail/tone/icon support has unit coverage if added
+- [x] Sidebar active state and theme toggle remain accessible
+- [x] Breadcrumbs remain secondary to `PageHeader`
+- [x] Shell does not introduce horizontal overflow at common desktop widths
+- [x] E2E locator impact is reviewed for sidebar/theme labels
 
 **Tests**: unit; targeted E2E if sidebar/theme labels change
 **Gate**: `pnpm test:unit -- src/renderer/src/components/app/app-shared.test.tsx src/renderer/src/components/layout-nav-active.test.tsx`
@@ -159,11 +159,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] New user state guides toward group/situation setup without fake metrics
-- [ ] Returning user state prioritizes continue training/review path
-- [ ] Existing dashboard summary values still render from current IPC data
-- [ ] Primary CTA remains reachable by role/name and navigates correctly
-- [ ] `e2e/dashboard.spec.ts` is updated if visible text/CTA changed
+- [x] New user state guides toward group/situation setup without fake metrics
+- [x] Returning user state prioritizes continue training/review path
+- [x] Existing dashboard summary values still render from current IPC data
+- [x] Primary CTA remains reachable by role/name and navigates correctly
+- [x] `e2e/dashboard.spec.ts` is updated if visible text/CTA changed
 
 **Tests**: E2E existing adjusted; unit optional for state branches if practical
 **Gate**: `pnpm test:unit && pnpm build:app && pnpm playwright test e2e/dashboard.spec.ts`
@@ -185,11 +185,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Groups page clearly separates create flow, group list and empty state
-- [ ] Group detail shows group context before table and preserves actions
-- [ ] Rename/archive controls remain accessible and covered
-- [ ] Empty states include contextual CTAs without breaking current flows
-- [ ] If actions move to menu/dialog, tests are updated instead of made brittle
+- [x] Groups page clearly separates create flow, group list and empty state
+- [x] Group detail shows group context before table and preserves actions
+- [x] Rename/archive controls remain accessible and covered
+- [x] Empty states include contextual CTAs without breaking current flows
+- [x] If actions move to menu/dialog, tests are updated instead of made brittle
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/components/groups/GroupCard.test.tsx && pnpm build:app && pnpm playwright test e2e/situation-groups/crud-groups.spec.ts e2e/situation-groups/archive-cascade.spec.ts`
@@ -211,10 +211,10 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Filter, count/list and table feel like one module
-- [ ] Empty state distinguishes no global data vs no data for selected filter when data allows
-- [ ] Create/edit/archive flows remain unchanged behaviorally
-- [ ] Existing `data-testid`/roles used by E2E remain stable or are migrated deliberately
+- [x] Filter, count/list and table feel like one module
+- [x] Empty state distinguishes no global data vs no data for selected filter when data allows
+- [x] Create/edit/archive flows remain unchanged behaviorally
+- [x] Existing `data-testid`/roles used by E2E remain stable or are migrated deliberately
 
 **Tests**: E2E existing adjusted; unit optional if new branch logic is added
 **Gate**: `pnpm test:unit && pnpm build:app && pnpm playwright test e2e/situations.spec.ts`
@@ -236,11 +236,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Editor has clear visual sequence: details -> actions -> range -> save
-- [ ] Range legend/action colors are legible and token-aligned
-- [ ] `RangeGrid13` still renders 169 cells and preserves suited/offsuit conventions
-- [ ] Existing `range-grid-13`, `situation-actions-panel`, `situation-action-row` testids remain stable
-- [ ] Save, duplicate-name error, required group validation and edit persistence still pass
+- [x] Editor has clear visual sequence: details -> actions -> range -> save
+- [x] Range legend/action colors are legible and token-aligned
+- [x] `RangeGrid13` still renders 169 cells and preserves suited/offsuit conventions
+- [x] Existing `range-grid-13`, `situation-actions-panel`, `situation-action-row` testids remain stable
+- [x] Save, duplicate-name error, required group validation and edit persistence still pass
 
 **Tests**: unit + E2E existing adjusted; range E2E required if range/action surroundings change
 **Gate**: `pnpm test:unit -- src/renderer/src/components/situations src/renderer/src/components/grid src/renderer/src/pages && pnpm build:app && pnpm playwright test e2e/situation-edit.spec.ts e2e/range-grid-improvements.spec.ts e2e/situation-groups/situation-group-field.spec.ts`
@@ -887,4 +887,99 @@ Gate run: `pnpm test:unit -- src/renderer/src/pages/TrainingResultPage.test.tsx 
 Gate run: `pnpm build:app` -> pass
 Gate run: `xvfb-run -a pnpm playwright test e2e/training.spec.ts e2e/simultaneous-training/full-flow.spec.ts --workers=1` outside sandbox with approval -> pass (14 tests)
 Manual checks: result screens now emphasize score, interpretation, acertos/erros, situation/table breakdowns and next-step CTAs while preserving `Revisão da sessão`, `Nova sessão`, `Ver estatísticas`, `Revisão múltipla`, `Novo treino simultâneo` and `Treino normal` routes
+SPEC_DEVIATION: none
+
+### T13: Redesign History List, Filters and Batch Toolbar
+
+Task: T13 - Redesign History List, Filters and Batch Toolbar
+Status: Complete
+Requirements covered: VUX-19, VUX-25, VUX-26, VUX-27, VUX-29, VUX-30, VUX-31, VUX-32
+Files changed: `src/renderer/src/pages/HistoryPage.tsx`, `src/renderer/src/components/history/SelectionToolbar.tsx`, `src/renderer/src/components/app/EntityTable.tsx`
+Existing unit tests reviewed: `src/renderer/src/pages/HistoryPage.test.tsx`, `src/renderer/src/components/history/SelectionToolbar.test.tsx`
+Existing E2E tests reviewed: `e2e/session-history/list.spec.ts`, `e2e/session-history/pagination.spec.ts`, `e2e/session-history/batch-actions.spec.ts`, `e2e/date-period-filter/history-filter.spec.ts`
+Tests adjusted: none; existing testids and accessible review action preserved
+New tests added: none
+Gate run: `pnpm test:unit -- src/renderer/src/pages/HistoryPage.test.tsx src/renderer/src/components/history/SelectionToolbar.test.tsx` -> pass (50 files, 461 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `pnpm playwright test e2e/session-history/list.spec.ts e2e/session-history/pagination.spec.ts e2e/session-history/batch-actions.spec.ts e2e/date-period-filter/history-filter.spec.ts` -> pass (15 tests)
+Manual checks: history filters, summary, selection toolbar, table and pagination now read as one query module; URL state, page reset, selection persistence and review actions preserved
+SPEC_DEVIATION: none
+
+### T14: Redesign Hand Review and Multi-Session Review
+
+Task: T14 - Redesign Hand Review and Multi-Session Review
+Status: Complete
+Requirements covered: VUX-17, VUX-18, VUX-20, VUX-22, VUX-23, VUX-24, VUX-26, VUX-27
+Files changed: `src/renderer/src/components/history/HandReviewCard.tsx`, `src/renderer/src/components/history/MultiSessionReviewHeader.tsx`, `src/renderer/src/pages/SessionHandReviewPage.tsx`, `src/renderer/src/pages/MultiSessionReviewPage.tsx`
+Existing unit tests reviewed: `HandReviewCard.test.tsx`, `MultiSessionReviewHeader.test.tsx`, `SessionHandReviewPage.test.tsx`, `MultiSessionReviewPage.test.tsx`
+Existing E2E tests reviewed: `e2e/session-history/hand-review.spec.ts`, `e2e/session-history/batch-review.spec.ts`
+Tests adjusted: none; review navigation labels, timeout text and `range-grid-13` preserved
+New tests added: none
+Gate run: `pnpm test:unit -- src/renderer/src/components/history/HandReviewCard.test.tsx src/renderer/src/components/history/MultiSessionReviewHeader.test.tsx src/renderer/src/pages/SessionHandReviewPage.test.tsx src/renderer/src/pages/MultiSessionReviewPage.test.tsx` -> pass (50 files, 461 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `pnpm playwright test e2e/session-history/hand-review.spec.ts e2e/session-history/batch-review.spec.ts` -> pass (7 tests)
+Manual checks: review cards now show status, cards/spot, chosen answer, correct answer, response time and expected range in clear zones; multi-session review shows aggregate context before hand list
+SPEC_DEVIATION: none
+
+### T15: Redesign Stats Analytics Page
+
+Task: T15 - Redesign Stats Analytics Page
+Status: Complete
+Requirements covered: VUX-19, VUX-20, VUX-22, VUX-23, VUX-25, VUX-26, VUX-27, VUX-29
+Files changed: `src/renderer/src/pages/StatsPage.tsx`, `src/renderer/src/components/stats/StatsOverviewCards.tsx`, `src/renderer/src/components/stats/StatsChartCard.tsx`, `src/renderer/src/components/stats/StatsWorstHandsList.tsx`
+Existing unit tests reviewed: `src/renderer/src/pages/StatsPage.test.tsx`, `src/renderer/src/components/stats/stats-shared.test.tsx`
+Existing E2E tests reviewed: `e2e/stats.spec.ts`, `e2e/date-period-filter/stats-filter.spec.ts`, `e2e/situation-groups/stats-filter.spec.ts`, `e2e/simultaneous-training/stats-segmentation.spec.ts`
+Tests adjusted: none; stats filter testids and IPC filter behavior preserved
+New tests added: none
+Gate run: `pnpm test:unit -- src/renderer/src/pages/StatsPage.test.tsx src/renderer/src/components/stats` -> pass (50 files, 461 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `pnpm playwright test e2e/stats.spec.ts e2e/date-period-filter/stats-filter.spec.ts e2e/situation-groups/stats-filter.spec.ts e2e/simultaneous-training/stats-segmentation.spec.ts` -> pass (16 tests)
+Manual checks: stats now flows as Recorte de análise -> Overview -> Evolução -> Ranking por situação/Vazamentos, with contextual empty states and unchanged clear-history behavior
+SPEC_DEVIATION: none
+
+### T16: Redesign Login Entry Experience
+
+Task: T16 - Redesign Login Entry Experience
+Status: Complete
+Requirements covered: VUX-01, VUX-04, VUX-21, VUX-24, VUX-27, VUX-35
+Files changed: `src/renderer/src/pages/LoginPage.tsx`, `src/renderer/src/components/app/AppSidebar.tsx`
+Existing unit tests reviewed: `src/renderer/src/components/forms/password-field.test.tsx`
+Existing E2E tests reviewed: `e2e/auth.spec.ts`, `e2e/auth-flows.spec.ts`, `e2e/smoke.spec.ts`
+Tests adjusted: none; auth tabs, form labels, submit labels and root error role preserved
+New tests added: none
+Gate run: `pnpm test:unit -- src/renderer/src/components/forms/password-field.test.tsx` -> pass (50 files, 461 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `pnpm playwright test e2e/auth.spec.ts e2e/auth-flows.spec.ts e2e/smoke.spec.ts` -> pass (10 tests)
+Manual checks: login now presents product value and auth card in Felt/amber visual language; QA found and fixed packaged Electron logo asset resolution in `LoginPage` and `AppSidebar`
+SPEC_DEVIATION: none
+
+### T17: Redesign Profile and Preferences Feedback
+
+Task: T17 - Redesign Profile and Preferences Feedback
+Status: Complete
+Requirements covered: VUX-21, VUX-24, VUX-26, VUX-27, VUX-30, VUX-31, VUX-32
+Files changed: `src/renderer/src/pages/ProfilePage.tsx`
+Existing unit tests reviewed: `src/renderer/src/pages/profile-page.test.tsx`, `src/renderer/src/stores/preferences.test.ts`
+Existing E2E tests reviewed: `e2e/profile/update-name.spec.ts`, `e2e/profile/change-password.spec.ts`, `e2e/profile/training-defaults.spec.ts`, `e2e/profile/theme-preference.spec.ts`
+Tests adjusted: none; account, password, preferences and theme sync flows preserved
+New tests added: none
+Gate run: `pnpm test:unit -- src/renderer/src/pages/profile-page.test.tsx src/renderer/src/stores/preferences.test.ts` -> pass (50 files, 461 tests)
+Gate run: `pnpm build:app` -> pass
+Gate run: `pnpm playwright test e2e/profile/update-name.spec.ts e2e/profile/change-password.spec.ts e2e/profile/training-defaults.spec.ts e2e/profile/theme-preference.spec.ts` -> pass (7 tests)
+Manual checks: account, security and preferences sections are visually distinct; success/error feedback uses shared `StatusMessage` roles and shell theme toggle remains synchronized
+SPEC_DEVIATION: none
+
+### T18: Final Regression, Accessibility and Visual QA
+
+Task: T18 - Final Regression, Accessibility and Visual QA
+Status: Complete
+Requirements covered: VUX-01 through VUX-38
+Files changed: `.specs/features/app-visual-ux-system/tasks.md`, `.specs/project/STATE.md`
+Existing unit tests reviewed: full unit suite
+Existing E2E tests reviewed: full E2E suite
+Tests adjusted: none
+New tests added: none committed; temporary Playwright QA spec was created, run and removed
+Gate run: `pnpm test` -> pass (461 unit tests, build app, 102 E2E tests)
+Gate run: temporary Playwright visual/keyboard QA across login, sidebar shell, history, stats, profile, clear-stats dialog and training session -> pass
+Manual checks: screenshots were generated and inspected for dark/light themes at 1280px, 1024px and 768px; keyboard focus checked in auth, sidebar, forms, training actions and dialogs
 SPEC_DEVIATION: none
