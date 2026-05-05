@@ -1,6 +1,6 @@
 import type { SessionHistoryItemDto } from '@shared/ipc/types';
 import { formatDuration } from '@shared/utils/format';
-import { StatCard } from '@/components/app';
+import { SectionCard, StatCard } from '@/components/app';
 
 export interface MultiSessionReviewHeaderProps {
   sessions: SessionHistoryItemDto[];
@@ -28,18 +28,22 @@ export function MultiSessionReviewHeader({
       : '—';
 
   return (
-    <div
-      className="grid grid-cols-2 gap-4 sm:grid-cols-5"
-      data-testid="multi-session-review-header"
+    <SectionCard
+      title="Resumo da revisão"
+      description="Agregado das sessões selecionadas antes de navegar mão a mão."
+      testId="multi-session-review-header"
     >
-      <StatCard label="Período" value={period} />
-      <StatCard label="Sessões" value={sessions.length} />
-      <StatCard label="Acerto" value={`${(accuracy * 100).toFixed(1)}%`} />
-      <StatCard
-        label="Duração total"
-        value={totalDurationMs !== null ? formatDuration(totalDurationMs) : '—'}
-      />
-      <StatCard label="Mãos" value={totalHands} />
-    </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <StatCard label="Período" value={period} tone="muted" />
+        <StatCard label="Sessões" value={sessions.length} />
+        <StatCard label="Acerto" value={`${(accuracy * 100).toFixed(1)}%`} />
+        <StatCard
+          label="Duração total"
+          value={totalDurationMs !== null ? formatDuration(totalDurationMs) : '—'}
+          tone="muted"
+        />
+        <StatCard label="Mãos" value={totalHands} tone="muted" />
+      </div>
+    </SectionCard>
   );
 }

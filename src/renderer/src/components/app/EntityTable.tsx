@@ -1,4 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
 import {
   Table,
   TableBody,
@@ -27,6 +28,7 @@ export interface EntityTableProps<T> {
   selectable?: boolean;
   selectedKeys?: Set<number | string>;
   onSelectionChange?: (selected: Set<number | string>) => void;
+  className?: string;
 }
 
 export function EntityTable<T>({
@@ -40,6 +42,7 @@ export function EntityTable<T>({
   selectable,
   selectedKeys,
   onSelectionChange,
+  className,
 }: EntityTableProps<T>): React.ReactElement {
   const allSelected =
     selectable &&
@@ -65,7 +68,7 @@ export function EntityTable<T>({
 
   return (
     <div
-      className="overflow-hidden rounded-xl border border-border bg-card"
+      className={cn('overflow-hidden rounded-xl border border-border bg-card', className)}
       data-testid={tableTestId}
     >
       <Table>

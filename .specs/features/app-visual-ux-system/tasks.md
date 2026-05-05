@@ -3,7 +3,7 @@
 **Spec**: `.specs/features/app-visual-ux-system/spec.md`
 **Design**: `.specs/features/app-visual-ux-system/design.md`
 **Test Plan**: `.specs/features/app-visual-ux-system/test-plan.md`
-**Status**: In Progress
+**Status**: Complete
 
 ---
 
@@ -390,10 +390,10 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Filters, table and pagination read as one query module
-- [ ] Selection toolbar appears only when relevant and preserves count/actions
-- [ ] URL params, page reset, back navigation and selection persistence remain correct
-- [ ] Table rows retain accessible review action
+- [x] Filters, table and pagination read as one query module
+- [x] Selection toolbar appears only when relevant and preserves count/actions
+- [x] URL params, page reset, back navigation and selection persistence remain correct
+- [x] Table rows retain accessible review action
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/pages/HistoryPage.test.tsx src/renderer/src/components/history/SelectionToolbar.test.tsx && pnpm build:app && pnpm playwright test e2e/session-history/list.spec.ts e2e/session-history/pagination.spec.ts e2e/session-history/batch-actions.spec.ts e2e/date-period-filter/history-filter.spec.ts`
@@ -415,11 +415,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Each review card clearly shows user answer, correct answer, correctness/timeout and range
-- [ ] Multi-session review has aggregate context before the hand list
-- [ ] Missing-session/omitted warnings use shared status styling if available
-- [ ] Previous/next navigation and grid visibility remain covered
-- [ ] `RangeGrid13` review display keeps existing semantics and testids
+- [x] Each review card clearly shows user answer, correct answer, correctness/timeout and range
+- [x] Multi-session review has aggregate context before the hand list
+- [x] Missing-session/omitted warnings use shared status styling if available
+- [x] Previous/next navigation and grid visibility remain covered
+- [x] `RangeGrid13` review display keeps existing semantics and testids
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/components/history/HandReviewCard.test.tsx src/renderer/src/components/history/MultiSessionReviewHeader.test.tsx src/renderer/src/pages/SessionHandReviewPage.test.tsx src/renderer/src/pages/MultiSessionReviewPage.test.tsx && pnpm build:app && pnpm playwright test e2e/session-history/hand-review.spec.ts e2e/session-history/batch-review.spec.ts`
@@ -441,11 +441,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Overview, chart/evolution and leak/ranking sections have clear priority
-- [ ] Date/group/type/session-table filters still compose correctly
-- [ ] Empty chart/ranking states remain contextual and not misleading
-- [ ] Clear stats dialog behavior is unchanged
-- [ ] IPC calls continue receiving expected filters in unit tests
+- [x] Overview, chart/evolution and leak/ranking sections have clear priority
+- [x] Date/group/type/session-table filters still compose correctly
+- [x] Empty chart/ranking states remain contextual and not misleading
+- [x] Clear stats dialog behavior is unchanged
+- [x] IPC calls continue receiving expected filters in unit tests
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/pages/StatsPage.test.tsx src/renderer/src/components/stats && pnpm build:app && pnpm playwright test e2e/stats.spec.ts e2e/date-period-filter/stats-filter.spec.ts e2e/situation-groups/stats-filter.spec.ts e2e/simultaneous-training/stats-segmentation.spec.ts`
@@ -467,11 +467,11 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Login and registration tabs remain reachable and accessible
-- [ ] Labels for name, email and password remain correctly associated
-- [ ] Error messages remain visible with appropriate role
-- [ ] Protected route redirect, login, register, duplicate email and validation flows still pass
-- [ ] Any visible copy changes are migrated in E2E locators intentionally
+- [x] Login and registration tabs remain reachable and accessible
+- [x] Labels for name, email and password remain correctly associated
+- [x] Error messages remain visible with appropriate role
+- [x] Protected route redirect, login, register, duplicate email and validation flows still pass
+- [x] Any visible copy changes are migrated in E2E locators intentionally
 
 **Tests**: unit optional + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/components/forms/password-field.test.tsx && pnpm build:app && pnpm playwright test e2e/auth.spec.ts e2e/auth-flows.spec.ts e2e/smoke.spec.ts`
@@ -493,10 +493,10 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] Conta, Segurança and Preferências remain visually distinct and consistent
-- [ ] Success/error feedback uses shared patterns with `role="status"`/`role="alert"` as appropriate
-- [ ] Update name, change password, training defaults and theme sync behavior remains unchanged
-- [ ] Shell theme toggle stays synchronized with profile preference
+- [x] Conta, Segurança and Preferências remain visually distinct and consistent
+- [x] Success/error feedback uses shared patterns with `role="status"`/`role="alert"` as appropriate
+- [x] Update name, change password, training defaults and theme sync behavior remains unchanged
+- [x] Shell theme toggle stays synchronized with profile preference
 
 **Tests**: unit + E2E existing adjusted
 **Gate**: `pnpm test:unit -- src/renderer/src/pages/profile-page.test.tsx src/renderer/src/stores/preferences.test.ts && pnpm build:app && pnpm playwright test e2e/profile/update-name.spec.ts e2e/profile/change-password.spec.ts e2e/profile/training-defaults.spec.ts e2e/profile/theme-preference.spec.ts`
@@ -518,15 +518,22 @@ T4..T17 -> T18
 
 **Done when**:
 
-- [ ] `pnpm test:unit` passes
-- [ ] Full E2E gate passes locally via `pnpm test` or documented equivalent
-- [ ] No test count drops are accepted without explanation
-- [ ] Manual QA covers dark/light themes and widths around 1280px, 1024px, 768px
-- [ ] Keyboard focus is checked in auth, sidebar, forms, training actions and dialogs
-- [ ] Known residual risks or deferred visual items are documented
+- [x] `pnpm test:unit` passes
+- [x] Full E2E gate passes locally via `pnpm test` or documented equivalent
+- [x] No test count drops are accepted without explanation
+- [x] Manual QA covers dark/light themes and widths around 1280px, 1024px, 768px
+- [x] Keyboard focus is checked in auth, sidebar, forms, training actions and dialogs
+- [x] Known residual risks or deferred visual items are documented
 
 **Tests**: unit + E2E full
 **Gate**: `pnpm test`
+
+**Completion notes**:
+
+- Automated regression: `pnpm test` passed with 461 unit tests and 102 E2E tests.
+- Visual/keyboard QA: temporary Playwright QA covered login, sidebar shell, history, stats, profile, clear-stats dialog and training session in dark/light themes at 1280px, 1024px and 768px; screenshots were generated and inspected, then removed as temporary artifacts.
+- Additional fix from QA: renderer logo assets now resolve correctly in packaged Electron `file://` routes.
+- Residual risk: QA is screenshot-assisted and assertion-based, not pixel-diff visual regression; future visual drift still needs human review or dedicated screenshot baselines.
 
 ---
 

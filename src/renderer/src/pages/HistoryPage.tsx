@@ -293,70 +293,19 @@ export function HistoryPage(): React.ReactElement {
 
   const totalPages = data?.totalPages ?? 0;
   const pageNumbers = getPageNumbers(page, totalPages);
+  const totalSessions = data?.total ?? 0;
+  const visibleSessions = data?.items.length ?? 0;
+  const historySummary =
+    totalSessions === 1
+      ? '1 sessão encontrada'
+      : `${totalSessions.toLocaleString('pt-BR')} sessões encontradas`;
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Histórico" />
-
-      <FilterToolbar>
-        <Tabs value={groupTabValue} onValueChange={handleGroupChange}>
-          <TabsList>
-            <TabsTrigger value="all">Todos</TabsTrigger>
-            {groups.map((g) => (
-              <TabsTrigger key={g.id} value={String(g.id)}>
-                {g.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-
-        <div data-testid="date-period-filter">
-          <DatePeriodFilter onChange={handlePeriodChange} />
-        </div>
-
-        <FilterToolbarRow>
-          <div className="flex min-w-44 flex-col gap-1">
-            <Label>Tipo de sessão</Label>
-            <Select value={sessionType} onValueChange={handleSessionTypeChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="single">Individual</SelectItem>
-                <SelectItem value="simultaneous">Simultâneo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex min-w-44 flex-col gap-1">
-            <Label>Mesas simultâneas</Label>
-            <Select
-              value={tableCount}
-              onValueChange={handleTableCountChange}
-              disabled={sessionType !== 'simultaneous'}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">Todas</SelectItem>
-                <SelectItem value="2">2 mesas</SelectItem>
-                <SelectItem value="3">3 mesas</SelectItem>
-                <SelectItem value="4">4 mesas</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </FilterToolbarRow>
-      </FilterToolbar>
-
-      {selectedRef.current.size > 0 && (
-        <SelectionToolbar
-          selectedCount={selectedRef.current.size}
-          onRemove={() => setDeleteDialogOpen(true)}
-          onReviewMultiple={handleReviewMultiple}
-          onClearSelection={handleClearSelection}
-        />
-      )}
+      <PageHeader
+        title="Histórico"
+        description="Filtre sessões concluídas, selecione blocos de estudo e volte para a revisão sem perder o contexto."
+      />
 
       <DeleteSessionsDialog
         open={deleteDialogOpen}
@@ -365,58 +314,150 @@ export function HistoryPage(): React.ReactElement {
         onComplete={handleDeleteComplete}
       />
 
-      {loading ? (
-        <div className="flex flex-col gap-2">
-          <Skeleton className="h-10 w-full" />
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
-      ) : (
-        <EntityTable
-          rows={data?.items ?? []}
-          columns={columns}
-          getRowKey={(row) => row.id}
-          selectable={true}
-          selectedKeys={selectedRef.current as Set<number | string>}
-          onSelectionChange={handleSelectionChange}
-          tableTestId="history-sessions-table"
-          emptyState={
-            <EmptyState
-              title="Nenhuma sessão encontrada"
-              description="Complete uma sessão de treino para vê-la aqui."
-            />
-          }
-        />
-      )}
+      <section
+        aria-label="Consulta do histórico"
+        className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+      >
+        <FilterToolbar className="rounded-none border-0 bg-transparent p-4">
+          <Tabs value={groupTabValue} onValueChange={handleGroupChange}>
+            <TabsList>
+              <TabsTrigger value="all">Todos</TabsTrigger>
+              {groups.map((g) => (
+                <TabsTrigger key={g.id} value={String(g.id)}>
+                  {g.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
 
-      {data && totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious onClick={() => setPage(page - 1)} disabled={page === 1} />
-            </PaginationItem>
-            {pageNumbers.map((p, i) =>
-              p === -1 ? (
-                <PaginationItem key={`ellipsis-${i}`}>
-                  <span className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground">
-                    …
-                  </span>
+          <div data-testid="date-period-filter">
+            <DatePeriodFilter onChange={handlePeriodChange} />
+          </div>
+
+          <FilterToolbarRow>
+            <div className="flex min-w-44 flex-col gap-1">
+              <Label>Tipo de sessão</Label>
+              <Select value={sessionType} onValueChange={handleSessionTypeChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="single">Individual</SelectItem>
+                  <SelectItem value="simultaneous">Simultâneo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex min-w-44 flex-col gap-1">
+              <Label>Mesas simultâneas</Label>
+              <Select
+                value={tableCount}
+                onValueChange={handleTableCountChange}
+                disabled={sessionType !== 'simultaneous'}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Todas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">Todas</SelectItem>
+                  <SelectItem value="2">2 mesas</SelectItem>
+                  <SelectItem value="3">3 mesas</SelectItem>
+                  <SelectItem value="4">4 mesas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </FilterToolbarRow>
+        </FilterToolbar>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/30 px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-sm font-semibold">
+              {loading ? 'Carregando histórico' : historySummary}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {loading
+                ? 'Buscando sessões com os filtros atuais.'
+                : `Mostrando ${visibleSessions.toLocaleString('pt-BR')} nesta página.`}
+            </p>
+          </div>
+          {selectedRef.current.size > 0 ? (
+            <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              Seleção ativa
+            </span>
+          ) : null}
+        </div>
+
+        {selectedRef.current.size > 0 && (
+          <div className="border-t border-border p-4">
+            <SelectionToolbar
+              selectedCount={selectedRef.current.size}
+              onRemove={() => setDeleteDialogOpen(true)}
+              onReviewMultiple={handleReviewMultiple}
+              onClearSelection={handleClearSelection}
+            />
+          </div>
+        )}
+
+        {loading ? (
+          <div className="flex flex-col gap-2 border-t border-border p-4">
+            <Skeleton className="h-10 w-full" />
+            {Array.from({ length: 10 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : (
+          <EntityTable
+            rows={data?.items ?? []}
+            columns={columns}
+            getRowKey={(row) => row.id}
+            selectable={true}
+            selectedKeys={selectedRef.current as Set<number | string>}
+            onSelectionChange={handleSelectionChange}
+            tableTestId="history-sessions-table"
+            className="rounded-none border-x-0 border-b-0"
+            emptyState={
+              <EmptyState
+                title="Nenhuma sessão encontrada"
+                description="Complete uma sessão de treino para vê-la aqui."
+              />
+            }
+          />
+        )}
+
+        {data && totalPages > 1 && (
+          <div className="border-t border-border bg-muted/20 px-4 py-3">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious onClick={() => setPage(page - 1)} disabled={page === 1} />
                 </PaginationItem>
-              ) : (
-                <PaginationItem key={p}>
-                  <PaginationLink isActive={p === page} onClick={() => setPage(p)} size="default">
-                    {p}
-                  </PaginationLink>
+                {pageNumbers.map((p, i) =>
+                  p === -1 ? (
+                    <PaginationItem key={`ellipsis-${i}`}>
+                      <span className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground">
+                        …
+                      </span>
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        isActive={p === page}
+                        onClick={() => setPage(p)}
+                        size="default"
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ),
+                )}
+                <PaginationItem>
+                  <PaginationNext onClick={() => setPage(page + 1)} disabled={page >= totalPages} />
                 </PaginationItem>
-              ),
-            )}
-            <PaginationItem>
-              <PaginationNext onClick={() => setPage(page + 1)} disabled={page >= totalPages} />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

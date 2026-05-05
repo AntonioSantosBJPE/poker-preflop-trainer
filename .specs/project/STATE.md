@@ -1,6 +1,6 @@
 # STATE — Preflop Trainer
 
-**Última actualização:** 2026-05-05 (app-visual-ux-system — tasks criadas)
+**Última actualização:** 2026-05-05 (app-visual-ux-system — T18 concluída)
 
 ## Decisões
 
@@ -32,16 +32,16 @@
 
 ## Features em Progresso
 
-| Feature              | Data       | Fase                  |
-| -------------------- | ---------- | --------------------- |
-| session-history      | 2026-05-02 | Tasks                 |
-| app-visual-ux-system | 2026-05-05 | T1-T12 done; next T13 |
+| Feature         | Data       | Fase  |
+| --------------- | ---------- | ----- |
+| session-history | 2026-05-02 | Tasks |
 
 ## Features Concluídas
 
-| Feature               | Data       | Notas                                                                 |
-| --------------------- | ---------- | --------------------------------------------------------------------- |
-| ui-design-refactoring | 2026-05-03 | 9/12 tasks executadas (D2/D5/D7/E3 diferidas) — 455 unit + 102 E2E ✅ |
+| Feature               | Data       | Notas                                                                                   |
+| --------------------- | ---------- | --------------------------------------------------------------------------------------- |
+| ui-design-refactoring | 2026-05-03 | 9/12 tasks executadas (D2/D5/D7/E3 diferidas) — 455 unit + 102 E2E ✅                   |
+| app-visual-ux-system  | 2026-05-05 | T1-T18 concluídas; 461 unit + 102 E2E; QA visual/teclado dark/light em 1280/1024/768 ✅ |
 
 | Feature                                     | Data       | Notas                                                                                                                                                        |
 | ------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |

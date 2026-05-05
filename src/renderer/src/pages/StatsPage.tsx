@@ -25,6 +25,7 @@ import {
   FilterToolbar,
   FilterToolbarRow,
   PageHeader,
+  SectionCard,
   type EntityTableColumn,
 } from '@/components/app';
 import { Button } from '@/components/ui/button';
@@ -174,6 +175,7 @@ export function StatsPage(): React.ReactElement {
         <>
           <PageHeader
             title="Estatísticas"
+            description="Acompanhe desempenho geral, evolução e vazamentos para escolher o próximo treino."
             actions={
               <Button
                 variant="outline"
@@ -192,91 +194,98 @@ export function StatsPage(): React.ReactElement {
             onComplete={loadStats}
           />
 
-          <FilterToolbar>
-            <Tabs
-              value={groupTabValue}
-              onValueChange={(value) => {
-                if (value === 'all') {
-                  setActiveGroupId(null);
-                  return;
-                }
-                setActiveGroupId(Number(value));
-              }}
-            >
-              <TabsList className="w-full justify-start" data-testid="stats-group-tabs">
-                <TabsTrigger value="all" data-testid="stats-tab-all">
-                  Todos
-                </TabsTrigger>
-                {groups.map((group) => (
-                  <TabsTrigger
-                    key={group.id}
-                    value={String(group.id)}
-                    data-testid={`stats-tab-group-${group.id}`}
-                  >
-                    {group.name}
+          <SectionCard
+            title="Recorte de análise"
+            description="Ajuste grupo, período e tipo de sessão; todos os blocos abaixo usam o mesmo recorte."
+            contentClassName="gap-0 p-0"
+          >
+            <FilterToolbar className="rounded-none border-0 bg-transparent p-4">
+              <Tabs
+                value={groupTabValue}
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    setActiveGroupId(null);
+                    return;
+                  }
+                  setActiveGroupId(Number(value));
+                }}
+              >
+                <TabsList className="w-full justify-start" data-testid="stats-group-tabs">
+                  <TabsTrigger value="all" data-testid="stats-tab-all">
+                    Todos
                   </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+                  {groups.map((group) => (
+                    <TabsTrigger
+                      key={group.id}
+                      value={String(group.id)}
+                      data-testid={`stats-tab-group-${group.id}`}
+                    >
+                      {group.name}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
 
-            <div data-testid="stats-date-filter">
-              <DatePeriodFilter onChange={handleDatePeriodChange} />
-            </div>
+              <div data-testid="stats-date-filter">
+                <DatePeriodFilter onChange={handleDatePeriodChange} />
+              </div>
 
-            <FilterToolbarRow>
-              <div className="flex min-w-52 flex-col gap-1">
-                <Label>Tipo de sessão</Label>
-                <Select
-                  value={sessionType}
-                  onValueChange={(value) =>
-                    setSessionType(value as 'all' | 'single' | 'simultaneous')
-                  }
-                >
-                  <SelectTrigger
-                    id="stats-session-type"
-                    data-testid="stats-session-type-filter"
-                    className="w-full"
+              <FilterToolbarRow>
+                <div className="flex min-w-52 flex-col gap-1">
+                  <Label>Tipo de sessão</Label>
+                  <Select
+                    value={sessionType}
+                    onValueChange={(value) =>
+                      setSessionType(value as 'all' | 'single' | 'simultaneous')
+                    }
                   >
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="single">Individual</SelectItem>
-                    <SelectItem value="simultaneous">Simultâneo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex min-w-52 flex-col gap-1">
-                <Label>Mesas simultâneas</Label>
-                <Select
-                  value={simultaneousTableCount}
-                  onValueChange={(value) =>
-                    setSimultaneousTableCount(value as '__all__' | '2' | '3' | '4')
-                  }
-                  disabled={sessionType !== 'simultaneous'}
-                >
-                  <SelectTrigger
-                    id="stats-table-count"
-                    data-testid="stats-simultaneous-count-filter"
-                    className="w-full"
+                    <SelectTrigger
+                      id="stats-session-type"
+                      data-testid="stats-session-type-filter"
+                      className="w-full"
+                    >
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="single">Individual</SelectItem>
+                      <SelectItem value="simultaneous">Simultâneo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex min-w-52 flex-col gap-1">
+                  <Label>Mesas simultâneas</Label>
+                  <Select
+                    value={simultaneousTableCount}
+                    onValueChange={(value) =>
+                      setSimultaneousTableCount(value as '__all__' | '2' | '3' | '4')
+                    }
+                    disabled={sessionType !== 'simultaneous'}
                   >
-                    <SelectValue placeholder="Todas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all__">Todas</SelectItem>
-                    <SelectItem value="2">2 mesas</SelectItem>
-                    <SelectItem value="3">3 mesas</SelectItem>
-                    <SelectItem value="4">4 mesas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </FilterToolbarRow>
-          </FilterToolbar>
+                    <SelectTrigger
+                      id="stats-table-count"
+                      data-testid="stats-simultaneous-count-filter"
+                      className="w-full"
+                    >
+                      <SelectValue placeholder="Todas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">Todas</SelectItem>
+                      <SelectItem value="2">2 mesas</SelectItem>
+                      <SelectItem value="3">3 mesas</SelectItem>
+                      <SelectItem value="4">4 mesas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </FilterToolbarRow>
+            </FilterToolbar>
+          </SectionCard>
 
           <StatsOverviewCards overview={overview} />
 
           <StatsChartCard
             title="Evolução"
+            description="Tendência de acerto e tempo médio ao longo das sessões filtradas."
             hasData={timeline.length > 0}
             emptyTitle="Sem dados no período"
             emptyDescription="Jogue novas sessões para visualizar a evolução de acerto e tempo."
@@ -317,21 +326,30 @@ export function StatsPage(): React.ReactElement {
             </ResponsiveContainer>
           </StatsChartCard>
 
-          <EntityTable
-            rows={bySituation}
-            columns={bySituationColumns}
-            getRowKey={(row) => row.situationId}
-            tableTestId="stats-by-situation-table"
-            emptyState={
-              <EmptyState
-                title="Sem dados por situação"
-                description="Jogue algumas mãos para preencher o ranking por situação."
-                className="border-0 bg-transparent"
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.42fr)] lg:items-start">
+            <SectionCard
+              title="Ranking por situação"
+              description="Spots com menor acerto ou maior tempo indicam onde concentrar estudo."
+              contentClassName="p-0"
+            >
+              <EntityTable
+                rows={bySituation}
+                columns={bySituationColumns}
+                getRowKey={(row) => row.situationId}
+                tableTestId="stats-by-situation-table"
+                className="rounded-none border-0"
+                emptyState={
+                  <EmptyState
+                    title="Sem dados por situação"
+                    description="Jogue algumas mãos para preencher o ranking por situação."
+                    className="border-0 bg-transparent"
+                  />
+                }
               />
-            }
-          />
+            </SectionCard>
 
-          <StatsWorstHandsList rows={worstHands} />
+            <StatsWorstHandsList rows={worstHands} />
+          </div>
         </>
       )}
     </div>
