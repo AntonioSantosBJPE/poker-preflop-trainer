@@ -138,12 +138,12 @@ describe('registerAuthIpc', () => {
       expect(bcrypt.hashSync).toHaveBeenCalledWith('12345678', 12);
     });
 
-    it('insert retorna vazio → Falha ao criar usuário', async () => {
+    it('insert retorna vazio → Não foi possível criar a conta', async () => {
       selectLimitResult = [];
       insertAllResult = [];
       const handler = getHandler('auth:register');
       await expect(handler({}, 'Test', 'new@test.com', '12345678')).rejects.toThrow(
-        'Falha ao criar usuário',
+        'Não foi possível criar a conta',
       );
     });
   });

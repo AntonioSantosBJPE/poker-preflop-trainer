@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { MultiSessionDetailDto } from '@shared/ipc/types';
 import { EmptyState, PageHeader, StatusMessage } from '@/components/app';
 import { Badge } from '@/components/ui/badge';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HandReviewCard } from '@/components/history/HandReviewCard';
@@ -46,9 +47,9 @@ export function MultiSessionReviewPage(): React.ReactElement {
         setDetail(res);
         setCurrentHandIndex(0);
       })
-      .catch(() => {
+      .catch((err) => {
         setDetail(null);
-        setError('Erro ao carregar sessões.');
+        setError(ipcErrorMessage(err));
       })
       .finally(() => setLoading(false));
   }, [idsRaw]);

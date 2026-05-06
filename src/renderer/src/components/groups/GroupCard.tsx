@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { Label } from '@/components/ui/label';
 import { ConfirmActionDialog, SectionCard, StatusMessage } from '@/components/app';
 
@@ -27,7 +28,7 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
       setEditing(false);
       onRenamed();
     } catch (err) {
-      setRenameError(err instanceof Error ? err.message : 'Erro ao renomear grupo');
+      setRenameError(ipcErrorMessage(err));
     }
   }
 
@@ -45,7 +46,7 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
       await window.api.groups.archive(group.id);
       onArchived();
     } catch (err) {
-      setArchiveError(err instanceof Error ? err.message : 'Erro ao arquivar grupo');
+      setArchiveError(ipcErrorMessage(err));
     } finally {
       setArchiving(false);
     }

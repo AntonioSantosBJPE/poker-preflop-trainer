@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { SessionDetailDto } from '@shared/ipc/types';
 import { EmptyState, PageHeader } from '@/components/app';
 import { Button } from '@/components/ui/button';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HandReviewCard } from '@/components/history/HandReviewCard';
 import { SessionReviewHeader } from '@/components/history/SessionReviewHeader';
@@ -27,9 +28,9 @@ export function SessionHandReviewPage(): React.ReactElement {
         setDetail(res);
         setCurrentHandIndex(0);
       })
-      .catch(() => {
+      .catch((err) => {
         setDetail(null);
-        setError('Sessão não encontrada');
+        setError(ipcErrorMessage(err));
       })
       .finally(() => setLoading(false));
   }, [sessionId]);

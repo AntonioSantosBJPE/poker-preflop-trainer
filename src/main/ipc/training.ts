@@ -25,7 +25,7 @@ type PendingHand = {
 const pendingBySession = new Map<number, PendingHand>();
 
 function pickRandom<T>(arr: T[]): T {
-  if (!arr.length) throw new Error('Lista vazia');
+  if (!arr.length) throw new Error('Nenhuma situação selecionada para treino.');
   return arr[randomInt(arr.length)]!;
 }
 
@@ -93,7 +93,7 @@ export function registerTrainingIpc(): void {
       .returning({ id: trainingSessions.id })
       .all();
     const sid = inserted[0]?.id;
-    if (!sid) throw new Error('Falha ao iniciar sessão');
+    if (!sid) throw new Error('Não foi possível iniciar a sessão. Tente novamente.');
     return sid;
   });
 

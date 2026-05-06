@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState, PageHeader, SectionCard, StatCard, StatusMessage } from '@/components/app';
 import { GroupCard } from '../components/groups/GroupCard';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 
 export function GroupsPage(): React.ReactElement {
   const [groups, setGroups] = useState<GroupSummaryDto[]>([]);
@@ -33,7 +34,7 @@ export function GroupsPage(): React.ReactElement {
       setShowNewForm(false);
       void load();
     } catch (err) {
-      setNewError(err instanceof Error ? err.message : 'Erro ao criar grupo');
+      setNewError(ipcErrorMessage(err));
     }
   }
 

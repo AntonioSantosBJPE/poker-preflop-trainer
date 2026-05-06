@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/app/PageHeader';
 import { EmptyState } from '@/components/app/EmptyState';
 import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { SimultaneousTablePanel } from '@/components/training/SimultaneousTablePanel';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -78,8 +79,8 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
             : table,
         ),
       );
-    } catch {
-      setSimSessionError('Erro ao processar mão');
+    } catch (err) {
+      setSimSessionError(ipcErrorMessage(err));
     }
   }
 

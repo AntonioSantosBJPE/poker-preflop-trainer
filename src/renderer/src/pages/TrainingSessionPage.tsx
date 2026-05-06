@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { Act } from '@/components/training/TrainingActionButtons';
 import { EmptyState, PageHeader } from '@/components/app';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
 import { TrainingActionButtons } from '@/components/training/TrainingActionButtons';
 import { TrainingFeedbackPanel } from '@/components/training/TrainingFeedbackPanel';
@@ -98,9 +99,9 @@ export function TrainingSessionPage(): ReactElement {
         setFeedbackMode(meta.feedbackMode as FeedbackMode);
         setIndex(meta.handsPlayed);
         await dealNextHand();
-      } catch {
+      } catch (err) {
         if (!cancelled) {
-          setSessionError('Erro ao carregar sessão');
+          setSessionError(ipcErrorMessage(err));
         }
       }
     })();

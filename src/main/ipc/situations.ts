@@ -123,7 +123,8 @@ export function registerSituationsIpc(): void {
         .returning({ id: situations.id })
         .all();
       const sid = insertedSit[0]?.id;
-      if (!sid) throw new Error('Falha ao criar situação');
+      if (!sid)
+        throw new Error('Não foi possível criar a situação. Verifique os dados e tente novamente.');
       for (let i = 0; i < p.actions.length; i++) {
         const a = p.actions[i]!;
         const insertedAct = tx
@@ -139,7 +140,7 @@ export function registerSituationsIpc(): void {
           .returning({ id: actions.id })
           .all();
         const aid = insertedAct[0]?.id;
-        if (!aid) throw new Error('Falha ao criar ação');
+        if (!aid) throw new Error('Não foi possível criar a ação. Tente novamente.');
         const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
         for (const c of cells) {
           tx.insert(rangeCells)
@@ -233,7 +234,7 @@ export function registerSituationsIpc(): void {
             .returning({ id: actions.id })
             .all();
           const aid = insertedAct[0]?.id;
-          if (!aid) throw new Error('Falha ao criar ação');
+          if (!aid) throw new Error('Não foi possível criar a ação. Tente novamente.');
           const cells = p.rangeCells.filter((c) => c.actionClientKey === a.clientKey);
           for (const c of cells) {
             tx.insert(rangeCells)
@@ -332,7 +333,7 @@ export function registerSituationsIpc(): void {
         .returning({ id: situations.id })
         .all();
       const sid = insertedSit[0]?.id;
-      if (!sid) throw new Error('Falha ao duplicar');
+      if (!sid) throw new Error('Não foi possível duplicar a situação. Tente novamente.');
       for (const a of acts) {
         const insertedAct = tx
           .insert(actions)
@@ -347,7 +348,7 @@ export function registerSituationsIpc(): void {
           .returning({ id: actions.id })
           .all();
         const aid = insertedAct[0]?.id;
-        if (!aid) throw new Error('Falha ao duplicar ação');
+        if (!aid) throw new Error('Não foi possível duplicar a ação. Tente novamente.');
         const forAction = cells.filter((c) => c.actionId === a.id);
         for (const c of forAction) {
           tx.insert(rangeCells)
