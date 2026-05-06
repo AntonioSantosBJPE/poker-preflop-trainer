@@ -1,15 +1,25 @@
 import { ACTION_TYPES } from '@shared/constants';
+import { Controller, type Control } from 'react-hook-form';
 import type { FieldErrors, UseFormGetValues, UseFormRegister } from 'react-hook-form';
 import type { FieldArrayWithId } from 'react-hook-form';
 import type { SituationEditorFormValues } from '@shared/forms/situationSchemas';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { SectionCard, StatusMessage } from '@/components/app';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type SituationActionField = FieldArrayWithId<SituationEditorFormValues, 'actions', 'id'>;
 
 export interface SituationActionsEditorProps {
   fields: SituationActionField[];
   register: UseFormRegister<SituationEditorFormValues>;
+  control: Control<SituationEditorFormValues>;
   getValues: UseFormGetValues<SituationEditorFormValues>;
   errors: FieldErrors<SituationEditorFormValues>;
   activeActionKey: string;
@@ -25,6 +35,7 @@ export interface SituationActionsEditorProps {
 export function SituationActionsEditor({
   fields,
   register,
+  control,
   getValues,
   errors,
   activeActionKey,
@@ -37,34 +48,31 @@ export function SituationActionsEditor({
   onRemoveAt,
 }: SituationActionsEditorProps): React.ReactElement {
   return (
-    <div
-      className="space-y-3 rounded-xl border border-border bg-card p-4"
-      data-testid="situation-actions-panel"
+    <SectionCard
+      title="2. Ações"
+      description="Configure as opções corretas e escolha qual ação está ativa para pintura."
+      contentClassName="gap-4"
+      testId="situation-actions-panel"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-baseline gap-3">
-          <h2 className="font-display text-lg font-semibold text-foreground">Ações</h2>
+        <div className="flex flex-wrap items-baseline gap-3">
           <span className="text-xs tabular-nums text-muted-foreground">
             Range total: {((totalCombos / 1326) * 100).toFixed(1)}%
           </span>
         </div>
         <div className="flex gap-3">
-          <button
-            type="button"
-            className="text-sm text-muted-foreground hover:text-foreground"
-            onClick={onClearAll}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={onClearAll}>
             Limpar tudo
-          </button>
+          </Button>
           <Button type="button" variant="link" size="sm" className="px-0" onClick={onAddAction}>
             + Adicionar
           </Button>
         </div>
       </div>
       {errors.actions && typeof errors.actions === 'object' && 'message' in errors.actions && (
-        <p className="text-sm text-destructive" role="alert">
+        <StatusMessage tone="error">
           {(errors.actions as { message?: string }).message}
-        </p>
+        </StatusMessage>
       )}
       <div className="space-y-2">
         {fields.map((field, index) => {
@@ -89,16 +97,24 @@ export function SituationActionsEditor({
                 {...register(`actions.${index}.name`)}
               />
               <input type="hidden" {...register(`actions.${index}.clientKey`)} />
-              <select
-                className="h-9 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                {...register(`actions.${index}.actionType`)}
-              >
-                {ACTION_TYPES.map((actionType) => (
-                  <option key={actionType} value={actionType}>
-                    {actionType}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name={`actions.${index}.actionType`}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="h-9 w-40 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ACTION_TYPES.map((actionType) => (
+                        <SelectItem key={actionType} value={actionType}>
+                          {actionType}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               <Input
                 type="number"
                 step="0.1"
@@ -155,6 +171,6 @@ export function SituationActionsEditor({
           );
         })}
       </div>
-    </div>
+    </SectionCard>
   );
 }

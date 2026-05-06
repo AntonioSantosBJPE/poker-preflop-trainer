@@ -222,7 +222,7 @@ export function registerStatsIpc(): void {
         .all();
       const sessionIds = sessions.map((s) => s.id);
       if (!sessionIds.length) {
-        throw new Error('Nenhuma sessão encontrada no período');
+        throw new Error('Nenhuma sessão de treino encontrada no período selecionado.');
       }
       const [handResult] = tx
         .select({ count: sql<number>`count(*)` })

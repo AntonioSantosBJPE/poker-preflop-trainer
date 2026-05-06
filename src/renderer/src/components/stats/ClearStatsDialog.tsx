@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 
 export interface ClearStatsDialogProps {
   open: boolean;
@@ -61,7 +62,7 @@ export function ClearStatsDialog({
         )) as DeleteEstimateDto | null;
         setEstimate(result);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Erro ao estimar');
+        setError(ipcErrorMessage(e));
         setEstimate(null);
       } finally {
         setEstimating(false);
@@ -83,7 +84,7 @@ export function ClearStatsDialog({
       setConfirmOpen(false);
       onComplete();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro ao remover sessões');
+      setError(ipcErrorMessage(e));
     } finally {
       setDeleting(false);
     }

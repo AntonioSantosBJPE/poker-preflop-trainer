@@ -2,6 +2,7 @@ import { test, expect } from './fixtures';
 import { registerAccount } from './helpers/auth';
 import { uniqueGroupName, uniqueSituationName, uniqueUserCredentials } from './helpers/credentials';
 import { createGroup } from './helpers/group';
+import { selectShadcnOption } from './helpers/shadcn';
 
 const rangeGridSelector = '[data-testid="range-grid-13"]';
 
@@ -15,7 +16,7 @@ test.describe('Range Grid — melhorias de usabilidade', () => {
     await appPage.getByRole('button', { name: 'Nova situação' }).click();
     await expect(appPage.getByRole('heading', { name: 'Nova situação' })).toBeVisible();
     await appPage.getByLabel('Nome').fill(uniqueSituationName());
-    await appPage.getByTestId('situation-group-select').selectOption({ label: groupName });
+    await selectShadcnOption(appPage, 'Grupo', groupName);
   });
 
   test('células do grid exibem label da mão (AA, 87s, 87o)', async ({ appPage }) => {

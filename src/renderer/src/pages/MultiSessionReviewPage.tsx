@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { MultiSessionDetailDto } from '@shared/ipc/types';
-import { PageHeader } from '@/components/app';
+import { EmptyState, PageHeader, StatusMessage } from '@/components/app';
 import { Badge } from '@/components/ui/badge';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HandReviewCard } from '@/components/history/HandReviewCard';
@@ -46,9 +47,9 @@ export function MultiSessionReviewPage(): React.ReactElement {
         setDetail(res);
         setCurrentHandIndex(0);
       })
-      .catch(() => {
+      .catch((err) => {
         setDetail(null);
-        setError('Erro ao carregar sessões.');
+        setError(ipcErrorMessage(err));
       })
       .finally(() => setLoading(false));
   }, [idsRaw]);
@@ -85,16 +86,16 @@ export function MultiSessionReviewPage(): React.ReactElement {
 
   if (error || !detail) {
     return (
-      <div
-        className="flex flex-col items-center justify-center gap-4 py-16"
-        data-testid="multi-session-error"
-      >
-        <p className="text-lg font-semibold text-foreground">
-          {error ?? 'Erro ao carregar sessões.'}
-        </p>
-        <Button variant="outline" onClick={() => navigate(`/history${search}`)}>
-          ← Voltar ao histórico
-        </Button>
+      <div className="flex flex-col gap-6" data-testid="multi-session-error">
+        <EmptyState
+          title={error ?? 'Erro ao carregar sessões.'}
+          description="Volte ao histórico e selecione duas ou mais sessões disponíveis."
+          action={
+            <Button variant="outline" onClick={() => navigate(`/history${search}`)}>
+              ← Voltar ao histórico
+            </Button>
+          }
+        />
       </div>
     );
   }
@@ -103,6 +104,7 @@ export function MultiSessionReviewPage(): React.ReactElement {
     <div className="flex flex-col gap-6" data-testid="multi-session-review-page">
       <PageHeader
         title="Revisão Múltipla"
+        description="Compare decisões de várias sessões em uma sequência única de revisão."
         backLink={{ to: `/history${search}`, label: '← Voltar ao histórico' }}
       />
 
@@ -114,20 +116,21 @@ export function MultiSessionReviewPage(): React.ReactElement {
       />
 
       {detail.omittedIds && detail.omittedIds.length > 0 && (
-        <div
-          className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200"
-          data-testid="multi-session-omitted-warning"
-        >
+        <StatusMessage tone="warning" data-testid="multi-session-omitted-warning">
           {detail.omittedIds.length}{' '}
           {detail.omittedIds.length === 1
             ? 'sessão não está disponível.'
             : 'sessões não estão disponíveis.'}
-        </div>
+        </StatusMessage>
       )}
 
       {currentHand && currentSessionInfo && currentSession && (
         <div className="flex flex-col gap-3">
-          <Badge variant="outline" className="w-fit" data-testid="multi-session-badge">
+          <Badge
+            variant="outline"
+            className="w-fit border-primary/30 bg-primary/10 text-primary"
+            data-testid="multi-session-badge"
+          >
             Sessão {currentSessionInfo.sessionIndex + 1} —{' '}
             {new Date(currentSession.startedAt).toLocaleDateString('pt-BR')}
           </Badge>

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/app/PageHeader';
 import { EmptyState } from '@/components/app/EmptyState';
 import { LeaveTrainingDialog } from '@/components/training/LeaveTrainingDialog';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { SimultaneousTablePanel } from '@/components/training/SimultaneousTablePanel';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -78,8 +79,8 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
             : table,
         ),
       );
-    } catch {
-      setSimSessionError('Erro ao processar mão');
+    } catch (err) {
+      setSimSessionError(ipcErrorMessage(err));
     }
   }
 
@@ -213,6 +214,7 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6">
       <PageHeader
         title="Treino simultâneo"
+        description="Cada mesa mantém progresso, timer e decisão independentes."
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -242,6 +244,29 @@ export function SimultaneousTrainingSessionPage(): React.ReactElement {
         description="As mesas ativas serão encerradas e você voltará para a configuração."
         onConfirm={abandonAll}
       />
+
+      <div className="grid gap-3 rounded-2xl border border-border bg-card/80 p-4 text-sm shadow-sm sm:grid-cols-3">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Mesas
+          </span>
+          <span className="font-semibold text-foreground">{tables.length}</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Mãos por mesa
+          </span>
+          <span className="font-semibold text-foreground">{totalHands}</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Estado
+          </span>
+          <span className="font-semibold text-foreground">
+            {isPaused ? 'Pausado' : 'Em andamento'}
+          </span>
+        </div>
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {tables.map((table, index) => (

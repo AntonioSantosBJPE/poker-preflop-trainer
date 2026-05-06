@@ -6,6 +6,8 @@ import {
   EmptyState,
   EntityTable,
   PageHeader,
+  SectionCard,
+  StatCard,
   type EntityTableColumn,
 } from '@/components/app';
 import { Button } from '@/components/ui/button';
@@ -156,6 +158,7 @@ export function GroupDetailPage(): React.ReactElement {
     <div className="flex flex-col gap-6">
       <PageHeader
         title={group.name}
+        description="Gerencie as situações deste bloco de estudo."
         backLink={{ to: '/groups', label: '← Grupos' }}
         actions={
           <Button
@@ -168,6 +171,32 @@ export function GroupDetailPage(): React.ReactElement {
         }
       />
 
+      <SectionCard
+        title="Resumo do grupo"
+        description="Use este painel para validar se o grupo já está pronto para entrar no treino."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard
+            label="Situações ativas"
+            value={situations.length}
+            description={
+              situations.length === 0 ? 'Ainda não treinável' : 'Disponíveis neste grupo'
+            }
+            tone={situations.length > 0 ? 'success' : 'warning'}
+          />
+          <StatCard
+            label="Status"
+            value={situations.length > 0 ? 'Pronto' : 'Setup'}
+            tone="primary"
+          />
+          <StatCard
+            label="Ação sugerida"
+            value={situations.length > 0 ? 'Treinar' : 'Criar'}
+            tone="muted"
+          />
+        </div>
+      </SectionCard>
+
       <EntityTable
         rows={situations}
         columns={columns}
@@ -176,10 +205,10 @@ export function GroupDetailPage(): React.ReactElement {
         emptyState={
           <EmptyState
             title="Nenhuma situação neste grupo"
-            description="Crie a primeira situação deste grupo para começar."
+            description="Crie a primeira situação para transformar este grupo em um bloco de treino."
             action={
               <Button asChild>
-                <Link to={`/situations/new?groupId=${group.id}`}>Criar a primeira?</Link>
+                <Link to={`/situations/new?groupId=${group.id}`}>Criar primeira situação</Link>
               </Button>
             }
             className="border-0 bg-transparent"

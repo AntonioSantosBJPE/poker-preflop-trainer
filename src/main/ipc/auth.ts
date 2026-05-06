@@ -18,7 +18,8 @@ export function registerAuthIpc(): void {
   ipcMain.handle('auth:register', async (_e, name: unknown, email: unknown, password: unknown) => {
     const parsed = registerFormSchema.safeParse({ name, email, password });
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message ?? 'Dados inválidos';
+      const msg =
+        parsed.error.issues[0]?.message ?? 'E-mail ou senha inválidos. Verifique os dados.';
       throw new Error(msg);
     }
     const { name: n, email: em, password: pw } = parsed.data;
@@ -34,14 +35,15 @@ export function registerAuthIpc(): void {
       .returning({ id: users.id, name: users.name, email: users.email })
       .all();
     const row = inserted[0];
-    if (!row) throw new Error('Falha ao criar usuário');
+    if (!row) throw new Error('Não foi possível criar a conta. Tente novamente.');
     return { userId: row.id, name: row.name, email: row.email };
   });
 
   ipcMain.handle('auth:login', async (_e, email: unknown, password: unknown) => {
     const parsed = loginFormSchema.safeParse({ email, password });
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message ?? 'Dados inválidos';
+      const msg =
+        parsed.error.issues[0]?.message ?? 'E-mail ou senha inválidos. Verifique os dados.';
       throw new Error(msg);
     }
     const { email: em, password: pw } = parsed.data;

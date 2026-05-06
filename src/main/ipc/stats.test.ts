@@ -518,7 +518,7 @@ describe('registerStatsIpc', () => {
       const handler = getHandler('stats:deleteSessions');
 
       await expect(handler({}, { fromTs: 1_700_000_000, toTs: 1_800_000_000 })).rejects.toThrow(
-        'Nenhuma sessão encontrada no período',
+        'Nenhuma sessão de treino encontrada no período selecionado.',
       );
 
       expect(parseDeletePeriod).toHaveBeenCalledWith({
@@ -540,7 +540,7 @@ describe('registerStatsIpc', () => {
       const handler = getHandler('stats:deleteSessions');
 
       await expect(handler({}, { fromTs: 1, toTs: 2 })).rejects.toThrow(
-        'Nenhuma sessão encontrada no período',
+        'Nenhuma sessão de treino encontrada no período selecionado.',
       );
     });
 

@@ -767,7 +767,9 @@ describe('registerHistoryIpc', () => {
       >);
 
       const handler = getHandler('training:deleteSessionsByIds');
-      await expect(handler({}, { ids: [999] })).rejects.toThrow('Nenhuma sessão encontrada');
+      await expect(handler({}, { ids: [999] })).rejects.toThrow(
+        'Nenhuma sessão encontrada no período.',
+      );
     });
 
     it('rejeita quando não autenticado', async () => {

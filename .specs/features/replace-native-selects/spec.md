@@ -1,31 +1,110 @@
-# Substituir native `<select>` por shadcn `Select` em HistoryPage e StatsPage
+# Replace Native `<select>` with shadcn/Radix Select
+
+## Scope Assessment
+
+| Dimension                | Value                                            |
+| ------------------------ | ------------------------------------------------ |
+| **Tamanho**              | Medium                                           |
+| **Source files**         | 2 componentes + 2 E2E + 0 unit tests existentes  |
+| **Dependências novas**   | Nenhuma (shadcn Select + radix-ui já instalados) |
+| **Mudança arquitetural** | Mínima — `register()` → `Controller` nos selects |
 
 ## Problem
 
-`HistoryPage.tsx` e `StatsPage.tsx` usam `<select>` nativo do HTML para os filtros de tipo de sessão e mesas simultâneas. O padrão do projeto é usar o componente `Select` do shadcn/ui (Radix). As páginas foram criadas/modificadas depois da migração shadcn (SHUI-01 a SHUI-18) e não seguiram o padrão.
+Existem 3 `<select>` nativos em 2 componentes de editor de situação. O resto do app já usa shadcn Select (`FormSelectField` ou `<Select>` direto). Esses 3 precisam ser substituídos para consistência visual e de comportamento (Radix Select gerencia acessibilidade, focus, keyboard nav, tema).
 
-## Requirements
+## Requirement IDs
 
-| ID         | Description                                                                                                                                              | Verification              |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| NSELECT-01 | `HistoryPage.tsx`: filtro "Tipo de sessão" usa `<Select>` shadcn                                                                                         | Render + interação        |
-| NSELECT-02 | `HistoryPage.tsx`: filtro "Mesas simultâneas" usa `<Select>` shadcn com `disabled` condicional                                                           | Render com disabled/abled |
-| NSELECT-03 | `StatsPage.tsx`: filtro "Tipo de sessão" usa `<Select>` shadcn preservando `data-testid="stats-session-type-filter"`                                     | Render + query by testid  |
-| NSELECT-04 | `StatsPage.tsx`: filtro "Mesas simultâneas" usa `<Select>` shadcn preservando `data-testid="stats-simultaneous-count-filter"` com `disabled` condicional | Render + query by testid  |
-| NSELECT-05 | Testes existentes continuam verdes após as alterações                                                                                                    | `pnpm test:unit`          |
+### R1 — SituationForm: groupId select
 
-## Out of Scope
+O `<select id="situation-group" data-testid="situation-group-select">` em `SituationForm.tsx:37-56` deve ser substituído por shadcn `<Select>`.
 
-- SituationForm.tsx e SituationActionsEditor.tsx (usam react-hook-form `register` nativo, requerem abordagem diferente com `FormSelectField`)
-- Qualquer alteração além da troca de `<select>` → `<Select>`
+**Atualmente:** `<select {...register('groupId', { setValueAs }) }>` com `<option value="">Selecione um grupo…</option>` + options dos grupos.
 
-## Changes
+**Após:** shadcn `<Select>` controlado via `Controller` do react-hook-form. Valor vazio/"Selecione um grupo…" tratado como placeholder do SelectValue.
 
-| File                                     | Change                                     |
-| ---------------------------------------- | ------------------------------------------ |
-| `src/renderer/src/pages/HistoryPage.tsx` | Import shadcn Select; replace 2 `<select>` |
-| `src/renderer/src/pages/StatsPage.tsx`   | Import shadcn Select; replace 2 `<select>` |
+- Mantém `data-testid="situation-group-select"` no `SelectTrigger`
+- `setValueAs` lógica (string vazia → 0, parse → Number) mantida no `Controller`
+- Placeholder visível: `"Selecione um grupo…"`
 
-## Design Decision
+### R2 — SituationForm: position select
 
-Usar `<Select>` com `<SelectTrigger>` recebendo `id`/`data-testid`/`className="w-full"`. Manter `htmlFor` no `<Label>` pois o Trigger é focado via `id`. Nenhuma alteração de comportamento — `onValueChange` mapeia diretamente para os handlers existentes que já recebem `string`.
+O `<select id="situation-position">` em `SituationForm.tsx:65-75` deve ser substituído por shadcn `<Select>`.
+
+**Atualmente:** `<select {...register('position')}>` com options das POSITIONS (UTG, HJ, CO, BTN, SB, BB).
+
+**Após:** shadcn `<Select>` controlado via `Controller`. POSITIONS mapeadas diretamente para `<SelectItem>`.
+
+### R3 — SituationActionsEditor: actionType select
+
+O `<select>` em `SituationActionsEditor.tsx:90-99` deve ser substituído por shadcn `<Select>`.
+
+**Atualmente:** `<select {...register('actions.${index}.actionType')}>` com options dos ACTION_TYPES.
+
+**Após:** shadcn `<Select>` controlado via `Controller` com field name `actions.${index}.actionType`.
+
+### R4 — Testes E2E: atualizar interação com selects
+
+Três arquivos E2E usam `selectOption()` em `situation-group-select`:
+
+| Arquivo                               | Linha | Uso                                                                        |
+| ------------------------------------- | ----- | -------------------------------------------------------------------------- |
+| `e2e/situation-edit.spec.ts`          | 80    | `getByTestId('situation-group-select').selectOption({ label: groupName })` |
+| `e2e/range-grid-improvements.spec.ts` | 18    | `getByTestId('situation-group-select').selectOption({ label: groupName })` |
+
+Trocar para `selectShadcnOption(page, 'Grupo', groupName)`.
+
+### R5 — Testes unitários
+
+Nenhum teste unitário cobre `SituationForm` ou `SituationActionsEditor` diretamente. `SituationEditPage` não tem teste unitário. Portanto:
+
+- **Nenhum teste unitário existente quebra.**
+- Não criar testes novos (fora do escopo desta spec — pode ser tarefa futura).
+
+### R6 — Interface dos componentes
+
+`SituationForm` e `SituationActionsEditor` precisam receber `control` (de `useForm`) além de `register`. O parâmetro `register` permanece pois outros campos (Input, Textarea, color input) continuam usando register.
+
+**Mudanças de props:**
+
+```diff
+ // SituationForm
+ export interface SituationFormProps {
+   register: UseFormRegister<SituationEditorFormValues>;
++  control: Control<SituationEditorFormValues>;
+   errors: FieldErrors<SituationEditorFormValues>;
+   groups: GroupSummaryDto[];
+ }
+
+ // SituationActionsEditor
+ export interface SituationActionsEditorProps {
+   fields: SituationActionField[];
+   register: UseFormRegister<SituationEditorFormValues>;
++  control: Control<SituationEditorFormValues>;
+   getValues: UseFormGetValues<SituationEditorFormValues>;
+   ...
+ }
+```
+
+## Arquivos Afetados
+
+| File                                                                | Change                                                                  |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `src/renderer/src/components/situations/SituationForm.tsx`          | R1, R2: trocar 2 `<select>` por shadcn Select, adicionar `control` prop |
+| `src/renderer/src/components/situations/SituationActionsEditor.tsx` | R3: trocar 1 `<select>` por shadcn Select, adicionar `control` prop     |
+| `src/renderer/src/pages/SituationEditPage.tsx`                      | R6: passar `control` para SituationForm e SituationActionsEditor        |
+| `e2e/situation-edit.spec.ts`                                        | R4: `selectOption` → `selectShadcnOption`                               |
+| `e2e/range-grid-improvements.spec.ts`                               | R4: `selectOption` → `selectShadcnOption`                               |
+
+## Dependências
+
+```
+Nenhuma — todos os componentes shadcn e pacotes já instalados.
+```
+
+## Verification
+
+1. `pnpm test:unit` passa sem regressão
+2. `pnpm exec playwright test --project=chromium e2e/situation-edit.spec.ts e2e/range-grid-improvements.spec.ts` passa
+3. Inspeção visual: selects no editor de situação têm mesma aparência que os outros shadcn Selects do app
+4. Grupo vazio (`groupId = 0`) mostra placeholder "Selecione um grupo…"

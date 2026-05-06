@@ -8,6 +8,8 @@ import {
   FilterToolbar,
   FilterToolbarRow,
   PageHeader,
+  SectionCard,
+  StatCard,
   type EntityTableColumn,
 } from '@/components/app';
 import { Button } from '@/components/ui/button';
@@ -64,6 +66,9 @@ export function SituationsPage(): React.ReactElement {
   useEffect(() => {
     void reload();
   }, [reload]);
+
+  const selectedGroup = groups.find((group) => group.id === selectedGroupId);
+  const totalSituations = groups.reduce((total, group) => total + group.situationCount, 0);
 
   const columns: EntityTableColumn<Row>[] = [
     {
@@ -135,12 +140,40 @@ export function SituationsPage(): React.ReactElement {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Situações"
+        description="Catalogue os spots que alimentam seus blocos de treino."
         actions={
           <Button type="button" onClick={() => navigate('/situations/new')}>
             Nova situação
           </Button>
         }
       />
+
+      <SectionCard
+        title="Catálogo de situações"
+        description="Filtre por grupo, revise stacks e mantenha sua biblioteca pronta para treinar."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard
+            label="Situações exibidas"
+            value={situationsLoading ? '...' : rows.length}
+            description={selectedGroup ? `Filtro: ${selectedGroup.name}` : 'Todos os grupos'}
+            tone={rows.length > 0 ? 'success' : 'warning'}
+          />
+          <StatCard
+            label="Total nos grupos"
+            value={totalSituations}
+            description="Biblioteca ativa"
+            tone={totalSituations > 0 ? 'primary' : 'muted'}
+          />
+          <StatCard
+            label="Grupos"
+            value={groups.length}
+            description={groups.length > 0 ? 'Disponíveis no filtro' : 'Crie um grupo primeiro'}
+            tone={groups.length > 0 ? 'primary' : 'warning'}
+          />
+        </div>
+      </SectionCard>
+
       <FilterToolbar>
         <FilterToolbarRow>
           <div className="flex min-w-52 flex-col gap-1">
@@ -189,10 +222,22 @@ export function SituationsPage(): React.ReactElement {
           emptyState={
             <EmptyState
               title="Nenhuma situação"
-              description="Crie sua primeira situação para começar os treinos."
+              description={
+                selectedGroup
+                  ? `Nenhuma situação encontrada em ${selectedGroup.name}. Crie uma situação para este grupo ou limpe o filtro.`
+                  : 'Crie sua primeira situação para começar os treinos.'
+              }
               action={
                 <Button asChild>
-                  <Link to="/situations/new">Criar a primeira</Link>
+                  <Link
+                    to={
+                      selectedGroup
+                        ? `/situations/new?groupId=${selectedGroup.id}`
+                        : '/situations/new'
+                    }
+                  >
+                    Criar a primeira
+                  </Link>
                 </Button>
               }
               className="border-0 bg-transparent"

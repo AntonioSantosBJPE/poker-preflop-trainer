@@ -9,7 +9,10 @@ export interface StatsWorstHandsListProps {
 export function StatsWorstHandsList({ rows }: StatsWorstHandsListProps): React.ReactElement {
   if (!rows.length) {
     return (
-      <SectionCard title="Piores mãos">
+      <SectionCard
+        title="Vazamentos por mão"
+        description="Combinações que mais geraram erros no recorte atual."
+      >
         <EmptyState
           title="Sem erros registrados"
           description="Complete mais sessões para ver as mãos com mais erros."
@@ -20,12 +23,17 @@ export function StatsWorstHandsList({ rows }: StatsWorstHandsListProps): React.R
   }
 
   return (
-    <SectionCard title="Piores mãos">
+    <SectionCard
+      title="Vazamentos por mão"
+      description="Priorize estas mãos ao montar o próximo bloco de treino."
+    >
       <ul className="divide-y divide-border rounded-xl border border-border">
         {rows.map((row) => (
-          <li key={row.label} className="flex justify-between gap-4 px-3 py-2 text-sm">
-            <span className="font-mono text-foreground">{row.label}</span>
-            <span className="tabular-nums text-primary">{row.count} erros</span>
+          <li key={row.label} className="flex items-center justify-between gap-4 px-3 py-2 text-sm">
+            <span className="font-mono text-base font-semibold text-foreground">{row.label}</span>
+            <span className="rounded-full border border-destructive/30 bg-destructive/10 px-2 py-1 text-xs font-medium tabular-nums text-destructive">
+              {row.count} erros
+            </span>
           </li>
         ))}
       </ul>

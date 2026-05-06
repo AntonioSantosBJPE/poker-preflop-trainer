@@ -12,13 +12,30 @@ export function TrainingFeedbackPanel({
   onNextHand,
 }: TrainingFeedbackPanelProps): ReactElement {
   return (
-    <div className="space-y-3 rounded-lg border border-border bg-card/90 p-4">
-      <p className={cn(feedback.ok ? 'text-primary' : 'text-destructive')}>
-        {feedback.ok ? 'Correto' : 'Incorreto'} — {feedback.ms} ms
-      </p>
-      <Button type="button" size="sm" onClick={onNextHand}>
-        Próxima mão
-      </Button>
+    <div
+      className={cn(
+        'rounded-2xl border bg-card/95 p-4 shadow-sm',
+        feedback.ok ? 'border-primary/40' : 'border-destructive/40',
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Feedback
+          </span>
+          <p
+            className={cn(
+              'text-lg font-semibold',
+              feedback.ok ? 'text-primary' : 'text-destructive',
+            )}
+          >
+            {feedback.ok ? 'Correto' : 'Incorreto'} — {feedback.ms} ms
+          </p>
+        </div>
+        <Button type="button" onClick={onNextHand}>
+          Próxima mão
+        </Button>
+      </div>
     </div>
   );
 }

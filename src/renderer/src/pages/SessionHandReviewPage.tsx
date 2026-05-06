@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { SessionDetailDto } from '@shared/ipc/types';
-import { PageHeader } from '@/components/app';
+import { EmptyState, PageHeader } from '@/components/app';
 import { Button } from '@/components/ui/button';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HandReviewCard } from '@/components/history/HandReviewCard';
 import { SessionReviewHeader } from '@/components/history/SessionReviewHeader';
@@ -27,9 +28,9 @@ export function SessionHandReviewPage(): React.ReactElement {
         setDetail(res);
         setCurrentHandIndex(0);
       })
-      .catch(() => {
+      .catch((err) => {
         setDetail(null);
-        setError('Sessão não encontrada');
+        setError(ipcErrorMessage(err));
       })
       .finally(() => setLoading(false));
   }, [sessionId]);
@@ -56,11 +57,16 @@ export function SessionHandReviewPage(): React.ReactElement {
 
   if (error || !detail) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-16">
-        <p className="text-lg font-semibold text-foreground">{error ?? 'Sessão não encontrada'}</p>
-        <Button variant="outline" onClick={() => navigate(`/history${search}`)}>
-          ← Voltar ao histórico
-        </Button>
+      <div className="flex flex-col gap-6">
+        <EmptyState
+          title={error ?? 'Sessão não encontrada'}
+          description="Volte ao histórico e escolha uma sessão disponível para revisão."
+          action={
+            <Button variant="outline" onClick={() => navigate(`/history${search}`)}>
+              ← Voltar ao histórico
+            </Button>
+          }
+        />
       </div>
     );
   }
@@ -69,6 +75,7 @@ export function SessionHandReviewPage(): React.ReactElement {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Revisão da sessão"
+        description="Revise cada decisão com cartas, spot, resposta e range esperado lado a lado."
         backLink={{ to: `/history${search}`, label: '← Voltar ao histórico' }}
       />
 

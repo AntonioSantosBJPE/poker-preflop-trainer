@@ -8,6 +8,7 @@ const raiseTypes = new Set(['RAISE_OPEN', 'RAISE_3BET', 'RAISE_4BET']);
 
 export const situationActionInputSchema = z
   .object({
+    id: z.number().int().positive().optional(),
     clientKey: z.string().min(1, 'Chave da ação inválida'),
     name: z.string().trim().min(1, 'Nome da ação obrigatório'),
     actionType: z.enum(ACTION_TYPES, { message: 'Tipo de ação inválido' }),

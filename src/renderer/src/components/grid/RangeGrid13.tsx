@@ -133,7 +133,7 @@ export function RangeGrid13({
               {RANK_CHARS.map((rCol, col) => {
                 const isHighlighted =
                   highlightCell?.rowIndex === row && highlightCell?.colIndex === col;
-                const highlightClass = isHighlighted ? 'ring-2 ring-inset ring-amber-400' : '';
+                const highlightClass = isHighlighted ? 'ring-2 ring-inset ring-primary' : '';
                 return (
                   <CellTag
                     type={readOnly ? undefined : 'button'}

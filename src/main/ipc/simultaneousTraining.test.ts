@@ -121,7 +121,7 @@ describe('registerSimultaneousTrainingIpc', () => {
           feedbackMode: 'IMMEDIATE',
         },
       ),
-    ).rejects.toThrow('Falha ao iniciar sessão simultânea');
+    ).rejects.toThrow('Não foi possível iniciar a sessão');
   });
 
   it('rejeita quando o DB devolve menos situações do que as pedidas (inativa ou outro user)', async () => {

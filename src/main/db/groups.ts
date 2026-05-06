@@ -60,7 +60,7 @@ export async function createGroup(db: Db, userId: number, name: string): Promise
     .returning({ id: situationGroups.id })
     .all();
   const id = inserted[0]?.id;
-  if (id === undefined) throw new Error('Falha ao criar grupo');
+  if (id === undefined) throw new Error('Não foi possível criar o grupo. Tente novamente.');
   return { id };
 }
 

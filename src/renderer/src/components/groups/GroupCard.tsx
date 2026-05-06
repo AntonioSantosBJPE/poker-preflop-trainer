@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ipcErrorMessage } from '@/hooks/useIpcError';
 import { Label } from '@/components/ui/label';
-import { ConfirmActionDialog, SectionCard } from '@/components/app';
+import { ConfirmActionDialog, SectionCard, StatusMessage } from '@/components/app';
 
 export interface GroupCardProps {
   group: GroupSummaryDto;
@@ -27,7 +28,7 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
       setEditing(false);
       onRenamed();
     } catch (err) {
-      setRenameError(err instanceof Error ? err.message : 'Erro ao renomear grupo');
+      setRenameError(ipcErrorMessage(err));
     }
   }
 
@@ -45,15 +46,19 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
       await window.api.groups.archive(group.id);
       onArchived();
     } catch (err) {
-      setArchiveError(err instanceof Error ? err.message : 'Erro ao arquivar grupo');
+      setArchiveError(ipcErrorMessage(err));
     } finally {
       setArchiving(false);
     }
   }
 
   return (
-    <SectionCard className="h-full" contentClassName="gap-4 p-4" testId="group-card">
-      <div className="flex flex-col gap-1">
+    <SectionCard
+      className="h-full overflow-hidden transition-colors hover:border-primary/50"
+      contentClassName="gap-4 p-4"
+      testId="group-card"
+    >
+      <div className="flex flex-col gap-3">
         {editing ? (
           <>
             <Label className="sr-only" htmlFor={`rename-${group.id}`}>
@@ -68,9 +73,9 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
               onChange={(e) => setEditName(e.target.value)}
             />
             {renameError ? (
-              <p className="text-sm text-destructive" data-testid="group-rename-error">
+              <StatusMessage tone="error" data-testid="group-rename-error">
                 {renameError}
-              </p>
+              </StatusMessage>
             ) : null}
             <div className="flex flex-wrap gap-2 pt-2">
               <Button type="button" size="sm" onClick={() => void handleSaveRename()}>
@@ -83,46 +88,66 @@ export function GroupCard({ group, onRenamed, onArchived }: GroupCardProps): Rea
           </>
         ) : (
           <>
-            <Link
-              to={`/groups/${group.id}`}
-              className="font-display text-lg font-semibold text-foreground hover:text-primary"
-            >
-              {group.name}
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              {group.situationCount} {group.situationCount === 1 ? 'situação' : 'situações'}
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-col gap-1">
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                  Grupo
+                </span>
+                <Link
+                  to={`/groups/${group.id}`}
+                  className="truncate font-display text-lg font-semibold text-foreground hover:text-primary"
+                >
+                  {group.name}
+                </Link>
+              </div>
+              <div className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs tabular-nums text-muted-foreground">
+                #{group.sortOrder}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-muted/30 p-3">
+              <p className="font-display text-2xl font-semibold tabular-nums text-primary">
+                {group.situationCount}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {group.situationCount} {group.situationCount === 1 ? 'situação' : 'situações'}
+              </p>
+            </div>
           </>
         )}
       </div>
       {!editing && (
-        <div className="mt-auto flex flex-wrap gap-2 border-t border-border pt-4">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            data-testid="group-rename-btn"
-            onClick={() => {
-              setEditName(group.name);
-              setRenameError('');
-              setEditing(true);
-            }}
-          >
-            Renomear
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
+          <Button asChild variant="secondary" size="sm">
+            <Link to={`/groups/${group.id}`}>Abrir</Link>
           </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            data-testid="group-archive-btn"
-            disabled={archiving}
-            onClick={() => setArchiveDialogOpen(true)}
-          >
-            Arquivar
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              data-testid="group-rename-btn"
+              onClick={() => {
+                setEditName(group.name);
+                setRenameError('');
+                setEditing(true);
+              }}
+            >
+              Renomear
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              data-testid="group-archive-btn"
+              disabled={archiving}
+              onClick={() => setArchiveDialogOpen(true)}
+            >
+              Arquivar
+            </Button>
+          </div>
         </div>
       )}
-      {archiveError ? <p className="text-sm text-destructive">{archiveError}</p> : null}
+      {archiveError ? <StatusMessage tone="error">{archiveError}</StatusMessage> : null}
       <ConfirmActionDialog
         open={archiveDialogOpen}
         onOpenChange={setArchiveDialogOpen}

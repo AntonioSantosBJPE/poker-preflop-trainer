@@ -1,3 +1,4 @@
+import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface AppSidebarProps {
@@ -8,6 +9,11 @@ export interface AppSidebarProps {
   children: React.ReactNode;
 }
 
+const logoSrc =
+  window.location.protocol === 'file:'
+    ? new URL(/* @vite-ignore */ '../assets/logo/logo-master.png', import.meta.url).href
+    : '/assets/logo/logo-master.png';
+
 export function AppSidebar({
   userName,
   isDarkTheme,
@@ -16,10 +22,10 @@ export function AppSidebar({
   children,
 }: AppSidebarProps): React.ReactElement {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-card">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-4">
+    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-card/95 shadow-[8px_0_30px_rgba(0,0,0,0.08)]">
+      <div className="flex items-center gap-2 border-b border-border bg-muted/20 px-4 py-4">
         <img
-          src="/assets/logo/logo-master.png"
+          src={logoSrc}
           alt=""
           className="h-9 w-auto max-w-[140px] object-contain object-left dark:brightness-[1.08]"
         />
@@ -33,8 +39,14 @@ export function AppSidebar({
           variant="outline"
           onClick={onToggleTheme}
           aria-label={isDarkTheme ? 'Ativar tema claro' : 'Ativar tema escuro'}
+          className="justify-start"
         >
-          {isDarkTheme ? '☀️ Claro' : '🌙 Escuro'}
+          {isDarkTheme ? (
+            <Sun className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <Moon className="h-4 w-4" aria-hidden="true" />
+          )}
+          {isDarkTheme ? 'Claro' : 'Escuro'}
         </Button>
         {userName ? (
           <div className="flex flex-col gap-1 text-sm">

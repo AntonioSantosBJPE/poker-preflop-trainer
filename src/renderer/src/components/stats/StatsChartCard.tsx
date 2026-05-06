@@ -3,6 +3,7 @@ import { EmptyState } from '@/components/app/EmptyState';
 
 export interface StatsChartCardProps {
   title: string;
+  description?: string;
   hasData: boolean;
   emptyTitle: string;
   emptyDescription: string;
@@ -11,13 +12,14 @@ export interface StatsChartCardProps {
 
 export function StatsChartCard({
   title,
+  description,
   hasData,
   emptyTitle,
   emptyDescription,
   children,
 }: StatsChartCardProps): React.ReactElement {
   return (
-    <SectionCard title={title} contentClassName="gap-0 p-2">
+    <SectionCard title={title} description={description} contentClassName="gap-0 p-2">
       {hasData ? (
         <div className="h-72">{children}</div>
       ) : (

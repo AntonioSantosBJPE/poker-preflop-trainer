@@ -99,6 +99,21 @@ describe('SimultaneousTrainingSummaryPage', () => {
     expect(screen.getByText('Treino normal')).toBeInTheDocument();
   });
 
+  it('exibe agregado antes da quebra por mesa', async () => {
+    vi.mocked(window.api.training.getSessionResult)
+      .mockResolvedValueOnce(mockResult1)
+      .mockResolvedValueOnce(mockResult2);
+
+    renderPage([1, 2]);
+
+    expect(await screen.findByText('Agregado multi-mesa')).toBeInTheDocument();
+    expect(screen.getAllByText('80.0%').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('4 acertos')).toBeInTheDocument();
+    expect(screen.getByText('1 erros')).toBeInTheDocument();
+    expect(screen.getByText('2 mesas')).toBeInTheDocument();
+    expect(screen.getByText('Quebra por mesa')).toBeInTheDocument();
+  });
+
   it('UT-SRN-09: Botões de revisão não aparecem quando sessionIds vazio', async () => {
     render(
       <MemoryRouter

@@ -359,7 +359,7 @@ export function registerHistoryIpc(): void {
         .all();
 
       if (!matched.length) {
-        throw new Error('Nenhuma sessão encontrada');
+        throw new Error('Nenhuma sessão encontrada no período.');
       }
 
       const matchedIds = matched.map((m) => m.id);

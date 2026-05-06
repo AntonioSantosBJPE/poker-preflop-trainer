@@ -21,10 +21,17 @@ export function SituationChecklist({
   error,
   testIdPrefix = 'training',
 }: SituationChecklistProps): React.ReactElement {
+  const selectedCount = selected.length;
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm font-medium leading-none text-foreground">Situações</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-medium leading-none text-foreground">Situações</span>
+          <span className="text-xs text-muted-foreground">
+            {selectedCount} de {situations.length} selecionadas
+          </span>
+        </div>
         <button
           type="button"
           data-testid={`${testIdPrefix}-select-all-btn`}
@@ -35,13 +42,13 @@ export function SituationChecklist({
           Selecionar todas
         </button>
       </div>
-      <ScrollArea className="h-56 rounded-xl border border-border">
+      <ScrollArea className="h-56 rounded-2xl border border-border bg-background/70">
         <div className="divide-y divide-border">
           {situations.map((s) => (
             <label
               key={s.id}
               htmlFor={`${testIdPrefix}-sit-${s.id}`}
-              className="flex cursor-pointer items-center gap-3 px-3 py-2 hover:bg-muted/60"
+              className="flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-muted/60"
             >
               <Checkbox
                 id={`${testIdPrefix}-sit-${s.id}`}
@@ -52,7 +59,9 @@ export function SituationChecklist({
             </label>
           ))}
           {!situations.length && (
-            <p className="p-4 text-sm text-muted-foreground">Cadastre situações antes.</p>
+            <p className="p-4 text-sm text-muted-foreground">
+              Cadastre situações antes de iniciar o treino.
+            </p>
           )}
         </div>
       </ScrollArea>

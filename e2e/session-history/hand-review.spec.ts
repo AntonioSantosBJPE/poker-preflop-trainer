@@ -113,7 +113,7 @@ test.describe('Histórico - revisão mão a mão', () => {
     await expect(appPage.getByRole('heading', { name: 'Revisão da sessão' })).toBeVisible();
 
     await expect(appPage.getByTestId('range-grid-13')).toBeVisible();
-    await expect(appPage.locator('.ring-amber-400')).toHaveCount(1);
+    await expect(appPage.getByTestId('range-grid-13').locator('.ring-primary')).toHaveCount(1);
   });
 
   test('E2E-HIST-10: mão errada mostra indicador de erro', async ({ appPage }) => {

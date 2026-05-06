@@ -1,5 +1,6 @@
 import { TimerIcon } from 'lucide-react';
 import type { ReactElement } from 'react';
+import { Button } from '@/components/ui/button';
 
 export interface TrainingSessionHeaderProps {
   index: number;
@@ -23,36 +24,38 @@ export function TrainingSessionHeader({
   const pct = ((index + 1) / totalHands) * 100;
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
-        <span data-testid="hand-label">
-          Mão {index + 1} / {totalHands}
-        </span>
-        <div className="flex items-center gap-4">
+    <div className="rounded-2xl border border-border bg-card/95 p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+            Sessão ativa
+          </span>
+          <span data-testid="hand-label" className="text-base font-semibold text-foreground">
+            Mão {index + 1} / {totalHands}
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
           {remainingSec !== null ? (
-            <span className="inline-flex items-center font-mono tabular-nums text-primary">
-              <TimerIcon data-testid="timer-icon" className="inline h-3.5 w-3.5 mr-1" />
+            <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 font-mono tabular-nums text-primary">
+              <TimerIcon data-testid="timer-icon" className="mr-1 inline h-3.5 w-3.5" />
               {remainingSec}s
             </span>
           ) : null}
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             data-testid="pause-continue-btn"
-            className="rounded-lg border border-border bg-muted px-3 py-1 text-sm text-foreground transition-colors hover:border-primary hover:text-primary"
             onClick={isPaused ? onContinue : onPause}
           >
             {isPaused ? 'Continuar' : 'Pausar'}
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-border bg-muted px-3 py-1 text-sm text-foreground transition-colors hover:border-destructive hover:text-destructive"
-            onClick={onAbandon}
-          >
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={onAbandon}>
             Abandonar
-          </button>
+          </Button>
         </div>
       </div>
-      <div data-testid="progress-track" className="mt-2 h-1.5 w-full rounded-full bg-muted">
+      <div data-testid="progress-track" className="mt-4 h-2 w-full rounded-full bg-muted">
         <div
           data-testid="progress-filler"
           className="h-full rounded-full bg-primary transition-all"

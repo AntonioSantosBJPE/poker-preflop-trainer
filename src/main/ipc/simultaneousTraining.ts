@@ -59,7 +59,7 @@ export function registerSimultaneousTrainingIpc(): void {
           .returning({ id: trainingSessions.id })
           .all();
         const sessionId = inserted[0]?.id;
-        if (!sessionId) throw new Error('Falha ao iniciar sessão simultânea');
+        if (!sessionId) throw new Error('Não foi possível iniciar a sessão. Tente novamente.');
         createdIds.push(sessionId);
       }
       return createdIds;

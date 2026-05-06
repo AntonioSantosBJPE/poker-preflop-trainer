@@ -7,7 +7,7 @@ import {
 } from '@shared/constants';
 import { profileChangePasswordSchema, profileNameSchema } from '@shared/forms/profileSchemas';
 import type { ApiUserPreferences } from '@/env';
-import { PageHeader, SectionCard } from '@/components/app';
+import { PageHeader, SectionCard, StatusMessage } from '@/components/app';
 import { FormField, FormNumberField, FormSelectField, PasswordField } from '@/components/forms';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -243,6 +243,7 @@ export function ProfilePage(): React.ReactElement {
       <SectionCard
         title="Conta"
         description="Atualize o nome da sua conta."
+        className="border-primary/20"
         testId="profile-section-account"
       >
         <form
@@ -264,14 +265,14 @@ export function ProfilePage(): React.ReactElement {
           </div>
 
           {nameErrors.root?.message ? (
-            <p className="text-sm text-destructive" role="alert">
+            <StatusMessage tone="error" className="md:col-span-2">
               {nameErrors.root.message}
-            </p>
+            </StatusMessage>
           ) : null}
           {accountFeedback ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">
+            <StatusMessage tone="success" className="md:col-span-2">
               {accountFeedback}
-            </p>
+            </StatusMessage>
           ) : null}
 
           <div className="md:col-span-2">
@@ -285,6 +286,7 @@ export function ProfilePage(): React.ReactElement {
       <SectionCard
         title="Segurança"
         description="Altere sua senha informando a senha atual."
+        className="border-primary/20"
         testId="profile-section-security"
       >
         <form
@@ -306,14 +308,14 @@ export function ProfilePage(): React.ReactElement {
           />
 
           {passwordErrors.root?.message ? (
-            <p className="text-sm text-destructive" role="alert">
+            <StatusMessage tone="error" className="md:col-span-2">
               {passwordErrors.root.message}
-            </p>
+            </StatusMessage>
           ) : null}
           {passwordFeedback ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">
+            <StatusMessage tone="success" className="md:col-span-2">
               {passwordFeedback}
-            </p>
+            </StatusMessage>
           ) : null}
 
           <div className="md:col-span-2">
@@ -327,6 +329,7 @@ export function ProfilePage(): React.ReactElement {
       <SectionCard
         title="Preferências"
         description="Defaults aplicados automaticamente nos fluxos de treino e tema."
+        className="border-primary/20"
         testId="profile-section-preferences"
       >
         <form
@@ -397,14 +400,14 @@ export function ProfilePage(): React.ReactElement {
           />
 
           {preferencesErrors.root?.message ? (
-            <p className="text-sm text-destructive" role="alert">
+            <StatusMessage tone="error" className="md:col-span-2">
               {preferencesErrors.root.message}
-            </p>
+            </StatusMessage>
           ) : null}
           {preferencesFeedback ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">
+            <StatusMessage tone="success" className="md:col-span-2">
               {preferencesFeedback}
-            </p>
+            </StatusMessage>
           ) : null}
 
           <div className="md:col-span-2">

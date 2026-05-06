@@ -1,19 +1,28 @@
 import type { GroupSummaryDto } from '@shared/ipc/types';
 import { POSITIONS } from '@shared/constants';
-import type { FieldErrors, UseFormRegister } from 'react-hook-form';
+import { Controller, type Control, type FieldErrors, type UseFormRegister } from 'react-hook-form';
 import type { SituationEditorFormValues } from '@shared/forms/situationSchemas';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export interface SituationFormProps {
   register: UseFormRegister<SituationEditorFormValues>;
+  control: Control<SituationEditorFormValues>;
   errors: FieldErrors<SituationEditorFormValues>;
   groups: GroupSummaryDto[];
 }
 
 export function SituationForm({
   register,
+  control,
   errors,
   groups,
 }: SituationFormProps): React.ReactElement {
@@ -34,26 +43,33 @@ export function SituationForm({
       </div>
       <div className="flex flex-col gap-1">
         <Label htmlFor="situation-group">Grupo</Label>
-        <select
-          id="situation-group"
-          className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive"
-          data-testid="situation-group-select"
-          aria-invalid={errors.groupId ? true : undefined}
-          {...register('groupId', {
-            setValueAs: (value) => {
-              if (value === '' || value === undefined || value === null) return 0;
-              const parsed = Number(value);
-              return Number.isNaN(parsed) ? 0 : parsed;
-            },
-          })}
-        >
-          <option value="">Selecione um grupo…</option>
-          {groups.map((group) => (
-            <option key={group.id} value={group.id}>
-              {group.name}
-            </option>
-          ))}
-        </select>
+        <Controller
+          control={control}
+          name="groupId"
+          render={({ field }) => (
+            <Select
+              key={groups.length}
+              value={field.value === 0 ? '' : String(field.value)}
+              onValueChange={(val) => field.onChange(val === '' ? 0 : Number(val))}
+            >
+              <SelectTrigger
+                id="situation-group"
+                data-testid="situation-group-select"
+                className="w-full"
+                aria-invalid={errors.groupId ? true : undefined}
+              >
+                <SelectValue placeholder="Selecione um grupo…" />
+              </SelectTrigger>
+              <SelectContent>
+                {groups.map((group) => (
+                  <SelectItem key={group.id} value={String(group.id)}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
         {errors.groupId && (
           <p className="text-sm text-destructive" role="alert" data-testid="situation-group-error">
             {errors.groupId.message}
@@ -62,17 +78,24 @@ export function SituationForm({
       </div>
       <div className="flex flex-col gap-1">
         <Label htmlFor="situation-position">Posição</Label>
-        <select
-          id="situation-position"
-          className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          {...register('position')}
-        >
-          {POSITIONS.map((position) => (
-            <option key={position} value={position}>
-              {position}
-            </option>
-          ))}
-        </select>
+        <Controller
+          control={control}
+          name="position"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="situation-position" className="w-full">
+                <SelectValue placeholder="Selecione uma posição…" />
+              </SelectTrigger>
+              <SelectContent>
+                {POSITIONS.map((position) => (
+                  <SelectItem key={position} value={position}>
+                    {position}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
       <div className="flex flex-col gap-1">
         <Label htmlFor="situation-stack">Stack efetivo (BB)</Label>
