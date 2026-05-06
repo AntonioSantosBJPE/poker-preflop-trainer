@@ -20,7 +20,7 @@
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:ci": "pnpm build:app && playwright test",
+    "test:e2e:ci": "pnpm build:app && xvfb-run -a playwright test",
     "test:e2e:coverage": "pnpm build:app && playwright test --reporter=html",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
